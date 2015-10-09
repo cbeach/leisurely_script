@@ -1,3 +1,10 @@
 *.sw[pomn]
 
 target/
+/bin/
+
+.cache
+.classpath
+.project
+.settings/
+
