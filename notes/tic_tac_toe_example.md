@@ -4,7 +4,7 @@
 
     from gdl import Game, Board, Player, Piece, End, Move
 
-    tic_tac_toe = Game(name='TicTacToe')
+    TicTacToe = Game(name='TicTacToe')
 
     board = Board(
         size=(3, 3), 
@@ -13,38 +13,38 @@
         tile_shape='square'
     ).graph.do_stuff_if_you_want()
 
-    tic_tac_toe.add(board)
+    TicTacToe.add(board)
 
-    tic_tac_toe.add((
+    TicTacToe.add((
         Player('X'), 
         Player('Y')
     ))
 
-    tic_tac_toe.add(
+    TicTacToe.add(
         Piece(
             name='stone', 
-            players=tic_tac_toe.players.all,
+            players=TicTacToe.players.all,
             moves=(
                 Move(
-                    precondition=tic_tac_toe.board.is_space_empty(dest),
-                    action=tic_tac_toe.board.place_piece(dest)
+                    precondition=TicTacToe.board.tile(dest).empty,
+                    action=TicTacToe.board.place_piece(dest)
                 ),
             )
         ), 
     )
         
-    tic_tac_toe.add((
+    TicTacToe.add((
         End(
             result='win', 
-            player=tic_tac_toe.players.current, 
-            condition=tic_tac_toe.board.n_in_a_row(3, 'indirect', tic_tac_toe.pieces.stone)
+            player=TicTacToe.players.current, 
+            condition=TicTacToe.board.nInARow(3, TicTacToe.pieces.stone)
         ),
         End(
             result='draw', 
-            tic_tac_toe.players.all, 
+            TicTacToe.players.all, 
             condition=!(
-                tic_tac_toe.board.n_in_a_row(3, 'indirect', tic_tac_toe.pieces.stone) 
-                && tic_tac_toe.board.is_full()
+                TicTacToe.board.nInARow(3, TicTacToe.pieces.stone) 
+                && TicTacToe.board.full
                 )
             ),
         ),
@@ -57,16 +57,14 @@
             val dimensions: List[Int]
             val boardShape: Shape
             val tileShape: Shape 
-            val neighborBehavior: Neighbors
+            val neighborBehavior: NeighborType
 
             // Could use an implicit board generator
             private def createBoardGraph(implicit BoardGenerator[T <: Shape]: graph) = {
                 // create graph according to the board shape, dimensions, tile shape, and neighbor behavior.   
             }
             
-            def isEmpty: Boolean = {
-                ... 
-            }
+            def empty: Boolean = { ... }
 
             // Neighbor behavior should be optional. Should use the board's neighborBehavior attribute by default.
             def nInARow(n: Int, piece: Piece): Boolean = {
@@ -80,5 +78,4 @@
         def score(b: Board): Double = { }
         def legalMoves(player: Player): List[MoveAction] = { }
         def apply(board: Board) Try[Board] = { }
-
     }

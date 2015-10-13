@@ -3,28 +3,97 @@
 ## Terms
 oracle: The object that represents the game's rules. Can be queried for information about the game's state. 
 
-### Classes
-#### Game
+## Libraries
+scalaTest
+
+    libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
+
+spray-json
+
+    libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
+
+scala-graph
+
+    libraryDependencies += "com.assembla.scala-incubator" %% "graph-core" % "1.9.4"
+
+
+## Classes and Functions
+
+### Views
+Write views for spray-json to serialize/deserialize games, boards, players, etc.
+
+
+### GameRepository
+Requests a serialized game definition from a repository. Possible sources:
+* GitGames: from a git repo
+* CouchbaseGames, SQLGames, CassandraGames, ElasitcGames, etc.: from a datastore/database
+* GameFile: from the file system 
+* WebGames: from a web-api
+
+- submit(game:Game): Try
+    - Put a game into the repo
+- load(gameID:String): Try
+    - Read a game from the repo
+- update(gameID:String, game:Game): Try
+    - Update an existing game
+- remove(gameID:String)
+
+
+### Game (class)
 - add( ... ): Try[Game]
     - add one or more objects (Board, Player, Piece, etc.)
 - start(interface:Interface): Try[Game]
     - Start playing a game. Returns failure if there's something wrong with the game rules.
+- gameValid(): Boolean
+    - Think of something better than a problem light
+- inputs(): Map[String, Input]
+- legalMoves(player: Player): List[Move]
+    - Iterate through each move for each piece that player owns, returning all moves that return true for pre and post conditions.
+- partialScore(): List[Double]
+- partialScore(player: Player): Double
+- gameResult(): Option[GameResult]
+- applyMove[T1, T2, T3...](input:Input*): Try[Game] 
+    - Each type parameter applies to a different input
+- applyMove(move:Move): Try[Game]
+- history(): List[Game]
+- various getters and setters
+    - board(): Board
 
-// Now that I'm using Scala I probably don't even need this
+// Now that I'm using Scala I probably don't need this stuff until much, much later.
 - process: process all of the objects that have been added to the game and return the game's oracle.
 - transpile(str <target language>): Produces the code for the oracle in the target language
 - compile(str <compiler command>): Compile a static library from the code that was generated with the transpile method, and registers is with the game repo. The library includes python language hooks.
 
 
-##### GameObject
-    This is the top level object.
-- Game(name:String = None): A UUID is generated if name is not specified
+### Game (object)
+Basically a game factory. 
+
+- Game(name:String = None): Game
+    - A UUID is generated if name is not specified
+- Game(repo:GameRepository): Game
+    Fetches a serialized game from the specified repo
 - apply(<game id>): Try[Game]
     - load and import a game oracle from the game repository. The game should be queryable after loading
 
+The lines:
 
-#### Board
-- Board(size: List[Int], boardShape: BoardShape, neighborType: NeighborTypes, tileShape: Shape)
+    val game1 = Game()
+    val game2 = Game("TicTacToe")
+
+Will yield two empty games that the developer can then fill with asset definitions. The first game's name is a UUID, the second game's name is "TicTacToe".
+
+    val gitGame = GitGame(<branch/repo/commit/something>)
+    val webGame = WebGames(<baseURL>).get(<gameID>)
+
+Download a serialized game from the a git repo and the internet respectively.
+
+
+### Board
+Possible graphing libraries
+- scalax.collection.Graph
+
+Class members
+- Board(size: List[Int], boardShape: Shape, neighborType: NeighborTypes, tileShape: Shape)
 
 // Manipulate existing boards while performing AI operations
 - Clone():Board
@@ -36,17 +105,25 @@ oracle: The object that represents the game's rules. Can be queried for informat
     - any(): returns an expression object equivalent to <expr> or <expr> or <expr> ...
     - same(<attribute name>): Eg. n_in_a_row(3, 'indirect', game.pieces.stone).all().same('color') would be equivalent to
         all(map(lambda tile: tile.color == tiles[0].color, tilesh))
-- boardEmpty
-- tile(coords: Int*): BoardNode
+- empty(): Boolean
+- tile(coords: Int*): Try[BoardNode]
+    - Pattern matcing for the win!
+        
+        list match {
+            case _ :: _ :: _ => // 3D board!
+            case _ :: _ => // 2D board!
+            case _ => // The board is a point! That's really boring!
+        }
 
 
-#### BoardNode
+### BoardNode
 - empty:Boolean
 
 
-#### Player
+### Player
     Player(name=null: String)
-    - hands
+    - Future
+    - Hands
         - A player can have multiple "hands"
         - A hand consists of a group of things that are owned by a player.
         - Hands can contain cards, pieces, dice, tokens, etc.
@@ -67,7 +144,8 @@ oracle: The object that represents the game's rules. Can be queried for informat
         'hidden': True,
     }
 
-##### PlayerObjects
+
+#### PlayerObjects
 These objects will probably provide the actual players by getting them from the game object
 - object allPlayers extends Player
 - object currentPlayer
@@ -75,42 +153,61 @@ These objects will probably provide the actual players by getting them from the 
 - object nextPlayer
 
     
-#### Piece
+### Piece
 - val name: String
 - val owner: Player
 - val moves: List[LegalMove]
 
+- legalMoves(player: Player): List[Move]
+
 // Future
 - val attributes: Map[String, Attribute]
 
-#### Input[T <: Double]
+
+### Input[T <: Double]
+How do I get the information from the input to the destination variable?
+    - Callback?
+    - Bind both sides of a variable (reference?) to the input and destination
+    - Automatically create hooks for the input based on the list of legal moves
+    - Make the game object create inputs, and have the interface use them. The developer would not deal with them. (I like this one the most so far)
+- Input[T]()
 - val value: () => T
 
-#### MoveAction
-- push
-- pop
 
-#### LegalMove
+### Move
+- val piece: Piece
+- val player: Player
+- val action: MoveAction
+- val tile: BoardTile
+
+### LegalMove
 - val owner: Player
+- val piece: Piece
 - val precondition: () => Boolean
 - val action: Action
 - val postcondition: () => Boolean
 
-#### EndCondition
+
+### EndCondition
 - val result: GameResult
 - val player: Player
 - val condition: () => Boolean
 
-#### GameResult
+
+### MoveAction
+- Enumeration
+    * push
+    * pop
+
+
+### GameResult
 - Enumeration
     * Win
     * Lose
     * Tie
 
 
-#### Variable
-
-#### Shape
+### Shape
     Enumeration
     * Triagle
     * Square
@@ -118,15 +215,23 @@ These objects will probably provide the actual players by getting them from the 
     * Hexagon
     * Octogon
 
-#### Card
 
-#### Deck
+### NeighborTypes
+    Enumeration
+    * Direct        // Default for most uses
+    * Indirect      // Diagonal
+    * NoDirect      // Implies Indirect is also True in most (all?) cases
 
-#### Dice
+### Card
 
-#### Attribute
+### Deck
 
-#### Interface
+### Dice
+
+### Attribute
+
+### Interface
+- Interface(inputs:List[Input], players:Player)
 
 ## Open questions
 
@@ -150,5 +255,3 @@ How do I handle things that haven't been described yet?
  * Or I could enforce strict ordering when adding game elements
      * This is the way to go
      * Easier for users to understand, and probably less complex too.
-
-
