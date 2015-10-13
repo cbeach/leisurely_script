@@ -47,6 +47,7 @@ Requests a serialized game definition from a repository. Possible sources:
 - gameValid(): Boolean
     - Think of something better than a problem light
 - inputs(): Map[String, Input]
+- currentPlayer(): Player
 - legalMoves(player: Player): List[Move]
     - Iterate through each move for each piece that player owns, returning all moves that return true for pre and post conditions.
 - partialScore(): List[Double]
