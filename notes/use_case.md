@@ -2,7 +2,7 @@
 
 1. Create a game: TicTacToe
     1. Get a blank game object from game()
-    2. Create TicTacToe using the rules provided in tic_tac_toe_example.md
+    2. Create TicTacToe using the rules provided in TicTacToe_example.md
 
 2. Start a game of TicTacToe
     1. Get TicTacToe (imported from repo, or created from scratch)
@@ -11,10 +11,40 @@
         - Interface gets the inputs from the game, binds them to a prompt
         - Input objects handle error conditions
         - Interface contains prompts for the players
-    3. call "tic_tac_toe start"
+    3. call "TicTacToe start"
     4. Get all available moves for player 1
+        naive solution    
+
+        game.legalMoves(game.currentPlayer)
+        // scope: game.legalMoves
+        for (p <- pieces) {
+            p.legalMoves(board)        
+        }
+
+        // scope: Piece.legalMoves
+        for (m <- moves) {
+            for (tile <- board.tiles) {
+                test precondition
+                perform move temporarily
+                test postcondition
+            }
+        }
+
     5. Make player 1's move
-    6. get all available moves for player 2
-    7. Make player 2's move
-    8. If board is not full, go to 3
-    9. Display game results 
+        
+        game.applyMove(move)
+        // scope: game.applyMove
+        for (p <- pieces) {
+            p.legal(move)
+        }
+        // scope: Piece.legal
+        for (m <- moves) {
+            m.legal(move)
+        }
+        // move succeeds if any LegalMove return back legal
+
+    6. check game's state (has the game ended)
+    7. get all available moves for player 2
+    8. Make player 2's move
+    9. If board is not full, go to 3
+    10. Display game results 
