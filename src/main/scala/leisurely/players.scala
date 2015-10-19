@@ -1,1 +1,3 @@
-class Player(name:String = java.util.UUID.randomUUID.toString) {}
+package org.leisurelyscript
+
+class Player(val name:String = java.util.UUID.randomUUID.toString) {}

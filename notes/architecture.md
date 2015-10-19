@@ -94,20 +94,20 @@ Possible graphing libraries
 - scalax.collection.Graph
 
 Class members
-- Board(size: List[Int], boardShape: Shape, neighborType: NeighborTypes, tileShape: Shape)
+- Board(size: List[Int], boardShape: Shape, neighborType: NeighborTypes, nodeShape: Shape)
 
 // Manipulate existing boards while performing AI operations
 - Clone():Board
 - Add(p:Piece, coords:Int*) // Add a piece to a node
 - Remove(coords:Int*) // Remove a piece from a node 
 
-- nInARow(<run length>, <neighbor type> <piece>): returns a custom iterable of board nodes (tiles) that has custom functions for creating expressive logic expressions 
+- nInARow(<run length>, <neighbor type> <piece>): returns a custom iterable of board nodes that has custom functions for creating expressive logic expressions 
     - all(): returns an expression object equivalent to <expr> and <expr> and <expr> ...
     - any(): returns an expression object equivalent to <expr> or <expr> or <expr> ...
     - same(<attribute name>): Eg. n_in_a_row(3, 'indirect', game.pieces.stone).all().same('color') would be equivalent to
-        all(map(lambda tile: tile.color == tiles[0].color, tilesh))
+        all(map(lambda node: node.color == nodes[0].color, node))
 - empty(): Boolean
-- tile(coords: Int*): Try[BoardNode]
+- node(coords: Int*): Try[BoardNode]
     - Pattern matcing for the win!
         
         list match {
@@ -119,11 +119,12 @@ Class members
 
 ### BoardNode
 - empty:Boolean
+- pieces(): List[Piece]
 
 
 ### Player
     Player(name=null: String)
-    - Future
+    Future
     - Hands
         - A player can have multiple "hands"
         - A hand consists of a group of things that are owned by a player.
@@ -158,8 +159,7 @@ These objects will probably provide the actual players by getting them from the 
 - val name: String
 - val owner: Player
 - val moves: List[LegalMove]
-
-- legalMoves(player: Player): List[Move]
+- legalMoves(game:Game)(player: Player): List[Move]
 
 // Future
 - val attributes: Map[String, Attribute]
@@ -175,15 +175,8 @@ How do I get the information from the input to the destination variable?
 - val value: () => T
 
 
-### Move
-- val piece: Piece
-- val player: Player
-- val action: MoveAction
-- val tile: BoardTile
-
 ### LegalMove
 - val owner: Player
-- val piece: Piece
 - val precondition: () => Boolean
 - val action: Action
 - val postcondition: () => Boolean
@@ -223,6 +216,14 @@ How do I get the information from the input to the destination variable?
     * Indirect      // Diagonal
     * NoDirect      // Implies Indirect is also True in most (all?) cases
 
+
+### Move
+- val piece: Piece
+- val player: Player
+- val action: MoveAction
+- val node: BoardNode
+
+
 ### Card
 
 ### Deck
@@ -247,12 +248,36 @@ How about switching to Scala?
  - Cons
    - Slower to develop
    - Don't know it as well
-   - 
 
-How am I going to handle adding arbitrary graphs to the board?
- * Should I treat the graph as a member? or should I wrap it entirely?
 
-How do I handle things that haven't been described yet?
- * Or I could enforce strict ordering when adding game elements
-     * This is the way to go
-     * Easier for users to understand, and probably less complex too.
+### Order of Implementation
+Start at the leaves and work your way up
+
+Game
+    Player
+    Board
+        Node
+    Piece
+        Player
+        LegalMove
+        MoveAction
+    EndConditions
+        Player
+        GameResult
+
+1. Player
+2. Game
+    - Stub with methods for getting players (current, previous, next, all, etc.)
+3. MoveAction
+4. LegalMove
+5. Piece
+6. GameResult
+7. EndConditions
+8. Board
+9. Game
+    - Complete implementation
+10. Move
+11. GameFactory
+12. Input
+13. Interface
+14. GameRepository

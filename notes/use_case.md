@@ -18,12 +18,13 @@
         game.legalMoves(game.currentPlayer)
         // scope: game.legalMoves
         for (p <- pieces) {
-            p.legalMoves(board)        
+            // Need access to the parent game object so temporary moves can be generated
+            p.legalMoves(this)        
         }
 
         // scope: Piece.legalMoves
         for (m <- moves) {
-            for (tile <- board.tiles) {
+            for (node <- game.board.nodes) {
                 test precondition
                 perform move temporarily
                 test postcondition
