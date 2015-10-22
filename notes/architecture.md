@@ -270,6 +270,7 @@ Game
     - Stub with methods for getting players (current, previous, next, all, etc.)
 3. MoveAction
 4. LegalMove
+    - Requirese Game to have an apply method
 5. Piece
 6. GameResult
 7. EndConditions
