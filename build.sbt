@@ -10,5 +10,4 @@ lazy val root = (project in file(".")).
         scalaVersion := "2.11.7",
         libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test",
         libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2",
-        libraryDependencies += "com.assembla.scala-incubator" %% "graph-core" % "1.9.4"
     )

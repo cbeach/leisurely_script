@@ -2,7 +2,8 @@ package org.leisurelyscript
 
 import MoveAction._
 
-case class LegalMove(val owner:Player, val precondition:(Game) => Boolean, action:MoveAction, val postcondition:() => Boolean) {
+
+class LegalMove(val owner:Player, val precondition:(Game) => Boolean, val action:MoveAction, val postcondition:() => Boolean) {
     def legal(game:Game, player:Player, move:Move):Boolean = {
         if (precondition(game) == true) {
             // create a temporary move
@@ -14,4 +15,3 @@ case class LegalMove(val owner:Player, val precondition:(Game) => Boolean, actio
     }
 }
 
-case class Move(val piece:Piece, val player:Player, val action:MoveAction, val tile:BoardNode) {}
