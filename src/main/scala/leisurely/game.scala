@@ -5,13 +5,29 @@ import scala.util.{Try, Success, Failure}
 import GameResult._
 
 
-class Game(val name:String, val players:Players, val board:Board) {
-    def add(playerList:Player*):Game = {
-        Game(this, playerList.toList)
+class Game(val name:String,
+	val players:Players,
+	val board:Board,
+	val pieces:List[Piece],
+	val endConditions:List[EndCondition],
+	val history:List[Game] = List[Game]()) {
+
+    private val privateUUID:String = java.util.UUID.randomUUID.toString
+    def this(game:Game) = {
+        this(game.name, game.players, game.board, game.pieces, game.endConditions, game.history)
     }
 
     def add(board:Board):Game = {
         Game(this, board)
+    }
+
+    def add[T](list:List[T]):Game = { 
+        list match {
+            case (first:Player)::rest => Game(this, list)
+            case (first:Piece)::rest => Game(this, list)
+            case (first:EndCondition)::rest => Game(this, list)
+            case _ => throw(new IllegalArgumentException("Can not add object to game. Invalid type."))
+        }
     }
 
     def gameValid(): Boolean = {
@@ -29,26 +45,40 @@ class Game(val name:String, val players:Players, val board:Board) {
     def partialScore: List[Double] = {
         List[Double]()
     }
+
     def partialScore(player: Player): Double = {
         1.0
     }
+
     def gameResult(): Option[GameResult] = {
         Some(Win)
     }
+
     def applyMove(move:Move): Try[Game] = {
-        Try(new Game(name, players, board))
+        Try(Game(name, players.all, board))
     }
     //def applyMove[T1, T2, T3...](input:Input*): Try[Game] 
     //  - Each type parameter applies to a different input
-    //history(): List[Game]
-    //def applyMove:
 }
 
 object Game {
     def apply(name:String = java.util.UUID.randomUUID.toString, 
               players:List[Player] = null, 
-              board:Board = null):Game = new Game(name, new Players(players), board)
-    def apply(game:Game, players:List[Player]):Game 
-        = new Game(game.name, new Players(players), game.board)
-    def apply(game:Game, board:Board):Game = new Game(game.name, game.players, board)
+              board:Board = null,
+              pieces:List[Piece] = null,
+              endConditions:List[EndCondition] = null
+              ):Game = new Game(name, new Players(players), board, pieces, endConditions)
+    private def apply(game:Game, board:Board):Game 
+        = new Game(game.name, game.players, board, game.pieces, game.endConditions)
+    private def apply[T](game:Game, list:List[T]):Game = {
+        list match {
+            case (pl:Player)::(pls:List[Player]) => 
+                new Game(game.name, new Players(pl::pls), game.board, game.pieces, game.endConditions)
+            case (pi:Piece)::(pis:List[Piece]) => 
+                new Game(game.name, game.players, game.board, pi:: pis, game.endConditions)
+            case (eC:EndCondition)::(eCs:List[EndCondition]) => 
+                new Game(game.name, game.players, game.board, game.pieces, eC::eCs)
+            case _ => throw(new IllegalArgumentException("How did you get in here. You shouldn't be in here..."))
+        }
+    }
 }

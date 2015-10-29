@@ -232,6 +232,10 @@ How do I get the information from the input to the destination variable?
 
 ### Attribute
 
+
+### Equipment
+    Trait that is used by Pieces, Cards, Decks, Dice, etc.
+
 ### Interface
 - Interface(inputs:List[Input], players:Player)
 
@@ -276,10 +280,16 @@ Game
 7. EndConditions
 8. Board
 9. Graph
-10. Game
-    - Complete implementation
-11. Move
+    - Node needs to contain references to its contents
+10. Move
+11. Game
+    - applyMove
+    - gameValid
 12. GameFactory
 13. Input
-14. Interface
-15. GameRepository
+14. Game
+    - inputs
+15. Interface
+16. Game
+    - interface
+17. GameRepository

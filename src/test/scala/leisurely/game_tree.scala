@@ -31,15 +31,23 @@ class GameTree extends FunSuite {
         }
     }
     test("Game.players.all should return all players.") { 
-        val game = Game().add(new Player("Andrew"), new Player("Bill"), new Player("Carol"))
+        val game = Game().add(List(new Player("Andrew"), new Player("Bill"), new Player("Carol")))
         assert(game.players.all.length == 3)
     }
 
     // This could be added later for convenience, but is not critical and should be skipped for now.
     ignore("If the game already has players, then game.add(<players>*) " 
          + "should return a new game with the new players appended") {
-        val game = Game().add(new Player("Andrew"), new Player("Bill")).add(new Player("Carol"))
+        val game = Game().add(List(new Player("Andrew"), new Player("Bill"), new Player("Carol")))
         assert(game.players.all.length == 3)
+    }
+
+    test("You shouldn't be able to add lists of arbitrary types to the game.") {
+        val listOfStrings:List[String] = List("1", "2", "3", "4", "5") 
+        val game = Game() 
+        intercept[IllegalArgumentException] {
+            game.add(listOfStrings)
+        }
     }
 
     test("A 3x3 board should have nine nodes") {
