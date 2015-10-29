@@ -41,4 +41,8 @@ class GameTree extends FunSuite {
         val game = new Game().add(new Player("Andrew"), new Player("Bill")).add(new Player("Carol"))
         assert(game.players.all.length == 3)
     }
+
+    test("The board should be able to create a rectanular graph") {
+
+    }
 }
