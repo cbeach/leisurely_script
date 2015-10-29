@@ -1,7 +1,7 @@
 package org.leisurelyscript
 
 
-class GameResult extends Enumeration {
+object GameResult extends Enumeration {
     type GameResult = Value
     val Win, Lose, Tie = Value
 }

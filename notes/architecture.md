@@ -47,7 +47,7 @@ Requests a serialized game definition from a repository. Possible sources:
 - gameValid(): Boolean
     - Think of something better than a problem light
 - inputs(): Map[String, Input]
-- currentPlayer(): Player
+- player.currentPlayer(): Player
 - legalMoves(player: Player): List[Move]
     - Iterate through each move for each piece that player owns, returning all moves that return true for pre and post conditions.
 - partialScore(): List[Double]
@@ -275,10 +275,11 @@ Game
 6. GameResult
 7. EndConditions
 8. Board
-9. Game
+9. Graph
+10. Game
     - Complete implementation
-10. Move
-11. GameFactory
-12. Input
-13. Interface
-14. GameRepository
+11. Move
+12. GameFactory
+13. Input
+14. Interface
+15. GameRepository

@@ -1,56 +1,54 @@
 package org.leisurelyscript
 
+import scala.util.{Try, Success, Failure}
 
-class Game(val name:String = java.util.UUID.randomUUID.toString) {
-    private var playerList:Players = _
-    private var boardObj:Board = _
-    private def this(game:Game, playerList:List[Player]) = {
-        this(game.name)
-        this.playerList = new Players(playerList)
-    }
+import GameResult._
 
-    private def this(game:Game, board:Board) = {
-        this(game.name)
-        this.boardObj = board
-    }
 
-    class Players(players:List[Player]) {
-        var currentPlayer:Int = 0
-        def all:List[Player] = players
-
-        def previous:Player = {
-            if (currentPlayer != 0) players(currentPlayer - 1) 
-                else players(players.length - 1)
-        }
-
-        def current:Player = players(currentPlayer)
-
-        def next:Player = {
-            if (currentPlayer <= players.length - 1) players(currentPlayer + 1) 
-                else players(0)
-        }
-
-        def endTurn():Unit = {
-            currentPlayer = if (currentPlayer <= players.length - 1) 
-                currentPlayer + 1 else 0
-        }
-        
-        def +(that:List[Player]):Players = {
-            new Players(this.players ::: that)
-        }
-    }
-
-    def players:Players = playerList
-
+class Game(val name:String, val players:Players, val board:Board) {
     def add(playerList:Player*):Game = {
-        new Game(this, playerList.toList)
+        Game(this, playerList.toList)
     }
 
     def add(board:Board):Game = {
-        new Game(this, board)
+        Game(this, board)
     }
 
-    def board:Board = {
-        this.boardObj
+    def gameValid(): Boolean = {
+        true
     }
+
+    def inputs: Map[String, Input] = {
+        Map[String, Input]()
+    }
+
+    def legalMoves: List[Move] = {
+        List[Move]()
+    }
+
+    def partialScore: List[Double] = {
+        List[Double]()
+    }
+    def partialScore(player: Player): Double = {
+        1.0
+    }
+    def gameResult(): Option[GameResult] = {
+        Some(Win)
+    }
+    def applyMove(move:Move): Try[Game] = {
+        Try(new Game(name, players, board))
+    }
+    //def applyMove[T1, T2, T3...](input:Input*): Try[Game] 
+    //  - Each type parameter applies to a different input
+    //history(): List[Game]
+    //def applyMove:
+}
+
+object Game {
+    def apply(name:String = java.util.UUID.randomUUID.toString, 
+              players:List[Player] = null, 
+              board:Board = null):Game = new Game(name, new Players(players), board)
+    def apply(game:Game, players:List[Player]):Game 
+        = new Game(game.name, new Players(players), game.board)
+    def apply(game:Game, board:Board):Game = new Game(game.name, game.players, board)
 }

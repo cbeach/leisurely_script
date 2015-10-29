@@ -1,4 +1,4 @@
 package org.leisurelyscript
 
 
-class Input {}
+class Interface {}

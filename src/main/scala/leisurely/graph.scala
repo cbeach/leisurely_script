@@ -2,12 +2,16 @@ package org.leisurelyscript
 
 
 class Graph {
-    var nodes:List[BoardNode] = List()
+    var nodes:Map[Coordinate, BoardNode] = Map()
     var edges:List[BoardEdge] = List()
+
     def add(node:BoardNode) = {
-        nodes = node :: nodes 
+        nodes += (node.coord -> node)
     }
+
     def add(edge:BoardEdge) = {
         edges = edge :: edges
+        val source = this.nodes(edge.boardNodes._1.coord)
+        source.edges = edge :: source.edges
     }
 }

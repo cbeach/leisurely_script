@@ -5,20 +5,8 @@ import NeighborType._
 import Shape._
 
 
-class Board() {
+class Board(val size:List[Int], val boardShape:Shape, val neighborType:NeighborType, val nodeShape:Shape) {
     val graph:Graph = new Graph()
-    var size:List[Int] = List()
-    var boardShape:Shape = Square
-    var neighborType:NeighborType = Direct
-    var nodeShape:Shape = Square
-
-    def this(size:List[Int], boardShape:Shape, neighborType:NeighborType, nodeShape:Shape) {
-        this()
-        this.size = size
-        this.boardShape = boardShape
-        this.neighborType = neighborType
-        this.nodeShape = nodeShape
-    }
 
     def nodes() = {
         graph.nodes
@@ -30,34 +18,70 @@ class Board() {
     }
 
     def generateNodes() = {
-        for (i <- 0 to size(0)) {
-            for (j <- 0 to size(1)) {
+        for (i <- 0 until size(0)) {
+            for (j <- 0 until size(1)) {
                 graph.add(BoardNode(Coordinate(i, j)))
             }
         }
     }
 
     def generateEdges() = {
-        for (i <- 0 to size(0)) {
-            for (j <- 0 to size(1)) {
+        for (i <- 0 until size(0)) {
+            for (j <- 0 until size(1)) {
                 if (neighborType != NoDirect) {
-                    // Horizontal (Left to right for digraphs)
-                    if (i == 0 || i % size(0) != 2) {
-                        graph.add(BoardEdge((graph.nodes(i), graph.nodes(i + 1)), N))
-                        graph.add(BoardEdge((graph.nodes(i + 1), graph.nodes(i)), S))
+                    // N
+                    if (j > 0) {
+                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i, j - 1))) , N))
                     }
 
-                    // Vertical (Top to bottom for digraphs)
-                    if (i < size(0) * (size(1) - 1)) {
-                        graph.add(BoardEdge((graph.nodes(i + size(0)), graph.nodes(i)) , N))
-                        graph.add(BoardEdge((graph.nodes(i), graph.nodes(i + size(0))), S))
+                    // S
+                    if (j < size(1) - 1) {
+                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i, j + 1))), S))
+                    }
+
+                    // E
+                    if (i > 0) {
+                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j))), E))
+                    }
+
+                    // W
+                    if (i < size(0) - 1) {
+                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j))), W))
                     }
                 }
 
                 if (neighborType == Indirect) {
-                    // Diagonal edges
+                    // NE
+                    if (i > 0 && j > 0) { 
+                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j - 1))), NE))
+                    }
+
+                    // NW
+                    if (i < size(0) - 1 && j > 0) { 
+                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j - 1))), NW))
+                    }
+                    
+                    // SE
+                    if (i > 0 && j < size(1) - 1) { 
+                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j + 1))) , SE))
+                    }
+                    
+                    // SW
+                    if (i < size(0) - 1 && j < size(1) - 1) { 
+                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j + 1))), SW))
+                    }
                 }
             }
         }
     }
 }
+
+
+object Board {
+    def apply(size:List[Int], boardShape:Shape, neighborType:NeighborType, nodeShape:Shape):Board = {
+        val board = new Board(size, boardShape, neighborType, nodeShape)
+        board.generateGraph()
+        board
+    }
+}
+
