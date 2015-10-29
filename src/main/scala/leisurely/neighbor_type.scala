@@ -1,7 +1,7 @@
 package org.leisurelyscript
 
 
-class NeighborTypes extends Enumeration {
-    type NeighborTypes = Value
+object NeighborType extends Enumeration {
+    type NeighborType = Value
     val Direct, Indirect, NoDirect = Value
 }

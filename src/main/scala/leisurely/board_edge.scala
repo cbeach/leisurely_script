@@ -1,8 +1,5 @@
 package org.leisurelyscript
 
-import scalax.collection.Graph // or scalax.collection.mutable.Graph
-import scalax.collection.GraphPredef._
-import scalax.collection.GraphEdge._
+import Direction._
 
-
-case class BoardEdge(boardNodes:Product, val edgeLabel:String) {}
+case class BoardEdge(boardNodes:Product, direction:Direction) {}

@@ -1,3 +1,5 @@
 package org.leisurelyscript
 
-case class BoardNode(x:Int, y:Int) {}
+case class BoardNode(coord:Coordinate) {
+    var edges:List[BoardEdge] = List()
+}
