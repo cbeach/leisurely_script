@@ -1,12 +1,21 @@
 package org.leisurelyscript
 
+import scala.util.{Try, Success, Failure}
+
 import Direction._
 import NeighborType._
 import Shape._
 
 
-class Board(val size:List[Int], val boardShape:Shape, val neighborType:NeighborType, val nodeShape:Shape) {
-    val graph:Graph = new Graph()
+class Board(val size:List[Int], 
+    val boardShape:Shape, 
+    val neighborType:NeighborType, 
+    val nodeShape:Shape,
+    val graph:Graph = new Graph()) extends Equipment {
+
+    def this(other:Board) = {
+        this(other.size, other.boardShape, other.neighborType, other.nodeShape, new Graph(other.graph))
+    }
 
     def nodes() = {
         graph.nodes
@@ -72,6 +81,46 @@ class Board(val size:List[Int], val boardShape:Shape, val neighborType:NeighborT
                     }
                 }
             }
+        }
+    }
+
+    /** 
+     * Is the board empty?
+     *
+     * @return Boolean  true if there are no pieces on the board, false if there are
+     */
+    def empty(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
+        for (node <- graph.nodes) {
+            if (node._2.empty(truthFunction) == false) {
+                return false
+            }
+        }
+        true
+    }
+
+    /** 
+     * Is the board full?
+     *
+     * @return Boolean  true if there are no more empty nodes on the board, false if there are
+     */
+    def full(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
+        for (node <- graph.nodes) {
+            if (node._2.empty(truthFunction) == true) {
+                return false
+            }
+        }
+        true
+    }
+
+    def place(thing:Equipment, coord:Coordinate):Try[Board] = {
+        val newBoard = new Board(this)
+        val node = Try(newBoard.graph.nodes(coord))
+        node match {
+            case Success(node:BoardNode) => {
+                node.equipment = thing :: node.equipment
+                Success(newBoard)
+            }
+            case Failure(exception) => Failure(exception)
         }
     }
 }

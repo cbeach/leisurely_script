@@ -92,6 +92,10 @@ Download a serialized game from the a git repo and the internet respectively.
 ### Board
 Possible graphing libraries
 - scalax.collection.Graph
+    - Nope nope nope nope. Literally crashed the scala compiler :/
+
+- Looks like I'm rolling my own :(
+
 
 Class members
 - Board(size: List[Int], boardShape: Shape, neighborType: NeighborTypes, nodeShape: Shape)
@@ -101,20 +105,14 @@ Class members
 - Add(p:Piece, coords:Int*) // Add a piece to a node
 - Remove(coords:Int*) // Remove a piece from a node 
 
-- nInARow(<run length>, <neighbor type> <piece>): returns a custom iterable of board nodes that has custom functions for creating expressive logic expressions 
+- nInARow(<run length>:Int, <neighbor type>:NeighborType=null, <piece>:Piece=null): returns a custom iterable of board nodes that has methods for creating expressive logic expressions 
+    - Note: Starting out with the assumtion that we want n in a row from the same player.
     - all(): returns an expression object equivalent to <expr> and <expr> and <expr> ...
     - any(): returns an expression object equivalent to <expr> or <expr> or <expr> ...
-    - same(<attribute name>): Eg. n_in_a_row(3, 'indirect', game.pieces.stone).all().same('color') would be equivalent to
-        all(map(lambda node: node.color == nodes[0].color, node))
-- empty(): Boolean
-- node(coords: Int*): Try[BoardNode]
-    - Pattern matcing for the win!
-        
-        list match {
-            case _ :: _ :: _ => // 3D board!
-            case _ :: _ => // 2D board!
-            case _ => // The board is a point! That's really boring!
-        }
+    - same(<attribute name>): Eg. n_in_a_row(3, 'indirect', game.pieces.stone).all().same(Owner) would be equivalent to
+        all(map(lambda node: node.piece.owner == nodes[0].owner, node))
+- empty():Boolean
+- full():Boolean
 
 
 ### BoardNode

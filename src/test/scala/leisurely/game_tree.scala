@@ -91,4 +91,31 @@ class GameTree extends FunSuite {
         val board = Board(List(4, 4), Square, Direct, Square) 
         assert(board.graph.edges.length == 48)
     }
+
+    test("A new board should be empty") {
+        import Shape._
+        import NeighborType._
+        val board = Board(List(4, 4), Square, Direct, Square) 
+        assert(board.empty())
+    }
+
+    test("The user can place a piece on the board") {
+        import Shape._
+        import NeighborType._
+        val board = Board(List(3, 3), Square, Direct, Square) 
+        val piece = new Piece("token", new Player("1"), List[LegalMove]())
+        board.place(piece, Coordinate(0, 0))
+
+        assert(!board.empty() && !board.full())
+    }
+
+    test("Board.full should return true when called on a full board") {
+        import Shape._
+        import NeighborType._
+        val board = Board(List(3, 3), Square, Direct, Square) 
+        for (node <- board.graph.nodes) {
+            board.place(new Piece("token", new Player("1"), List[LegalMove]()), node._1)
+        }
+        assert(board.full())
+    }
 }

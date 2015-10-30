@@ -1,7 +1,7 @@
 package org.leisurelyscript
 
 
-class Piece(val name:String, val owner:Player, val moves:List[LegalMove]) {
+class Piece(val name:String, val owner:Player, val moves:List[LegalMove]) extends Equipment {
     def legalMoves(game:Game, player:Player): List[Move] = {
         var moveList:List[Move] = List()
         for (move <- moves) {
