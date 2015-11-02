@@ -123,6 +123,10 @@ class Board(val size:List[Int],
             case Failure(exception) => Failure(exception)
         }
     }
+
+    def nInARow(n:Int, neighborType:NeighborType=null, piece:Piece=null):Option[Player] = {
+                 
+    }
 }
 
 

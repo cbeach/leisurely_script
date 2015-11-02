@@ -118,4 +118,11 @@ class GameTree extends FunSuite {
         }
         assert(board.full())
     }
+
+    test("Board.nInARow should detect rows that are 3 long") {
+        import Shape._
+        import NeighborType._
+        val board = Board(List(3, 3), Square, Direct, Square) 
+        board.nInARow(nARow(3, piece))
+    }
 }
