@@ -103,7 +103,6 @@ Class members
 // Manipulate existing boards while performing AI operations
 - Clone():Board
 - Add(p:Piece, coords:Int*) // Add a piece to a node
-- Remove(coords:Int*) // Remove a piece from a node 
 
 - nInARow(<run length>:Int, <neighbor type>:NeighborType=null, <piece>:Piece=null): returns a custom iterable of board nodes that has methods for creating expressive logic expressions 
     - Note: Starting out with the assumtion that we want n in a row from the same player.
@@ -113,6 +112,9 @@ Class members
         all(map(lambda node: node.piece.owner == nodes[0].owner, node))
 - empty():Boolean
 - full():Boolean
+
+// Future
+- Remove(coords:Int*) // Remove a piece from a node 
 
 
 ### BoardNode

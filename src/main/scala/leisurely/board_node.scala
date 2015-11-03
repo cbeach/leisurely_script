@@ -11,4 +11,12 @@ case class BoardNode(coord:Coordinate,
             return truthFunction(this)
         }
     }
+
+    def numberOfPieces(pieceCounter:(BoardNode)=>Int=null) = {
+        if (pieceCounter == null) {
+            equipment.size
+        } else {
+            pieceCounter(this)
+        }
+    }
 }

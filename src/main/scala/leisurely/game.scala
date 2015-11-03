@@ -3,6 +3,7 @@ package org.leisurelyscript
 import scala.util.{Try, Success, Failure}
 
 import GameResult._
+import MoveAction._
 
 
 class Game(val name:String,
@@ -55,10 +56,17 @@ class Game(val name:String,
     }
 
     def applyMove(move:Move): Try[Game] = {
-        Try(Game(name, players.all, board))
+        move.action match {
+            case Push => board.place(move.piece, move.node.coord) match {
+                case Success(newBoard) => Try(Game(name, players.all, newBoard))
+                case Failure(ex) => Failure(ex)
+            }
+            case Pop => board.pop(move.node.coord) match {
+                case Success(newBoard) => Try(Game(name, players.all, newBoard))
+                case Failure(ex) => Failure(ex)
+            }
+        }
     }
-    //def applyMove[T1, T2, T3...](input:Input*): Try[Game] 
-    //  - Each type parameter applies to a different input
 }
 
 object Game {

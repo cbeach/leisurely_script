@@ -1,6 +1,11 @@
 package org.leisurelyscript
 
+import scala.util.{Try, Success, Failure}
+
 import org.scalatest.FunSuite
+
+import MoveAction._
+import Direction._
 
 
 class GameTree extends FunSuite {
@@ -57,11 +62,27 @@ class GameTree extends FunSuite {
         assert(board.nodes.size == 9)
     }
 
-    test("A 3x3 board with indirect neighbors should have 40 edges") {
+    test("A 3x3 board with indirect neighbors should have 40 well formed edges") {
         import Shape._
         import NeighborType._
         val board = Board(List(3, 3), Square, Indirect, Square) 
         assert(board.graph.edges.length == 40)
+        val edges = board.graph.nodes(Coordinate(0, 0)).edges
+        edges.foreach(e => e.direction match {
+            case S => if (!(e.boardNodes._1.coord.x == 0 && e.boardNodes._1.coord.y == 0 
+                   && e.boardNodes._2.coord.x == 0 && e.boardNodes._2.coord.y == 1)) {
+                       fail 
+                   }
+           case W => if (!(e.boardNodes._1.coord.x == 0 && e.boardNodes._1.coord.y == 0 
+                     && e.boardNodes._2.coord.x == 1 && e.boardNodes._2.coord.y == 0)) {
+                         fail
+                     }
+           case SW => if (!(e.boardNodes._1.coord.x == 0 && e.boardNodes._1.coord.y == 0 
+                      && e.boardNodes._2.coord.x == 1 && e.boardNodes._2.coord.y == 1)) {
+                          fail
+                      }
+            case _ => fail
+        })
     }
 
     test("Node (0, 0) on a 3x3 board with indirect neighbors should have 3 edges") {
@@ -124,24 +145,54 @@ class GameTree extends FunSuite {
         import NeighborType._
         val player = new Player("1")
         val piece = new Piece("token", player, List[LegalMove]())
-        val horizontalBoard = Board(List(3, 3), Square, Direct, Square)
+        val horizontalBoard = Board(List(3, 3), Square, Indirect, Square)
             .place(piece, Coordinate(0, 0))
             .flatMap(b => b.place(piece, Coordinate(0, 1)))
             .flatMap(b => b.place(piece, Coordinate(0, 2))) getOrElse fail
-        val verticalBoard = Board(List(3, 3), Square, Direct, Square)
+        val verticalBoard = Board(List(3, 3), Square, Indirect, Square)
             .place(piece, Coordinate(0, 0))
             .flatMap(b => b.place(piece, Coordinate(1, 0)))
             .flatMap(b => b.place(piece, Coordinate(2, 0))) getOrElse fail
-        val diagonalBoard = Board(List(3, 3), Square, Direct, Square)
+        val diagonalBoard = Board(List(3, 3), Square, Indirect, Square)
             .place(piece, Coordinate(0, 0))
             .flatMap(b => b.place(piece, Coordinate(1, 1)))
             .flatMap(b => b.place(piece, Coordinate(2, 2))) getOrElse fail
-        val emptyBoard = Board(List(3, 3), Square, Direct, Square) 
+        val cornerBoard = Board(List(3, 3), Square, Indirect, Square)
+            .place(piece, Coordinate(0, 0))
+            //.flatMap(b => b.place(piece, Coordinate(1, 1)))
+            .flatMap(b => b.place(piece, Coordinate(2, 2))) getOrElse fail
+        val emptyBoard = Board(List(3, 3), Square, Indirect, Square) 
 
-        assert(horizontalBoard.nInARow(3, piece).size > 0 
-            && verticalBoard.nInARow(3, piece).size > 0 
-            && diagonalBoard.nInARow(3, piece).size > 0 
-            && emptyBoard.nInARow(3, piece).size == 0)
+        assert(horizontalBoard.nInARow(3, piece).size > 0 )
+        assert(verticalBoard.nInARow(3, piece).size > 0 )
+        assert(diagonalBoard.nInARow(3, piece).size > 0 )
+        assert(cornerBoard.nInARow(3, piece).size == 0 )
+        assert(emptyBoard.nInARow(3, piece).size == 0)
+    }
+
+    test("A user should be able to get the number of pieces that occupy a board") {
+        import Shape._
+        import NeighborType._
+        val player = new Player("1")
+        val piece = new Piece("token", player, List[LegalMove]())
+        val board = Board(List(3, 3), Square, Indirect, Square) 
+            .place(piece, Coordinate(0, 0))
+            .flatMap(b => b.place(piece, Coordinate(0, 1)))
+            .flatMap(b => b.place(piece, Coordinate(0, 2))) getOrElse fail
+        assert(board.numberOfPieces() == 3)
+    }
+
+    test("Performing a place move should return a new game with a board that has 1 piece in it") {
+        import Shape._
+        import NeighborType._
+        val board = Board(List(3, 3), Square, Indirect, Square) 
+        val player = new Player("1")
+        val piece = new Piece("token", player, List[LegalMove]())
+        val game = Game(board=board) 
+        assert(game.applyMove(new Move(piece, player, Push, game.board.graph.nodes(Coordinate(0, 1)))) match {
+            case Success(newGame) => newGame.board.numberOfPieces() == 1
+            case Failure(_) => fail
+        })
     }
 
     ignore("Edge directions must be unique per node. (can't have two North edges on one node)") {
