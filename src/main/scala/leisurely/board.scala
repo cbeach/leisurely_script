@@ -1,6 +1,7 @@
 package org.leisurelyscript
 
 import scala.util.{Try, Success, Failure}
+import scala.util.control.Breaks._
 
 import Direction._
 import NeighborType._
@@ -124,8 +125,37 @@ class Board(val size:List[Int],
         }
     }
 
-    def nInARow(n:Int, neighborType:NeighborType=null, piece:Piece=null):Option[Player] = {
-                 
+    def nInARow(n:Int, piece:Piece, neighborType:NeighborType=null):Set[Player] = {
+        def recursiveWalk(x:Int, n:Int, e:BoardEdge, piece:Piece):Boolean = {
+            val thisNode = e.boardNodes._1
+            val matchingPieces = thisNode.equipment.filter(eq => {
+                eq match {
+                    case p:Piece => piece.name == p.name && piece.owner == p.owner
+                    case _ => false
+                }
+            })
+
+            val edges = thisNode.edges.filter(edge => e.direction == edge.direction)
+
+            if (matchingPieces.length == 0 
+            || (x != n && edges.length == 0)) {
+                false
+            } else if (x != n) {
+                (for (e <- edges) yield recurse(x + 1, n, e, piece)).exists(x => x)
+            } else {
+                true
+            }
+        }
+
+        var players:Set[Player] = Set()
+        for (node <- graph.nodes) {
+            for (edge <- node._2.edges) {
+                if (recursiveWalk(0, n, edge, piece)) {
+                    players += piece.owner
+                }
+            }
+        }
+        return players
     }
 }
 

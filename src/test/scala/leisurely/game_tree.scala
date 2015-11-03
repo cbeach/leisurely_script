@@ -122,7 +122,29 @@ class GameTree extends FunSuite {
     test("Board.nInARow should detect rows that are 3 long") {
         import Shape._
         import NeighborType._
-        val board = Board(List(3, 3), Square, Direct, Square) 
-        board.nInARow(nARow(3, piece))
+        val player = new Player("1")
+        val piece = new Piece("token", player, List[LegalMove]())
+        val horizontalBoard = Board(List(3, 3), Square, Direct, Square)
+            .place(piece, Coordinate(0, 0))
+            .flatMap(b => b.place(piece, Coordinate(0, 1)))
+            .flatMap(b => b.place(piece, Coordinate(0, 2))) getOrElse fail
+        val verticalBoard = Board(List(3, 3), Square, Direct, Square)
+            .place(piece, Coordinate(0, 0))
+            .flatMap(b => b.place(piece, Coordinate(1, 0)))
+            .flatMap(b => b.place(piece, Coordinate(2, 0))) getOrElse fail
+        val diagonalBoard = Board(List(3, 3), Square, Direct, Square)
+            .place(piece, Coordinate(0, 0))
+            .flatMap(b => b.place(piece, Coordinate(1, 1)))
+            .flatMap(b => b.place(piece, Coordinate(2, 2))) getOrElse fail
+        val emptyBoard = Board(List(3, 3), Square, Direct, Square) 
+
+        assert(horizontalBoard.nInARow(3, piece).size > 0 
+            && verticalBoard.nInARow(3, piece).size > 0 
+            && diagonalBoard.nInARow(3, piece).size > 0 
+            && emptyBoard.nInARow(3, piece).size == 0)
+    }
+
+    ignore("Edge directions must be unique per node. (can't have two North edges on one node)") {
+
     }
 }
