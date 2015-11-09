@@ -27,7 +27,7 @@ class Game(val name:String,
             case (first:Player)::rest => Game(this, list)
             case (first:Piece)::rest => Game(this, list)
             case (first:EndCondition)::rest => Game(this, list)
-            case _ => throw(new IllegalArgumentException("Can not add object to game. Invalid type."))
+            case _ => throw(new IllegalGameAttributeException("Can not add object to game. Invalid type."))
         }
     }
 
@@ -55,17 +55,48 @@ class Game(val name:String,
         Some(Win)
     }
 
-    def applyMove(move:Move): Try[Game] = {
+    def nonValidatedApplyMove(move:Move):Try[Game] = {
         move.action match {
-            case Push => board.place(move.piece, move.node.coord) match {
-                case Success(newBoard) => Try(Game(name, players.all, newBoard))
-                case Failure(ex) => Failure(ex)
+            case Push => board.push(move.piece, move.node.coord) match {
+                case Success(newBoard) => {
+                    Try(new Game(name, players, newBoard, pieces, endConditions, history))
+                } 
+                case Failure(ex) => Failure(ex) 
             }
             case Pop => board.pop(move.node.coord) match {
-                case Success(newBoard) => Try(Game(name, players.all, newBoard))
+                case Success(newBoard) => {
+                    Try(new Game(name, players, newBoard, pieces, endConditions, history))
+                }
                 case Failure(ex) => Failure(ex)
             }
         }
+    }
+
+    def applyMove(move:Move): Try[Game] = {
+        move.action match {
+            case Push => board.push(move.piece, move.node.coord) match {
+                case Success(newBoard) => {
+                    Try(new Game(name, players, newBoard, pieces, endConditions, history))
+                } 
+                case Failure(ex) => Failure(ex) 
+            }
+            case Pop => board.pop(move.node.coord) match {
+                case Success(newBoard) => {
+                    Try(new Game(name, players, newBoard, pieces, endConditions, history))
+                }
+                case Failure(ex) => Failure(ex)
+            }
+        }
+    }
+
+    def isMoveLegal(move:Move):Boolean = {
+        for (piece <- pieces) {
+            println(piece.name)
+            if (piece.isMoveLegal(this, move)) {
+                return true
+            }
+        }
+        false
     }
 }
 
@@ -86,7 +117,7 @@ object Game {
                 new Game(game.name, game.players, game.board, pi:: pis, game.endConditions)
             case (eC:EndCondition)::(eCs:List[EndCondition]) => 
                 new Game(game.name, game.players, game.board, game.pieces, eC::eCs)
-            case _ => throw(new IllegalArgumentException("How did you get in here. You shouldn't be in here..."))
+            case _ => throw(new IllegalGameAttributeException("How did you get in here. You shouldn't be in here..."))
         }
     }
 }

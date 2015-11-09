@@ -122,29 +122,12 @@ class Board(val size:List[Int],
         }).reduce(_+_)
     }
 
-    def place(thing:Equipment, coord:Coordinate):Try[Board] = {
-        val newBoard = new Board(this)
-        val node = Try(newBoard.graph.nodes(coord))
-        node match {
-            case Success(node:BoardNode) => {
-                node.equipment = thing :: node.equipment
-                Success(newBoard)
-            }
-            case Failure(exception) => Failure(exception)
-        }
+    def push(thing:Equipment, coord:Coordinate):Try[Board] = {
+        Try(new Board(size, boardShape, neighborType, nodeShape, graph.push(thing, coord).get))
     }
 
     def pop(coord:Coordinate):Try[Board] = {
-        val newBoard = new Board(this)
-        val node = Try(newBoard.graph.nodes(coord))
-        node match {
-            case Success(node:BoardNode) => Try(node.equipment = node.equipment.tail) match {
-                case Success(_) => Success(newBoard)
-                case Failure(_) => Failure(new Exception(s"Could not pop piece off of node ${coord})"))
-            }
-            case Failure(exception) => Failure(exception)
-        }
-        
+        Try(new Board(size, boardShape, neighborType, nodeShape, graph.pop(coord).get))
     }
 
     def nInARow(n:Int, piece:Piece, neighborType:NeighborType=null):Set[Player] = {
@@ -160,24 +143,15 @@ class Board(val size:List[Int],
                 case null => thisNode.edges
                 case _ => thisNode.edges.filter(edge => direction == edge.direction)
             }
-            println(s"x:${x}")
-            thisNode.edges.foreach(e => println(s"(${e.boardNodes._1.coord.x}, ${e.boardNodes._1.coord.y}) -> (${e.boardNodes._2.coord.x}, ${e.boardNodes._2.coord.y}): ${e.direction}"))
-            println()
-            //println(s"${"\t" * x}x:${x}, n:${n}, coord:(${thisNode.coord.x}, ${thisNode.coord.y}), dir:${direction} edges:${thisNode.edges.size}, ${edges.size}")
 
             if (matchingPieces.length == 0 
             || (x != n - 1 && edges.length == 0)) {
-                println(s"${"\t" * x}false: matchingPieces:${matchingPieces.length} x:${x} == n:${n} edges.length:${edges.length}")
                 false
             } else if (x != n - 1) {
-                val temp = (for (e <- edges) yield recursiveWalk(x + 1, n, e.boardNodes._2, piece, e.direction))
-                println(s"${"\t" * x}recurse: ${temp}")
-                temp.exists(x => x == true)
+                (for (e <- edges) yield recursiveWalk(x + 1, n, e.nodes._2, piece, e.direction)).exists(x => x == true)
             } else if (x == n - 1 && matchingPieces.length > 0) {
-                println(s"${"\t" * x}true")
                 true
             } else {
-                println("Default false")
                 false
             }
         }
