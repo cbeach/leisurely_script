@@ -50,6 +50,7 @@ Requests a serialized game definition from a repository. Possible sources:
 - player.currentPlayer(): Player
 - legalMoves(player: Player): List[Move]
     - Iterate through each move for each piece that player owns, returning all moves that return true for pre and post conditions.
+- isMoveLegal(move:Move): Boolean
 - partialScore(): List[Double]
 - partialScore(player: Player): Double
 - gameResult(): Option[GameResult]
@@ -284,7 +285,6 @@ Game
 10. Move
 11. Game
     - applyMove
-    - gameValid
 12. GameFactory
 13. Input
 14. Game

@@ -73,25 +73,28 @@ class Game(val name:String,
     }
 
     def applyMove(move:Move): Try[Game] = {
-        move.action match {
-            case Push => board.push(move.piece, move.node.coord) match {
-                case Success(newBoard) => {
-                    Try(new Game(name, players, newBoard, pieces, endConditions, history))
-                } 
-                case Failure(ex) => Failure(ex) 
-            }
-            case Pop => board.pop(move.node.coord) match {
-                case Success(newBoard) => {
-                    Try(new Game(name, players, newBoard, pieces, endConditions, history))
+        if (isMoveLegal(move)) {
+            move.action match {
+                case Push => board.push(move.piece, move.node.coord) match {
+                    case Success(newBoard) => {
+                        Try(new Game(name, players, newBoard, pieces, endConditions, history))
+                    } 
+                    case Failure(ex) => Failure(ex) 
                 }
-                case Failure(ex) => Failure(ex)
+                case Pop => board.pop(move.node.coord) match {
+                    case Success(newBoard) => {
+                        Try(new Game(name, players, newBoard, pieces, endConditions, history))
+                    }
+                    case Failure(ex) => Failure(ex)
+                }
             }
+        } else {
+            Failure(new IllegalMoveException())
         }
     }
 
     def isMoveLegal(move:Move):Boolean = {
         for (piece <- pieces) {
-            println(piece.name)
             if (piece.isMoveLegal(this, move)) {
                 return true
             }

@@ -198,11 +198,13 @@ class GameTree extends FunSuite {
         import NeighborType._
         val board = Board(List(3, 3), Square, Indirect, Square) 
         val player = new Player("1")
-        val piece = new Piece("token", player, List[LegalMove]())
-        val game = Game(board=board) 
+        val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
+        val legalMove = new LegalMove(player, precondition, Push)
+        val piece = new Piece("token", player, List(legalMove))
+        val game = Game(pieces=List(piece), board=board) 
         assert(game.applyMove(new Move(piece, player, Push, game.board.graph.nodes(Coordinate(0, 1)))) match {
             case Success(newGame) => newGame.board.numberOfPieces() == 1
-            case Failure(_) => fail
+            case Failure(ex) => throw(ex)
         })
     }
 
@@ -234,10 +236,14 @@ class GameTree extends FunSuite {
         import NeighborType._
         val board = Board(List(3, 3), Square, Indirect, Square) 
         val player = new Player("1")
-        val piece = new Piece("token", player, List[LegalMove]())
-        val game = Game(board=board) 
-        val firstMove = game.applyMove(new Move(piece, player, Push, game.board.graph.nodes(Coordinate(0, 1))))
-            .getOrElse(fail)
+        val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
+        val legalMove = new LegalMove(player, precondition, Push)
+        val piece = new Piece("token", player, List(legalMove))
+        val game = Game(board=board, pieces=List(piece))
+        val firstMove = game.applyMove(new Move(piece, player, Push, game.board.graph.nodes(Coordinate(0, 1)))) match {
+            case Success(newGame) => newGame
+            case Failure(ex) => throw(ex)
+        }
         assert(game.board.graph.nodes(Coordinate(0, 1)).equipment.size == 0)
     }
 
@@ -259,14 +265,48 @@ class GameTree extends FunSuite {
        
         assert(precondition(game, move))
         assert(game.isMoveLegal(move))
-        assert(firstMove.isMoveLegal(move))
+        assert(!firstMove.isMoveLegal(move))
     }
 
-    ignore("The game should only allow legal moves to be applied") {
-          
+    test("game.isMoveLegal should return true if a move is legal, false otherwise") {
+        import Shape._
+        import NeighborType._
+        val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
+        val board = Board(List(3, 3), Square, Indirect, Square) 
+        val player = new Player("1")
+        val legalMove = new LegalMove(player, precondition, Push)
+        val piece = new Piece("token", player, List[LegalMove](legalMove))
+        val move = new Move(piece, player, Push, board.graph.nodes(Coordinate(0, 0)))
+
+        val game = Game().add(board).add(List(piece))
+        assert(game.isMoveLegal(move))
+
+        val firstMove:Game = game.applyMove(move).get
+        assert(!firstMove.isMoveLegal(move))
+    }
+
+    test("The game should only allow legal moves to be applied") {
+        import Shape._
+        import NeighborType._
+        val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
+        val board = Board(List(3, 3), Square, Indirect, Square) 
+        val player = new Player("1")
+        val legalMove = new LegalMove(player, precondition, Push)
+        val piece = new Piece("token", player, List[LegalMove](legalMove))
+        val move = new Move(piece, player, Push, board.graph.nodes(Coordinate(0, 0)))
+
+        val game = Game().add(board).add(List(piece))
+        assert(game.isMoveLegal(move))
+
+        val firstMove:Game = game.applyMove(move).get
+        assert(!firstMove.isMoveLegal(move))
+        firstMove.applyMove(move) match {
+            case Failure(_:IllegalMoveException) => {}
+            case _ => fail
+        }
     }
 
     ignore("The game should recognize when an end condition has been met.") {
-
+        
     }
 }

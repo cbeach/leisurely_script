@@ -7,11 +7,20 @@ class Piece(val name:String, val owner:Player, val moves:List[LegalMove]) extend
         for (move <- moves) {
             for (node <- game.board.nodes) {
                 val newMove = Move(this, player, move.action, node._2)
-                if (move.legal(game, player, newMove)) {
+                if (move.legal(game, newMove)) {
                     moveList = newMove :: moveList
                 }
             }
         }
         moveList
+    }
+
+    def isMoveLegal(game:Game, move:Move):Boolean = {
+        for (legalMove <- moves) {
+            if (legalMove.legal(game, move)) {
+                return true
+            }
+        }
+        false
     }
 }

@@ -3,12 +3,19 @@ package org.leisurelyscript
 import MoveAction._
 
 
-class LegalMove(val owner:Player, val precondition:(Game) => Boolean, val action:MoveAction, val postcondition:() => Boolean) {
-    def legal(game:Game, player:Player, move:Move):Boolean = {
-        if (precondition(game) == true) {
-            // create a temporary move
-            // test postcondition
-            true
+class LegalMove(val owner:Player, 
+    val precondition:(Game, Move)=>Boolean=(game:Game, move:Move)=>true, 
+    val action:MoveAction, 
+    val postcondition:(Game, Move)=>Boolean=null) {
+
+    def legal(game:Game, move:Move):Boolean = {
+        if (precondition(game, move)) {
+            if (postcondition == null) {
+                true
+            } else {
+                game.nonValidatedApplyMove(move)
+                postcondition(game, move)
+            }
         } else {
             false
         }
