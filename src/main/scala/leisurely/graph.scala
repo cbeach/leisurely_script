@@ -17,9 +17,22 @@ class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
     }
 
     def add(edge:BoardEdge) = {
-        edges = edge :: edges
-        val source = this.nodes(edge.nodes._1.coord)
-        source.edges = edge :: source.edges
+        if (nodes.contains(edge.nodes._1.coord)) {
+            if (!nodes.contains(edge.nodes._2.coord)) {
+                throw(new IllegalBoardEdgeException("The destination node does not exist in this graph instance"))
+            }
+            val sourceNode = edge.nodes._1
+            sourceNode.edges.foreach(e => {
+                if (edge.direction == e.direction) {
+                    throw(new IllegalBoardEdgeException("A node can not have two edges with the same direction."))
+                }
+            })
+            edges = edge :: edges
+            val source = this.nodes(edge.nodes._1.coord)
+            source.edges = edge :: source.edges
+        } else {
+            throw(new IllegalBoardEdgeException("The source node does not exist in this graph instance"))
+        }
     }
 
     def push(thing:Equipment, coord:Coordinate):Try[Graph] = {

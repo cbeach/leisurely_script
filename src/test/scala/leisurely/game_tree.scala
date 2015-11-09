@@ -50,7 +50,7 @@ class GameTree extends FunSuite {
     test("You shouldn't be able to add lists of arbitrary types to the game.") {
         val listOfStrings:List[String] = List("1", "2", "3", "4", "5") 
         val game = Game() 
-        intercept[IllegalArgumentException] {
+        intercept[IllegalGameAttributeException] {
             game.add(listOfStrings)
         }
     }
@@ -130,6 +130,18 @@ class GameTree extends FunSuite {
         assert(!newBoard.empty() && !newBoard.full())
     }
 
+    test("The user can pop a piece out of a node in the board") {
+        import Shape._
+        import NeighborType._
+        val board = Board(List(3, 3), Square, Direct, Square) 
+        val piece = new Piece("token", new Player("1"), List[LegalMove]())
+        val firstNewBoard = board.push(piece, Coordinate(0, 0)).get
+        val secondNewBoard = firstNewBoard.pop(Coordinate(0, 0)).get
+
+        assert(secondNewBoard.empty())
+        assert(!(firstNewBoard eq secondNewBoard))
+    }
+
     test("Board.full should return true when called on a full board") {
         import Shape._
         import NeighborType._
@@ -194,8 +206,13 @@ class GameTree extends FunSuite {
         })
     }
 
-    ignore("Edge directions must be unique per node. (can't have two North edges on one node)") {
-        
+    test("Edge directions must be unique per node. (can't have two North edges on one node)") {
+        import Shape._
+        import NeighborType._
+        val board = Board(List(3, 3), Square, Indirect, Square) 
+        intercept[IllegalBoardEdgeException] {
+            board.graph.add(board.graph.edges(0))
+        }
     }
 
     test("The game object should be able to return the previous, current, and next players.") {
