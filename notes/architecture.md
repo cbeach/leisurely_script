@@ -44,8 +44,16 @@ Requests a serialized game definition from a repository. Possible sources:
     - add one or more objects (Board, Player, Piece, etc.)
 - start(interface:Interface): Try[Game]
     - Start playing a game. Returns failure if there's something wrong with the game rules.
-- gameValid(): Boolean
-    - Think of something better than a problem light
+- gameValid(): Try[Game]
+    If game is not valid, return Failure with the exception that was captured
+    - Should check for:
+        * Is there a Board?
+        * Are there one or more of the following, and are they all valid?
+            * Players?
+            * Pieces?
+                * Do all of the pieces have one or more LegalMoves?
+            * EndConditions?
+                * Are the conditions valid?
 - inputs(): Map[String, Input]
 - player.currentPlayer(): Player
 - legalMoves(player: Player): List[Move]
@@ -53,10 +61,15 @@ Requests a serialized game definition from a repository. Possible sources:
 - isMoveLegal(move:Move): Boolean
 - partialScore(): List[Double]
 - partialScore(player: Player): Double
-- gameResult(): Option[GameResult]
+- gameResult(): GameResult
 - applyMove[T1, T2, T3...](input:Input*): Try[Game] 
     - Each type parameter applies to a different input
+- nonValidatedApplyMove(move:Move): Try[Game]
 - applyMove(move:Move): Try[Game]
+
+- isMoveTerminal(move:Move): Boolean
+- moveResults(move:Move): GameResults
+
 - history(): List[Game]
 - various getters and setters
     - board(): Board
@@ -124,6 +137,47 @@ Class members
 
 
 ### Player
+How should I handle things like Piece("name", player=all...)
+It needs to handle 
+    * Previous
+    * Current
+    * Next
+    * Any
+    * All
+    * SomePlayers
+    * NoPlayer
+
+I could use:
+    Almost all of these run into a chicken and egg problem, just write a simple kludge and refactor later.
+    1. Companion object and a set of sub-classes
+        Most versitile solution so far
+        More complex than an enumeration or a function
+        Difficult to get the correct game object into the mix
+    2. A class and an enumeration
+        Set player constraint on instantiation
+        Method to check whether player p is valid given the constraint
+        Difficult to get the correct game object into the mix
+    2. A class and an enumeration
+        Difficult to get the correct game object into the mix
+    3. An enumeration.
+        Easy, simple, very limited
+    4. Functions that return the proper players
+    5. A set of objects that extend Player
+    6. Could be member functions of the Players class
+        Already has the complete list of players
+
+class Player(...) {...}
+object Player {
+    apply(...)
+    previous:Player
+    current:Player
+    next:Player
+    any:Player
+    all:Player
+    some:Player
+    none:Player
+}
+
     Player(name=null: String)
     Future
     - Hands
@@ -195,20 +249,35 @@ How do I get the information from the input to the destination variable?
     * pop
 
 
-### GameResult
+### GameResultState
 - Enumeration
     * Win
     * Lose
     * Tie
+    * Pending
+
+
+### GameResult
+- Case Class
+    * val status:GameStatus 
+    * val ranking:List[List[Player]]
+
+
+### GameStatus
+- Enumeration
+    * Invalid
+    * Beginning
+    * InProgress
+    * Completed
 
 
 ### Shape
     Enumeration
-    * Triagle
+    * Triangle
     * Square
     * Rectangle
     * Hexagon
-    * Octogon
+    * Octagon
 
 
 ### NeighborTypes

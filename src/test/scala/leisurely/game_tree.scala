@@ -4,20 +4,24 @@ import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
 
-import MoveAction._
 import Direction._
+import GameStatus._
+import GameResultState._
+import MoveAction._
+import NeighborType._
+import Shape._
 
 
 class GameTree extends FunSuite {
     test("A player can be created with a name") { 
-        val fred = new Player("Fred")
+        val fred = Player("Fred")
         assert(fred.name == "Fred")
     }
     test("Instantiating a player without a name executes successfully") { 
-        val noName = new Player() 
+        val noName = Player() 
     }
     test("Creating a player without a name results in a UUID being generated") { 
-        val noName = new Player() 
+        val noName = Player() 
         val uuidRegex = """^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$""".r
         uuidRegex findFirstIn noName.name match {
             case None => fail
@@ -36,14 +40,14 @@ class GameTree extends FunSuite {
         }
     }
     test("Game.players.all should return all players.") { 
-        val game = Game().add(List(new Player("Andrew"), new Player("Bill"), new Player("Carol")))
+        val game = Game().add(List(Player("Andrew"), Player("Bill"), Player("Carol")))
         assert(game.players.all.length == 3)
     }
 
     // This could be added later for convenience, but is not critical and should be skipped for now.
     ignore("If the game already has players, then game.add(<players>*) " 
          + "should return a new game with the new players appended") {
-        val game = Game().add(List(new Player("Andrew"), new Player("Bill"), new Player("Carol")))
+        val game = Game().add(List(Player("Andrew"), Player("Bill"), Player("Carol")))
         assert(game.players.all.length == 3)
     }
 
@@ -56,15 +60,11 @@ class GameTree extends FunSuite {
     }
 
     test("A 3x3 board should have nine nodes") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(3, 3), Square, Indirect, Square) 
         assert(board.nodes.size == 9)
     }
 
     test("A 3x3 board with indirect neighbors should have 40 well formed edges") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(3, 3), Square, Indirect, Square) 
         assert(board.graph.edges.length == 40)
         val edges = board.graph.nodes(Coordinate(0, 0)).edges
@@ -86,55 +86,41 @@ class GameTree extends FunSuite {
     }
 
     test("Node (0, 0) on a 3x3 board with indirect neighbors should have 3 edges") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(3, 3), Square, Indirect, Square) 
         assert(board.graph.nodes(Coordinate(0, 0)).edges.length == 3)
     }
 
     test("A 3x3 board with direct neighbors should have 24 edges") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(3, 3), Square, Direct, Square) 
         assert(board.graph.edges.length == 24)
     }
 
     test("A 4x4 board with indirect neighbors should have 84 edges") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(4, 4), Square, Indirect, Square) 
         assert(board.graph.edges.length == 84)
     }
 
     test("A 4x4 board with direct neighbors should have 48 edges") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(4, 4), Square, Direct, Square) 
         assert(board.graph.edges.length == 48)
     }
 
     test("A new board should be empty") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(4, 4), Square, Direct, Square) 
         assert(board.empty())
     }
 
     test("The user can push a piece into a node in the board") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(3, 3), Square, Direct, Square) 
-        val piece = new Piece("token", new Player("1"), List[LegalMove]())
+        val piece = new Piece("token", Player("1"), List[LegalMove]())
         val newBoard = board.push(piece, Coordinate(0, 0)).get
 
         assert(!newBoard.empty() && !newBoard.full())
     }
 
     test("The user can pop a piece out of a node in the board") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(3, 3), Square, Direct, Square) 
-        val piece = new Piece("token", new Player("1"), List[LegalMove]())
+        val piece = new Piece("token", Player("1"), List[LegalMove]())
         val firstNewBoard = board.push(piece, Coordinate(0, 0)).get
         val secondNewBoard = firstNewBoard.pop(Coordinate(0, 0)).get
 
@@ -143,19 +129,15 @@ class GameTree extends FunSuite {
     }
 
     test("Board.full should return true when called on a full board") {
-        import Shape._
-        import NeighborType._
         var board = Board(List(3, 3), Square, Direct, Square) 
         for (node <- board.graph.nodes) {
-            board = board.push(new Piece("token", new Player("1"), List[LegalMove]()), node._1).get
+            board = board.push(new Piece("token", Player("1"), List[LegalMove]()), node._1).get
         }
         assert(board.full())
     }
 
     test("Board.nInARow should detect rows that are 3 long") {
-        import Shape._
-        import NeighborType._
-        val player = new Player("1")
+        val player = Player("1")
         val piece = new Piece("token", player, List[LegalMove]())
         val horizontalBoard = Board(List(3, 3), Square, Indirect, Square)
             .push(piece, Coordinate(0, 0))
@@ -182,9 +164,7 @@ class GameTree extends FunSuite {
     }
 
     test("A user should be able to get the number of pieces that occupy a board") {
-        import Shape._
-        import NeighborType._
-        val player = new Player("1")
+        val player = Player("1")
         val piece = new Piece("token", player, List[LegalMove]())
         val board = Board(List(3, 3), Square, Indirect, Square) 
             .push(piece, Coordinate(0, 0))
@@ -194,10 +174,8 @@ class GameTree extends FunSuite {
     }
 
     test("Performing a push move should return a new game with a board that has 1 piece in it") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(3, 3), Square, Indirect, Square) 
-        val player = new Player("1")
+        val player = Player("1")
         val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
         val legalMove = new LegalMove(player, precondition, Push)
         val piece = new Piece("token", player, List(legalMove))
@@ -209,8 +187,6 @@ class GameTree extends FunSuite {
     }
 
     test("Edge directions must be unique per node. (can't have two North edges on one node)") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(3, 3), Square, Indirect, Square) 
         intercept[IllegalBoardEdgeException] {
             board.graph.add(board.graph.edges(0))
@@ -218,24 +194,22 @@ class GameTree extends FunSuite {
     }
 
     test("The game object should be able to return the previous, current, and next players.") {
-        val game = Game().add(List(new Player("A"), new Player("B"), new Player("C")))
+        val game = Game().add(List(Player("A"), Player("B"), Player("C")))
         assert(game.players.current.name == "A")
         assert(game.players.next.name == "B")
         assert(game.players.previous.name == "C")
     }
 
     test("Ending a player's turn should advance the game to the next player.") {
-        val game = Game().add(List(new Player("A"), new Player("B"), new Player("C")))
+        val game = Game().add(List(Player("A"), Player("B"), Player("C")))
         assert(game.players.current.name == "A")
         game.players.endTurn()
         assert(game.players.current.name == "B")
     }
 
     test("Making a move should result in a completely new game with a different board") {
-        import Shape._
-        import NeighborType._
         val board = Board(List(3, 3), Square, Indirect, Square) 
-        val player = new Player("1")
+        val player = Player("1")
         val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
         val legalMove = new LegalMove(player, precondition, Push)
         val piece = new Piece("token", player, List(legalMove))
@@ -248,11 +222,9 @@ class GameTree extends FunSuite {
     }
 
     test("The precondition in LegalMoves should return false for illegal moves") {
-        import Shape._
-        import NeighborType._
         val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
         val board = Board(List(3, 3), Square, Indirect, Square) 
-        val player = new Player("1")
+        val player = Player("1")
         val legalMove = new LegalMove(player, precondition, Push)
         val piece = new Piece("token", player, List[LegalMove](legalMove))
         val move = new Move(piece, player, Push, board.graph.nodes(Coordinate(0, 0)))
@@ -269,11 +241,9 @@ class GameTree extends FunSuite {
     }
 
     test("game.isMoveLegal should return true if a move is legal, false otherwise") {
-        import Shape._
-        import NeighborType._
         val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
         val board = Board(List(3, 3), Square, Indirect, Square) 
-        val player = new Player("1")
+        val player = Player("1")
         val legalMove = new LegalMove(player, precondition, Push)
         val piece = new Piece("token", player, List[LegalMove](legalMove))
         val move = new Move(piece, player, Push, board.graph.nodes(Coordinate(0, 0)))
@@ -286,11 +256,9 @@ class GameTree extends FunSuite {
     }
 
     test("The game should only allow legal moves to be applied") {
-        import Shape._
-        import NeighborType._
         val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
         val board = Board(List(3, 3), Square, Indirect, Square) 
-        val player = new Player("1")
+        val player = Player("1")
         val legalMove = new LegalMove(player, precondition, Push)
         val piece = new Piece("token", player, List[LegalMove](legalMove))
         val move = new Move(piece, player, Push, board.graph.nodes(Coordinate(0, 0)))
@@ -306,7 +274,51 @@ class GameTree extends FunSuite {
         }
     }
 
-    ignore("The game should recognize when an end condition has been met.") {
-        
+    test("The game should recognize when an end condition has been met.") {
+        val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
+        val board = Board(List(3, 3), Square, Indirect, Square) 
+        val player = Player("1")
+        val legalMove = new LegalMove(player, precondition, Push)
+        val piece = new Piece("token", player, List[LegalMove](legalMove))
+        val endCondition = EndCondition(Win, player, (game) => {
+            game.board.nInARow(3, piece).size > 0
+        })
+        val game = Game().add(board).add(List(piece)).add(List(endCondition))
+        val endGame:Game = game
+            .applyMove(new Move(piece, player, Push, board.graph.nodes(Coordinate(0, 0)))).get
+            .applyMove(new Move(piece, player, Push, board.graph.nodes(Coordinate(0, 1)))).get
+            .applyMove(new Move(piece, player, Push, board.graph.nodes(Coordinate(0, 2)))).get
+        assert(endGame.status == Finished)
+    }
+
+    test("The special player objects (Any, All, SomePlayers, NoPlayer, etc.) should condence into the proper player") {
+        val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
+        val board = Board(List(3, 3), Square, Indirect, Square) 
+        val players = List(Player("1"), Player("2"), Player("3"), Player("4"), Player("5"))
+        val player = players(0)
+        val legalMove = new LegalMove(player, precondition, Push)
+        val piece = new Piece("token", player, List[LegalMove](legalMove))
+        val endCondition = EndCondition(Win, player, (game) => {
+            game.board.nInARow(3, piece).size > 0
+        })
+        val game = Game().add(board).add(List(piece)).add(List(endCondition)).add(players)
+
+        val aFewPlayers = List(players(1), players(2), players(3))
+        val Previous = new game.players.Previous()
+        val Current = new game.players.Current()
+        val Next = new game.players.Next()
+        val Any = new game.players.Any()
+        val All = new game.players.All()
+        val SomePlayers = new game.players.SomePlayers(aFewPlayers)
+        val NoPlayer = new game.players.NoPlayer()
+
+        assert(Previous(players(4)) == true)
+        assert(Previous(players(1)) != true)
+        assert(Current(players(0)) == true)
+        assert(Next(players(1)) == true)
+        assert(Any(players(0)) == true)
+        assert(All(players) == true)
+        assert(SomePlayers(aFewPlayers) == true)
+        assert(NoPlayer(players(0)) == false)
     }
 }

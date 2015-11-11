@@ -2,18 +2,68 @@ package org.leisurelyscript
 
 import scala.util.{Try, Success, Failure}
 
-import GameResult._
+import GameStatus._
+import GameResultState._
 import MoveAction._
 
 
-class Game(val name:String,
+class Game(
+    val name:String,
 	val players:Players,
 	val board:Board,
 	val pieces:List[Piece],
 	val endConditions:List[EndCondition],
 	val history:List[Game] = List[Game]()) {
 
-    private val privateUUID:String = java.util.UUID.randomUUID.toString
+    val gameResult:GameResult = {
+        val conditionValues:List[Boolean] = endConditions.map(endCondition => {
+            endCondition.condition(this)
+        })
+         
+        if (history.size == 0) {
+            GameResult(Pending, rankPlayers) 
+        } else {
+            history(0).gameResult.result match {
+                case Pending => 
+                    if (conditionValues.size > 0 && conditionValues.reduce(_ || _)) {
+                        val conditionThatWasMetIndex = conditionValues.indexOf(true)
+                        val conditionThatWasMet = endConditions(conditionValues.indexOf(true))
+                        val endResult = conditionThatWasMet.result
+                        // What if two conditions are met at the same time?
+                        GameResult(endResult, rankPlayers, conditionThatWasMet)
+                    } else {
+                        GameResult(Pending, rankPlayers)
+                    }
+                case _ => history(0).gameResult
+            }
+        }
+    }
+
+    val status:GameStatus.Value = {
+        gameResult.result match {
+            case Pending => InProgress
+            case _ => Finished
+        }
+    }
+
+    var playerScoringFunction:(Player)=>Double = player => {
+        gameResult.result match {
+            case Win => {
+                if (true) {
+                    1.0
+                } else {
+                    0.0
+                }
+            }
+            case Lose => 0.0
+            case Tie => 1.0
+            case Pending => 0.0
+        }
+    }
+
+    private def playerScore(player:Player) = { playerScoringFunction(player) }
+    private def rankPlayers() = {List[List[Player]]()}
+
     def this(game:Game) = {
         this(game.name, game.players, game.board, game.pieces, game.endConditions, game.history)
     }
@@ -22,11 +72,15 @@ class Game(val name:String,
         Game(this, board)
     }
 
+    def add(players:Players):Game = {
+        Game(this, players)
+    }
+
     def add[T](list:List[T]):Game = { 
         list match {
-            case (first:Player)::rest => Game(this, list)
-            case (first:Piece)::rest => Game(this, list)
-            case (first:EndCondition)::rest => Game(this, list)
+            case (first:Player)::(rest:List[Player]) => Game(this, new Players(first::rest))
+            case (first:Piece)::(rest:List[Piece]) => Game(this, list)
+            case (first:EndCondition)::(rest:List[EndCondition]) => Game(this, list)
             case _ => throw(new IllegalGameAttributeException("Can not add object to game. Invalid type."))
         }
     }
@@ -51,22 +105,18 @@ class Game(val name:String,
         1.0
     }
 
-    def gameResult(): Option[GameResult] = {
-        Some(Win)
-    }
+    //def results(): GameResult = { }
 
     def nonValidatedApplyMove(move:Move):Try[Game] = {
         move.action match {
             case Push => board.push(move.piece, move.node.coord) match {
-                case Success(newBoard) => {
-                    Try(new Game(name, players, newBoard, pieces, endConditions, history))
-                } 
+                case Success(newBoard) =>
+                    Try(new Game(name, players, newBoard, pieces, endConditions, this :: history))
                 case Failure(ex) => Failure(ex) 
             }
             case Pop => board.pop(move.node.coord) match {
-                case Success(newBoard) => {
-                    Try(new Game(name, players, newBoard, pieces, endConditions, history))
-                }
+                case Success(newBoard) =>
+                    Try(new Game(name, players, newBoard, pieces, endConditions, this :: history))
                 case Failure(ex) => Failure(ex)
             }
         }
@@ -76,15 +126,13 @@ class Game(val name:String,
         if (isMoveLegal(move)) {
             move.action match {
                 case Push => board.push(move.piece, move.node.coord) match {
-                    case Success(newBoard) => {
-                        Try(new Game(name, players, newBoard, pieces, endConditions, history))
-                    } 
+                    case Success(newBoard) =>
+                        Try(new Game(name, players, newBoard, pieces, endConditions, this :: history))
                     case Failure(ex) => Failure(ex) 
                 }
                 case Pop => board.pop(move.node.coord) match {
-                    case Success(newBoard) => {
-                        Try(new Game(name, players, newBoard, pieces, endConditions, history))
-                    }
+                    case Success(newBoard) =>
+                        Try(new Game(name, players, newBoard, pieces, endConditions, this :: history))
                     case Failure(ex) => Failure(ex)
                 }
             }
@@ -101,15 +149,27 @@ class Game(val name:String,
         }
         false
     }
+
+    def isMoveTerminal(move:Move):Boolean = {
+        if (!isMoveLegal(move)) {
+            throw(new IllegalMoveException())
+        }
+        val game = applyMove(move).get 
+        gameResult.result match {
+            case Pending => return false
+            case _ => return true
+        }
+    }
 }
+
 
 object Game {
     def apply(name:String = java.util.UUID.randomUUID.toString, 
-              players:List[Player] = null, 
+              players:Players = new Players(List[Player]()), 
               board:Board = null,
-              pieces:List[Piece] = null,
-              endConditions:List[EndCondition] = null
-              ):Game = new Game(name, new Players(players), board, pieces, endConditions)
+              pieces:List[Piece] = List[Piece](),
+              endConditions:List[EndCondition] = List[EndCondition]()
+              ):Game = new Game(name, players, board, pieces, endConditions)
     private def apply(game:Game, board:Board):Game 
         = new Game(game.name, game.players, board, game.pieces, game.endConditions)
     private def apply[T](game:Game, list:List[T]):Game = {
@@ -122,5 +182,8 @@ object Game {
                 new Game(game.name, game.players, game.board, game.pieces, eC::eCs)
             case _ => throw(new IllegalGameAttributeException("How did you get in here. You shouldn't be in here..."))
         }
+    }
+    private def apply(game:Game, players:Players) = {
+        new Game(game.name, players, game.board, game.pieces, game.endConditions)
     }
 }

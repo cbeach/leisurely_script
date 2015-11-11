@@ -1,7 +1,7 @@
 package org.leisurelyscript
 
 
-object GameResult extends Enumeration {
-    type GameResult = Value
-    val Win, Lose, Tie = Value
-}
+case class GameResult(
+    val result:GameResultState.Value, 
+    val ranking:List[List[Player]], 
+    val conditionThatWasMet:EndCondition=null) {}
