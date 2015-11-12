@@ -28,7 +28,11 @@ class TicTacToeTests extends FunSuite {
                 game.board.nInARow(3, piece).size == 0 && game.board.full()
             })
         )
-        Game().add(List(piece)).add(List(endConditions)).add(board).add(players)
+        Game()
+            .add(players)
+            .add(board)
+            .add(List(piece))
+            .add(endConditions)
     }
 
     test("Create a TicTacToe game object") {
@@ -37,20 +41,24 @@ class TicTacToeTests extends FunSuite {
         val legalMove = new LegalMove(new players.Any(), (game:Game, move:Move) => {
             game.board.graph.nodes(move.node.coord).empty()
         }, Push)
-        val piece = new Piece("token", new players.Any(), List[LegalMove](legalMove))
+        val piece = new Piece("token", new players.Current(), List[LegalMove](legalMove))
         val endConditions = List(
-            EndCondition(Win, new players.Current(), (game:Game) => {
+            EndCondition(Win, new players.Previous(), (game:Game) => {
                 game.board.nInARow(3, piece).size > 0
             }),
             EndCondition(Tie, new players.All(), (game:Game) => {
                 game.board.nInARow(3, piece).size == 0 && game.board.full()
             })
         )
-        val first = game()
-        val second = first.add(List(piece))
-        val third = second.add(endConditions)
-        val fourth = third.add(board)
-        val fifth = fourth.add(players)
+        val first = Game()
+        val second = first.add(players)
+        val third = second.add(board)
+        val fourth = third.add(List(piece))
+        val fifth = fourth.add(endConditions)
+    }
 
+    test("A user should be able to get a list of legal moves.") {
+        val ticTacToe:Game = ticTacToeObject
+        assert(ticTacToe.legalMoves.size == 9)
     }
 }

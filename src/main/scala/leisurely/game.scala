@@ -93,7 +93,7 @@ class Game(
         Map[String, Input]()
     }
 
-    def legalMoves: List[Move] = {
+    def legalMoves:List[Move] = {
         List[Move]()
     }
 
