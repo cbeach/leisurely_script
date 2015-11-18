@@ -3,5 +3,5 @@ package org.leisurelyscript
 
 object GameStatus extends Enumeration {
     type GameStatus = Value
-    val Invalid, Beginning, InProgress, Finished = Value
+    val Invalid, WaitingToBegin, InProgress, Finished = Value
 }

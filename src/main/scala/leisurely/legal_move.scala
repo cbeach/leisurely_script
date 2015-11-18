@@ -9,7 +9,9 @@ class LegalMove(val owner:Player,
     val postcondition:(Game, Move)=>Boolean=null) {
 
     def legal(game:Game, move:Move):Boolean = {
-        if (precondition(game, move)) {
+        if (!owner.valid(move.player)) {
+            return false 
+        } else if (precondition(game, move)) {
             if (postcondition == null) {
                 true
             } else {

@@ -3,5 +3,5 @@ package org.leisurelyscript
 
 case class GameResult(
     val result:GameResultState.Value, 
-    val ranking:List[List[Player]], 
-    val conditionThatWasMet:EndCondition=null) {}
+    val ranking:Option[List[List[Player]]], 
+    val conditionThatWasMet:Option[EndCondition]=None) {}

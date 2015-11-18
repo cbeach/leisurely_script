@@ -13,56 +13,85 @@ class Game(
 	val board:Board,
 	val pieces:List[Piece],
 	val endConditions:List[EndCondition],
-	val history:List[Game] = List[Game]()) {
+	val history:List[Game]=List[Game](),
+    var gameResult:Option[GameResult]=None,
+    var status:GameStatus.Value=InProgress,
+    private var playerScoringFunction:Option[(Player, GameResultState.Value, Option[Player])=>Double]=None) {
 
-    val gameResult:GameResult = {
+    playerScoringFunction = Some(playerScoringFunction.getOrElse(
+        (player:Player, resultState:GameResultState.Value, winner:Option[Player])=>{
+            resultState match {
+                case Win => 
+                    if (winner.contains(player)) { 
+                        1.0 
+                    } else { 
+                        0.0 
+                    }
+                case Lose => 0.0
+                case Tie => 1.0
+                case Pending => 0.0
+            }
+        }
+    ))
+
+    gameResult = Some(gameResult.getOrElse({
         val conditionValues:List[Boolean] = endConditions.map(endCondition => {
             endCondition.condition(this)
         })
          
         if (history.size == 0) {
-            GameResult(Pending, rankPlayers) 
+            GameResult(Pending, None)
         } else {
-            history(0).gameResult.result match {
+            history(0).gameResult.get.result match {
                 case Pending => 
                     if (conditionValues.size > 0 && conditionValues.reduce(_ || _)) {
                         val conditionThatWasMetIndex = conditionValues.indexOf(true)
                         val conditionThatWasMet = endConditions(conditionValues.indexOf(true))
                         val endResult = conditionThatWasMet.result
+                        val winner:Option[Player] = endResult match {
+                            case Win => {
+                                players.all.find(p => {
+                                    conditionThatWasMet.player.valid(p)
+                                })
+                            }
+                            case _ => None
+                        }
                         // What if two conditions are met at the same time?
-                        GameResult(endResult, rankPlayers, conditionThatWasMet)
+                        GameResult(endResult, Some(rankPlayers(endResult, winner)), Some(conditionThatWasMet))
                     } else {
-                        GameResult(Pending, rankPlayers)
+                        GameResult(Pending, None)
                     }
-                case _ => history(0).gameResult
+                case _ => history(0).gameResult.get
             }
         }
-    }
+    }))
 
-    val status:GameStatus.Value = {
-        gameResult.result match {
+    status = {
+        gameResult.get.result match {
             case Pending => InProgress
             case _ => Finished
         }
     }
-
-    var playerScoringFunction:(Player)=>Double = player => {
-        gameResult.result match {
-            case Win => {
-                if (true) {
-                    1.0
-                } else {
-                    0.0
-                }
-            }
-            case Lose => 0.0
-            case Tie => 1.0
-            case Pending => 0.0
-        }
+    
+    private def playerScore(player:Player, resultState:GameResultState.Value, winner:Option[Player]) = { 
+        val func = playerScoringFunction.get
+        func(player, resultState, winner)
     }
 
-    private def playerScore(player:Player) = { playerScoringFunction(player) }
-    private def rankPlayers() = {List[List[Player]]()}
+    private def rankPlayers(resultState:GameResultState.Value, winner:Option[Player]):List[List[Player]] = {
+        val playerScores:List[Tuple2[Player, Double]] = 
+            players.all.zip(players.all.map(playerScore(_, resultState, winner)))
+        val playerScoreMap:List[List[Player]] = playerScores.groupBy({
+            case (player:Player, score:Double) => score 
+        }).toList.map({
+            case (score:Double, list:List[(Player, Double)]) => (score, list.map(_._1))
+        }).sortWith((first:Tuple2[Double, List[Player]], second:Tuple2[Double, List[Player]]) => {
+            first._1 < second._1
+        }).map({
+            case (score:Double, list:List[Player]) => list
+        })
+        playerScoreMap
+    }
 
     def this(game:Game) = {
         this(game.name, game.players, game.board, game.pieces, game.endConditions, game.history)
@@ -93,8 +122,8 @@ class Game(
         Map[String, Input]()
     }
 
-    def legalMoves:List[Move] = {
-        List[Move]()
+    def legalMoves(player:Player):List[Move] = {
+        pieces.flatMap(piece => piece.legalMoves(this, player))
     }
 
     def partialScore: List[Double] = {
@@ -110,34 +139,45 @@ class Game(
     def nonValidatedApplyMove(move:Move):Try[Game] = {
         move.action match {
             case Push => board.push(move.piece, move.node.coord) match {
-                case Success(newBoard) =>
-                    Try(new Game(name, players, newBoard, pieces, endConditions, this :: history))
+                case Success(newBoard) => {
+                    Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, this :: history))
+                }
                 case Failure(ex) => Failure(ex) 
             }
             case Pop => board.pop(move.node.coord) match {
-                case Success(newBoard) =>
-                    Try(new Game(name, players, newBoard, pieces, endConditions, this :: history))
+                case Success(newBoard) => {
+                    Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, this :: history))
+                }
                 case Failure(ex) => Failure(ex)
             }
         }
     }
 
     def applyMove(move:Move): Try[Game] = {
-        if (isMoveLegal(move)) {
-            move.action match {
-                case Push => board.push(move.piece, move.node.coord) match {
-                    case Success(newBoard) =>
-                        Try(new Game(name, players, newBoard, pieces, endConditions, this :: history))
-                    case Failure(ex) => Failure(ex) 
+        status match {
+            case WaitingToBegin => Failure(new IllegalMoveException("The game has not started yet."))
+            case InProgress => 
+                if (isMoveLegal(move)) {
+                    move.action match {
+                        case Push => board.push(move.piece, move.node.coord) match {
+                            case Success(newBoard) => {
+                                Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, this :: history))
+                            }
+                            case Failure(ex) => Failure(ex) 
+                        }
+                        case Pop => board.pop(move.node.coord) match {
+                            case Success(newBoard) => {
+                                Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, this :: history))
+                            }
+                            case Failure(ex) => Failure(ex)
+                        }
+                    }
+                } else {
+                    Failure(new IllegalMoveException(s"${move} is an illegal move."))
                 }
-                case Pop => board.pop(move.node.coord) match {
-                    case Success(newBoard) =>
-                        Try(new Game(name, players, newBoard, pieces, endConditions, this :: history))
-                    case Failure(ex) => Failure(ex)
-                }
+            case Finished => {
+                Failure(new IllegalMoveException("The game is over, no more moves are possible."))
             }
-        } else {
-            Failure(new IllegalMoveException())
         }
     }
 
@@ -155,7 +195,7 @@ class Game(
             throw(new IllegalMoveException())
         }
         val game = applyMove(move).get 
-        gameResult.result match {
+        gameResult.get.result match {
             case Pending => return false
             case _ => return true
         }

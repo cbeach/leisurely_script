@@ -1,13 +1,13 @@
 package org.leisurelyscript
 
 
-class Piece(val name:String, val owner:Player, val moves:List[LegalMove]) extends Equipment {
+class Piece(val name:String, val owner:Player, val legalMoves:List[LegalMove]) extends Equipment {
     def legalMoves(game:Game, player:Player): List[Move] = {
         var moveList:List[Move] = List()
-        for (move <- moves) {
+        for (legalMove <- legalMoves) {
             for (node <- game.board.nodes) {
-                val newMove = Move(this, player, move.action, node._2)
-                if (move.legal(game, newMove)) {
+                val newMove = Move(this, player, legalMove.action, node._2)
+                if (legalMove.legal(game, newMove)) {
                     moveList = newMove :: moveList
                 }
             }
@@ -16,11 +16,15 @@ class Piece(val name:String, val owner:Player, val moves:List[LegalMove]) extend
     }
 
     def isMoveLegal(game:Game, move:Move):Boolean = {
-        for (legalMove <- moves) {
+        for (legalMove <- legalMoves) {
             if (legalMove.legal(game, move)) {
                 return true
             }
         }
         false
+    }
+
+    override def toString:String = {
+        s"Piece(String(${name}), ${owner}, ${legalMoves})"
     }
 }

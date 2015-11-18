@@ -203,8 +203,8 @@ class GameTree extends FunSuite {
     test("Ending a player's turn should advance the game to the next player.") {
         val game = Game().add(List(Player("A"), Player("B"), Player("C")))
         assert(game.players.current.name == "A")
-        game.players.endTurn()
-        assert(game.players.current.name == "B")
+        val players = game.players.endTurn
+        assert(players.current.name == "B")
     }
 
     test("Making a move should result in a completely new game with a different board") {
@@ -312,13 +312,13 @@ class GameTree extends FunSuite {
         val SomePlayers = new game.players.SomePlayers(aFewPlayers)
         val NoPlayer = new game.players.NoPlayer()
 
-        assert(Previous(players(4)) == true)
-        assert(Previous(players(1)) != true)
-        assert(Current(players(0)) == true)
-        assert(Next(players(1)) == true)
-        assert(Any(players(0)) == true)
-        assert(All(players) == true)
-        assert(SomePlayers(aFewPlayers) == true)
-        assert(NoPlayer(players(0)) == false)
+        assert(Previous.valid(players(4)) == true)
+        assert(Previous.valid(players(1)) != true)
+        assert(Current.valid(players(0)) == true)
+        assert(Next.valid(players(1)) == true)
+        assert(Any.valid(players(0)) == true)
+        assert(All.valid(players) == true)
+        assert(SomePlayers.valid(aFewPlayers) == true)
+        assert(NoPlayer.valid(players(0)) == false)
     }
 }
