@@ -108,4 +108,26 @@ class TicTacToeTests extends FunSuite {
             val failingMove = move5.applyMove(Move(move5.pieces(0), move5.players.current, Push, move5.board.graph.nodes(Coordinate(0, 2)))).get
         }
     }
+
+    test("The game history is well formed.") {
+        val move0:Game = ticTacToeObject
+        val move1 = move0.applyMove(Move(move0.pieces(0), move0.players.current, Push, move0.board.graph.nodes(Coordinate(0, 0)))).get
+        val move2 = move1.applyMove(Move(move1.pieces(0), move1.players.current, Push, move1.board.graph.nodes(Coordinate(2, 0)))).get
+        val move3 = move2.applyMove(Move(move2.pieces(0), move2.players.current, Push, move2.board.graph.nodes(Coordinate(1, 1)))).get
+        val move4 = move3.applyMove(Move(move3.pieces(0), move3.players.current, Push, move3.board.graph.nodes(Coordinate(2, 1)))).get
+        val move5 = move4.applyMove(Move(move4.pieces(0), move4.players.current, Push, move4.board.graph.nodes(Coordinate(2, 2)))).get
+
+        assert(move0.history.size == 0)
+        assert(move1.history.size == 1)
+        assert(move2.history.size == 2)
+        assert(move3.history.size == 3)
+        assert(move4.history.size == 4)
+        assert(move5.history.size == 5)
+
+        assert(move5.history(0) eq move4)
+        assert(move5.history(1) eq move3)
+        assert(move5.history(2) eq move2)
+        assert(move5.history(3) eq move1)
+        assert(move5.history(4) eq move0)
+    }
 }
