@@ -97,5 +97,3 @@ class Players(players:List[Player]) {
         }
 	}
 }
-
-

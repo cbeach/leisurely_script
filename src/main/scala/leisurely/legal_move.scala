@@ -23,4 +23,3 @@ class LegalMove(val owner:Player,
         }
     }
 }
-

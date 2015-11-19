@@ -15,7 +15,7 @@ class Game(
 	val endConditions:List[EndCondition],
 	val history:List[Game]=List[Game](),
     var gameResult:Option[GameResult]=None,
-    var status:GameStatus.Value=InProgress,
+    var status:GameStatus.Value=Invalid,
     private var playerScoringFunction:Option[(Player, GameResultState.Value, Option[Player])=>Double]=None) {
 
     playerScoringFunction = Some(playerScoringFunction.getOrElse(
@@ -68,7 +68,7 @@ class Game(
 
     status = {
         gameResult.get.result match {
-            case Pending => InProgress
+            case Pending => status
             case _ => Finished
         }
     }
@@ -114,8 +114,23 @@ class Game(
         }
     }
 
-    def gameValid(): Boolean = {
-        true
+    def startGame():Game = {
+        Try(wellFormed) match {
+            case Success(_) => {
+                status = InProgress
+                this
+            }
+            case Failure(exception) => {
+                status = Invalid
+                throw exception
+            }
+        }
+    }
+
+    private def wellFormed():Unit = {
+        if (players.all.size <= 0) {
+            throw new IllegalGameAttributeException("There are no players in this game.")
+        }
     }
 
     def inputs: Map[String, Input] = {
@@ -134,19 +149,19 @@ class Game(
         1.0
     }
 
-    //def results(): GameResult = { }
-
     def nonValidatedApplyMove(move:Move):Try[Game] = {
         move.action match {
             case Push => board.push(move.piece, move.node.coord) match {
                 case Success(newBoard) => {
-                    Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, this :: history))
+                    Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, 
+                        this :: history, status=status))
                 }
                 case Failure(ex) => Failure(ex) 
             }
             case Pop => board.pop(move.node.coord) match {
                 case Success(newBoard) => {
-                    Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, this :: history))
+                    Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, 
+                        this :: history, status=status))
                 }
                 case Failure(ex) => Failure(ex)
             }
@@ -155,19 +170,22 @@ class Game(
 
     def applyMove(move:Move): Try[Game] = {
         status match {
-            case WaitingToBegin => Failure(new IllegalMoveException("The game has not started yet."))
+            case Invalid => Failure(new IllegalGameStateException("This game is not valid."))
+            case WaitingToBegin => Failure(new IllegalGameStateException("The game has not started yet."))
             case InProgress => 
                 if (isMoveLegal(move)) {
                     move.action match {
                         case Push => board.push(move.piece, move.node.coord) match {
                             case Success(newBoard) => {
-                                Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, this :: history))
+                                Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, 
+                                    this :: history, status=status))
                             }
                             case Failure(ex) => Failure(ex) 
                         }
                         case Pop => board.pop(move.node.coord) match {
                             case Success(newBoard) => {
-                                Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, this :: history))
+                                Try(new Game(name, players.endTurn, newBoard, pieces, endConditions, 
+                                    this :: history, status=status))
                             }
                             case Failure(ex) => Failure(ex)
                         }
@@ -176,7 +194,7 @@ class Game(
                     Failure(new IllegalMoveException(s"${move} is an illegal move."))
                 }
             case Finished => {
-                Failure(new IllegalMoveException("The game is over, no more moves are possible."))
+                Failure(new IllegalGameStateException("The game is over, no more moves are possible."))
             }
         }
     }
