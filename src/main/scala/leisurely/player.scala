@@ -1,7 +1,7 @@
 package org.leisurelyscript
 
 class Player(val name:String = java.util.UUID.randomUUID.toString) { 
-    def valid(player:Player):Boolean = {
+    def valid(game:Game, player:Player):Boolean = {
         player == this
     }
     override def toString:String = {

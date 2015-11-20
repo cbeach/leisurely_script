@@ -164,6 +164,12 @@ class Board(val size:List[Int],
         }
         return players
     }
+    
+    def wellFormed:Unit = {
+        if (graph.nodes.size == 0) {
+            throw new IllegalBoardException("The board must have nodes, no nodes found.")
+        }
+    }
 }
 
 

@@ -27,4 +27,9 @@ class Piece(val name:String, val owner:Player, val legalMoves:List[LegalMove]) e
     override def toString:String = {
         s"Piece(String(${name}), ${owner}, ${legalMoves})"
     }
+    def wellFormed:Unit = {
+        if (legalMoves.size == 0) {
+            throw new IllegalPieceException("A piece must have at least one legal move. None found.")
+        }
+    }
 }

@@ -271,36 +271,36 @@ class GameTree extends FunSuite {
         val game = Game().add(board).add(List(piece)).add(List(endCondition)).add(players)
 
         val aFewPlayers = List(players(1), players(2), players(3))
-        val Previous = new game.players.Previous()
-        val Current = new game.players.Current()
-        val Next = new game.players.Next()
-        val Any = new game.players.Any()
-        val All = new game.players.All()
-        val SomePlayers = new game.players.SomePlayers(aFewPlayers)
-        val NoPlayer = new game.players.NoPlayer()
+        val Previous = new Previous()
+        val Current = new Current()
+        val Next = new Next()
+        val Any = new Any()
+        val All = new All()
+        val SomePlayers = new SomePlayers(aFewPlayers)
+        val NoPlayer = new NoPlayer()
 
-        assert(Previous.valid(players(4)) == true)
-        assert(Previous.valid(players(1)) != true)
-        assert(Current.valid(players(0)) == true)
-        assert(Next.valid(players(1)) == true)
-        assert(Any.valid(players(0)) == true)
-        assert(All.valid(players) == true)
-        assert(SomePlayers.valid(aFewPlayers) == true)
-        assert(NoPlayer.valid(players(0)) == false)
+        assert(Previous.valid(game, players(4)) == true)
+        assert(Previous.valid(game, players(1)) != true)
+        assert(Current.valid(game, players(0)) == true)
+        assert(Next.valid(game, players(1)) == true)
+        assert(Any.valid(game, players(0)) == true)
+        assert(All.valid(game, players) == true)
+        assert(SomePlayers.valid(game, aFewPlayers) == true)
+        assert(NoPlayer.valid(game, players(0)) == false)
     }
     
     test("The game checks for validity and updates the game status accordingly.") {
         val board = Board(List(3, 3), Square, Indirect, Square) 
         val players = new Players(List(Player("X"), Player("O")))
-        val legalMove = new LegalMove(new players.Any(), (game:Game, move:Move) => {
+        val legalMove = new LegalMove(new Any(), (game:Game, move:Move) => {
             game.board.graph.nodes(move.node.coord).empty()
         }, Push)
-        val piece = new Piece("token", new players.Any(), List[LegalMove](legalMove))
+        val piece = new Piece("token", new Any(), List[LegalMove](legalMove))
         val endConditions = List(
-            EndCondition(Win, new players.Previous(), (game:Game) => {
+            EndCondition(Win, new Previous(), (game:Game) => {
                 game.board.nInARow(3, piece).size > 0
             }),
-            EndCondition(Tie, new players.All(), (game:Game) => {
+            EndCondition(Tie, new All(), (game:Game) => {
                 game.board.nInARow(3, piece).size == 0 && game.board.full()
             })
         )
@@ -323,8 +323,6 @@ class GameTree extends FunSuite {
         intercept[IllegalGameException] {
             gameWithPieces.startGame()
         }
-        intercept[IllegalGameException] {
-            gameWithEndCondition.startGame()
-        }
+        gameWithEndCondition.startGame()
     }
 }

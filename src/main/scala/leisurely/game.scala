@@ -22,10 +22,9 @@ class Game(
         (player:Player, resultState:GameResultState.Value, winner:Option[Player])=>{
             resultState match {
                 case Win => 
-                    if (winner.contains(player)) { 
-                        1.0 
-                    } else { 
-                        0.0 
+                    winner match { 
+                        case Some(winningPlayer) if (winningPlayer == player) => 1.0
+                        case _ => 0.0
                     }
                 case Lose => 0.0
                 case Tie => 1.0
@@ -51,7 +50,7 @@ class Game(
                         val winner:Option[Player] = endResult match {
                             case Win => {
                                 players.all.find(p => {
-                                    conditionThatWasMet.player.valid(p)
+                                    conditionThatWasMet.player.valid(this, p)
                                 })
                             }
                             case _ => None
@@ -86,7 +85,7 @@ class Game(
         }).toList.map({
             case (score:Double, list:List[(Player, Double)]) => (score, list.map(_._1))
         }).sortWith((first:Tuple2[Double, List[Player]], second:Tuple2[Double, List[Player]]) => {
-            first._1 < second._1
+            first._1 > second._1
         }).map({
             case (score:Double, list:List[Player]) => list
         })
@@ -129,7 +128,23 @@ class Game(
 
     private def wellFormed():Unit = {
         if (players.all.size <= 0) {
-            throw new IllegalGameAttributeException("There are no players in this game.")
+            throw new IllegalGameException("A game requires one or more players. None found.")
+        }
+
+        if (board == null) {
+            throw new IllegalGameException("A game requires a board. None found.")
+        } else {
+            board.wellFormed
+        }
+
+        if (pieces.size <= 0) {
+            throw new IllegalGameException("A game requires one or more pieces. None found.")
+        } else {
+            pieces.foreach(_.wellFormed)
+        }
+
+        if (endConditions.size <= 0) {
+            throw new IllegalGameException("A game requires one or more end conditions. None found.")
         }
     }
 

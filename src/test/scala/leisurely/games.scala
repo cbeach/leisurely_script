@@ -11,15 +11,15 @@ object TestGameFactory {
     def ticTacToe:Game = {
         val board = Board(List(3, 3), Square, Indirect, Square) 
         val players = new Players(List(Player("X"), Player("O")))
-        val legalMove = new LegalMove(new players.Current(), (game:Game, move:Move) => {
+        val legalMove = new LegalMove(new Current, (game:Game, move:Move) => {
             game.board.graph.nodes(move.node.coord).empty()
         }, Push)
-        val piece = new Piece("token", new players.Any(), List[LegalMove](legalMove))
+        val piece = new Piece("token", new Any, List[LegalMove](legalMove))
         val endConditions = List(
-            EndCondition(Win, new players.Previous(), (game:Game) => {
+            EndCondition(Win, new Previous, (game:Game) => {
                 game.board.nInARow(3, piece).size > 0
             }),
-            EndCondition(Tie, new players.All(), (game:Game) => {
+            EndCondition(Tie, new Any, (game:Game) => {
                 game.board.nInARow(3, piece).size == 0 && game.board.full()
             })
         )

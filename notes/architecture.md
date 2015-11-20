@@ -311,17 +311,12 @@ How do I get the information from the input to the destination variable?
 
 ## Open questions
 
-How about switching to Scala?
- - Pros
-    - Statically typed
-    - Better operator overloading
-    - Apache Spark ready
-    - Performance is a *lot* better than Python. I might not have to even transpile the code.
-    - Many interesting and potentially useful language features
-    - Will learn Scala better   
- - Cons
-   - Slower to develop
-   - Don't know it as well
+Player validation: I would like to use readable values like Previous, Current, Next, All, Any, etc. to identify players.
+    Problems
+        1. The functional design of the game play makes this difficult. A new game object and list of players is created for each turn. Any references to 
+           the list of players after that is out of date.
+
+
 
 
 ### Order of Implementation
