@@ -1,4 +1,6 @@
 package org.leisurelyscript
 
 
-trait Equipment {}
+trait Equipment {
+    def copy:Equipment
+}

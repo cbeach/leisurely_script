@@ -24,10 +24,10 @@ class TicTacToeTests extends FunSuite {
         }, Push)
         val piece = new Piece("token", new Current(), List[LegalMove](legalMove))
         val endConditions = List(
-            EndCondition(Win, new Previous(), (game:Game) => {
+            EndCondition(Win, new Previous(), (game:Game, player:Player) => {
                 game.board.nInARow(3, piece).size > 0
             }),
-            EndCondition(Tie, new All(), (game:Game) => {
+            EndCondition(Tie, new All(), (game:Game, player:Player) => {
                 game.board.nInARow(3, piece).size == 0 && game.board.full()
             })
         )
@@ -67,14 +67,34 @@ class TicTacToeTests extends FunSuite {
     }
 
     test("A full game of TicTacToe should be possible") {
-        val ticTacToe:Game = TestGameFactory.ticTacToe
-        ticTacToe.startGame()
-        val move1 = ticTacToe.applyMove(Move(ticTacToe.pieces(0), ticTacToe.players.current, Push, ticTacToe.board.graph.nodes(Coordinate(0, 0)))).get
-        val move2 = move1.applyMove(Move(move1.pieces(0), move1.players.current, Push, move1.board.graph.nodes(Coordinate(2, 0)))).get
-        val move3 = move2.applyMove(Move(move2.pieces(0), move2.players.current, Push, move2.board.graph.nodes(Coordinate(1, 1)))).get
-        val move4 = move3.applyMove(Move(move3.pieces(0), move3.players.current, Push, move3.board.graph.nodes(Coordinate(2, 1)))).get
-        val move5 = move4.applyMove(Move(move4.pieces(0), move4.players.current, Push, move4.board.graph.nodes(Coordinate(2, 2)))).get
+        val boardToString:(Board) => String = (board:Board) => {
+            val strList = for (i <- 0 until 3; j <- 0 until 3) yield {
+                val equipment = board.graph.nodes(Coordinate(i, j)).equipment
+                if (equipment.size == 0) {
+                    "-" 
+                } else {
+                    equipment(0) match {
+                        case piece:Piece => piece.owner.name
+                    }
+                }
+            }
+            s"\n ${strList.slice(0, 3).mkString("")} \n ${strList.slice(3, 6).mkString("")} \n ${strList.slice(6, 9).mkString("")}"
+        }
 
+        val ticTacToe:Game = TestGameFactory.ticTacToe
+        info(boardToString(ticTacToe.board))
+        ticTacToe.startGame()
+        info(boardToString(ticTacToe.board))
+        val move1 = ticTacToe.applyMove(Move(ticTacToe.pieces(0), ticTacToe.players.current, Push, ticTacToe.board.graph.nodes(Coordinate(0, 0)))).get
+        info(boardToString(move1.board))
+        val move2 = move1.applyMove(Move(move1.pieces(0), move1.players.current, Push, move1.board.graph.nodes(Coordinate(2, 0)))).get
+        info(boardToString(move2.board))
+        val move3 = move2.applyMove(Move(move2.pieces(0), move2.players.current, Push, move2.board.graph.nodes(Coordinate(1, 1)))).get
+        info(boardToString(move3.board))
+        val move4 = move3.applyMove(Move(move3.pieces(0), move3.players.current, Push, move3.board.graph.nodes(Coordinate(2, 1)))).get
+        info(boardToString(move4.board))
+        val move5 = move4.applyMove(Move(move4.pieces(0), move4.players.current, Push, move4.board.graph.nodes(Coordinate(2, 2)))).get
+        info(boardToString(move5.board))
         assert(move5.gameResult.get.result == Win)
         val move5Ranking = move5.gameResult.get.ranking.get
 
@@ -127,30 +147,35 @@ class TicTacToeTests extends FunSuite {
         }
     }
 
-    test("The game should recognize when an end condition has been met.") {
+    test("nInARow should not return true for tic-tac-toe if the pieces belong to different players.") {
         val game = TestGameFactory.ticTacToe.startGame()
-        val move1 = game.applyMove(new Move(game.pieces(0), game.players.current, Push, 
-            game.board.graph.nodes(Coordinate(0, 0)))).get
-        val move2 = move1.applyMove(new Move(move1.pieces(0), move1.players.current, Push, 
-            move1.board.graph.nodes(Coordinate(0, 1)))).get
-        val endGame = move2.applyMove(new Move(move2.pieces(0), move2.players.current, Push, 
-            move2.board.graph.nodes(Coordinate(0, 2)))).get
-        assert(endGame.status == Finished)
-        info(s"${endGame.board.nInARow(3, game.pieces(0))}")
+        val move1 = game.applyMove(new Move(game.pieces(0).copy(game.players.current), 
+            game.players.current, Push, game.board.graph.nodes(Coordinate(0, 0)))).get
+        val move2 = move1.applyMove(new Move(move1.pieces(0).copy(game.players.current), 
+            move1.players.current, Push, move1.board.graph.nodes(Coordinate(0, 1)))).get
+        val endGame = move2.applyMove(new Move(move2.pieces(0).copy(game.players.current), 
+            move2.players.current, Push, move2.board.graph.nodes(Coordinate(0, 2)))).get
+        assert(endGame.status == InProgress)
     }
 
     test("What about a tied game?") {
         val move0:Game = TestGameFactory.ticTacToe.startGame()
-        val move1 = move0.applyMove(Move(move0.pieces(0), move0.players.current, Push, move0.board.graph.nodes(Coordinate(0, 0)))).get
-        val move2 = move1.applyMove(Move(move1.pieces(0), move1.players.current, Push, move1.board.graph.nodes(Coordinate(0, 1)))).get
-        val move3 = move2.applyMove(Move(move2.pieces(0), move2.players.current, Push, move2.board.graph.nodes(Coordinate(0, 2)))).get
-        val move4 = move3.applyMove(Move(move3.pieces(0), move3.players.current, Push, move3.board.graph.nodes(Coordinate(1, 0)))).get
-        val move5 = move4.applyMove(Move(move4.pieces(0), move4.players.current, Push, move4.board.graph.nodes(Coordinate(1, 1)))).get
-        val move6 = move5.applyMove(Move(move5.pieces(0), move5.players.current, Push, move5.board.graph.nodes(Coordinate(1, 2)))).get
-        val move7 = move6.applyMove(Move(move6.pieces(0), move6.players.current, Push, move6.board.graph.nodes(Coordinate(2, 0)))).get
-        val move8 = move7.applyMove(Move(move7.pieces(0), move7.players.current, Push, move7.board.graph.nodes(Coordinate(2, 1)))).get
-        val move9 = move8.applyMove(Move(move8.pieces(0), move8.players.current, Push, move8.board.graph.nodes(Coordinate(2, 2)))).get
+        val move1 = move0.applyMove(Move(move0.pieces(0).copy(move0.players.current), move0.players.current, Push, move0.board.graph.nodes(Coordinate(1, 1)))).get
+        val move2 = move1.applyMove(Move(move1.pieces(0).copy(move1.players.current), move1.players.current, Push, move1.board.graph.nodes(Coordinate(0, 0)))).get
+        val move3 = move2.applyMove(Move(move2.pieces(0).copy(move2.players.current), move2.players.current, Push, move2.board.graph.nodes(Coordinate(0, 1)))).get
+        val move4 = move3.applyMove(Move(move3.pieces(0).copy(move3.players.current), move3.players.current, Push, move3.board.graph.nodes(Coordinate(2, 1)))).get
+        val move5 = move4.applyMove(Move(move4.pieces(0).copy(move4.players.current), move4.players.current, Push, move4.board.graph.nodes(Coordinate(1, 0)))).get
+        val move6 = move5.applyMove(Move(move5.pieces(0).copy(move5.players.current), move5.players.current, Push, move5.board.graph.nodes(Coordinate(1, 2)))).get
+        val move7 = move6.applyMove(Move(move6.pieces(0).copy(move6.players.current), move6.players.current, Push, move6.board.graph.nodes(Coordinate(0, 2)))).get
+        val move8 = move7.applyMove(Move(move7.pieces(0).copy(move7.players.current), move7.players.current, Push, move7.board.graph.nodes(Coordinate(2, 0)))).get
+        val move9 = move8.applyMove(Move(move8.pieces(0).copy(move8.players.current), move8.players.current, Push, move8.board.graph.nodes(Coordinate(2, 2)))).get
 
-        
+        move9.gameResult match {
+            case Some(gameResult:GameResult) => {
+                info(s"${gameResult.result}")
+                assert(gameResult.result == Tie)
+            }
+            case None => fail
+        }
     }
 }

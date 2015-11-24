@@ -14,7 +14,7 @@ import NeighborType._
 import Shape._
 
 
-class GameTree extends FunSuite {
+class GameTreeTests extends FunSuite {
     test("A player can be created with a name") { 
         val fred = Player("Fred")
         assert(fred.name == "Fred")
@@ -139,30 +139,38 @@ class GameTree extends FunSuite {
     }
 
     test("Board.nInARow should detect rows that are 3 long") {
-        val player = Player("1")
-        val piece = new Piece("token", player, List[LegalMove]())
+        val player1 = Player("1")
+        val piece1 = new Piece("token", player1, List[LegalMove]())
         val horizontalBoard = Board(List(3, 3), Square, Indirect, Square)
-            .push(piece, Coordinate(0, 0))
-            .flatMap(b => b.push(piece, Coordinate(0, 1)))
-            .flatMap(b => b.push(piece, Coordinate(0, 2))) getOrElse fail
+            .push(piece1, Coordinate(0, 0))
+            .flatMap(b => b.push(piece1, Coordinate(0, 1)))
+            .flatMap(b => b.push(piece1, Coordinate(0, 2))) getOrElse fail
         val verticalBoard = Board(List(3, 3), Square, Indirect, Square)
-            .push(piece, Coordinate(0, 0))
-            .flatMap(b => b.push(piece, Coordinate(1, 0)))
-            .flatMap(b => b.push(piece, Coordinate(2, 0))) getOrElse fail
+            .push(piece1, Coordinate(0, 0))
+            .flatMap(b => b.push(piece1, Coordinate(1, 0)))
+            .flatMap(b => b.push(piece1, Coordinate(2, 0))) getOrElse fail
         val diagonalBoard = Board(List(3, 3), Square, Indirect, Square)
-            .push(piece, Coordinate(0, 0))
-            .flatMap(b => b.push(piece, Coordinate(1, 1)))
-            .flatMap(b => b.push(piece, Coordinate(2, 2))) getOrElse fail
+            .push(piece1, Coordinate(0, 0))
+            .flatMap(b => b.push(piece1, Coordinate(1, 1)))
+            .flatMap(b => b.push(piece1, Coordinate(2, 2))) getOrElse fail
         val cornerBoard = Board(List(3, 3), Square, Indirect, Square)
-            .push(piece, Coordinate(0, 0))
-            .flatMap(b => b.push(piece, Coordinate(2, 2))) getOrElse fail
+            .push(piece1, Coordinate(0, 0))
+            .flatMap(b => b.push(piece1, Coordinate(2, 2))) getOrElse fail
         val emptyBoard = Board(List(3, 3), Square, Indirect, Square) 
 
-        assert(horizontalBoard.nInARow(3, piece).size > 0 )
-        assert(verticalBoard.nInARow(3, piece).size > 0 )
-        assert(diagonalBoard.nInARow(3, piece).size > 0 )
-        assert(cornerBoard.nInARow(3, piece).size == 0 )
-        assert(emptyBoard.nInARow(3, piece).size == 0)
+        val player2 = Player("2")
+        val piece2 = new Piece("token", player2, List[LegalMove]())
+        val diagonalBoardAlternatingPlayers = Board(List(3, 3), Square, Indirect, Square)
+            .push(piece1, Coordinate(0, 0))
+            .flatMap(b => b.push(piece2, Coordinate(1, 1)))
+            .flatMap(b => b.push(piece1, Coordinate(2, 2))) getOrElse fail
+
+        assert(horizontalBoard.nInARow(3, piece1).size > 0 )
+        assert(verticalBoard.nInARow(3, piece1).size > 0 )
+        assert(diagonalBoard.nInARow(3, piece1).size > 0 )
+        assert(cornerBoard.nInARow(3, piece1).size == 0 )
+        assert(emptyBoard.nInARow(3, piece1).size == 0)
+        assert(diagonalBoardAlternatingPlayers.nInARow(3, piece1).size == 0)
     }
 
     test("A user should be able to get the number of pieces that occupy a board") {
@@ -265,7 +273,7 @@ class GameTree extends FunSuite {
         val player = players(0)
         val legalMove = new LegalMove(player, precondition, Push)
         val piece = new Piece("token", player, List[LegalMove](legalMove))
-        val endCondition = EndCondition(Win, player, (game) => {
+        val endCondition = EndCondition(Win, player, (game, player) => {
             game.board.nInARow(3, piece).size > 0
         })
         val game = Game().add(board).add(List(piece)).add(List(endCondition)).add(players)
@@ -297,10 +305,10 @@ class GameTree extends FunSuite {
         }, Push)
         val piece = new Piece("token", new Any(), List[LegalMove](legalMove))
         val endConditions = List(
-            EndCondition(Win, new Previous(), (game:Game) => {
+            EndCondition(Win, new Previous(), (game:Game, player:Player) => {
                 game.board.nInARow(3, piece).size > 0
             }),
-            EndCondition(Tie, new All(), (game:Game) => {
+            EndCondition(Tie, new All(), (game:Game, player:Player) => {
                 game.board.nInARow(3, piece).size == 0 && game.board.full()
             })
         )
@@ -324,5 +332,72 @@ class GameTree extends FunSuite {
             gameWithPieces.startGame()
         }
         gameWithEndCondition.startGame()
+    }
+
+    test("New graphs don't change as the game progresses") {
+        val move0:Game = TestGameFactory.ticTacToe.startGame()
+        val move1 = move0.applyMove(Move(move0.pieces(0).copy(move0.players.current), move0.players.current, Push, move0.board.graph.nodes(Coordinate(0, 0)))).get
+        val move2 = move1.applyMove(Move(move1.pieces(0).copy(move1.players.current), move1.players.current, Push, move1.board.graph.nodes(Coordinate(0, 1)))).get
+        val move3 = move2.applyMove(Move(move2.pieces(0).copy(move2.players.current), move2.players.current, Push, move2.board.graph.nodes(Coordinate(0, 2)))).get
+        val move4 = move3.applyMove(Move(move3.pieces(0).copy(move3.players.current), move3.players.current, Push, move3.board.graph.nodes(Coordinate(1, 0)))).get
+        val move5 = move4.applyMove(Move(move4.pieces(0).copy(move4.players.current), move4.players.current, Push, move4.board.graph.nodes(Coordinate(1, 1)))).get
+        val move6 = move5.applyMove(Move(move5.pieces(0).copy(move5.players.current), move5.players.current, Push, move5.board.graph.nodes(Coordinate(1, 2)))).get
+        val move7 = move6.applyMove(Move(move6.pieces(0).copy(move6.players.current), move6.players.current, Push, move6.board.graph.nodes(Coordinate(2, 0)))).get
+        val move8 = move7.applyMove(Move(move7.pieces(0).copy(move7.players.current), move7.players.current, Push, move7.board.graph.nodes(Coordinate(2, 1)))).get
+        val move9 = move8.applyMove(Move(move8.pieces(0).copy(move8.players.current), move8.players.current, Push, move8.board.graph.nodes(Coordinate(2, 2)))).get
+
+        val boardToString:(Board) => String = (board:Board) => {
+            val strList = for (i <- 0 until 3; j <- 0 until 3) yield {
+                val equipment = board.graph.nodes(Coordinate(i, j)).equipment
+                if (equipment.size == 0) {
+                    "-" 
+                } else {
+                    equipment(0) match {
+                        case piece:Piece => piece.owner.name
+                    }
+                }
+            }
+            s"\n ${strList.slice(0, 3).mkString("")} \n ${strList.slice(3, 6).mkString("")} \n ${strList.slice(6, 9).mkString("")}"
+        }
+
+        assert(move0.board.nInARow(3, move0.pieces(0).copy(move0.players.all(0))).size == 0)
+        assert(move1.board.nInARow(3, move1.pieces(0).copy(move1.players.all(0))).size == 0)
+        assert(move2.board.nInARow(3, move2.pieces(0).copy(move2.players.all(0))).size == 0)
+        assert(move3.board.nInARow(3, move3.pieces(0).copy(move3.players.all(0))).size == 0)
+        assert(move4.board.nInARow(3, move4.pieces(0).copy(move4.players.all(0))).size == 0)
+        assert(move5.board.nInARow(3, move5.pieces(0).copy(move5.players.all(0))).size == 0)
+        assert(move6.board.nInARow(3, move6.pieces(0).copy(move6.players.all(0))).size == 0)
+        assert(move7.board.nInARow(3, move7.pieces(0).copy(move7.players.all(0))).size == 1)
+        assert(move8.board.nInARow(3, move8.pieces(0).copy(move8.players.all(0))).size == 1)
+
+        assert(move0.gameResult.get.result == Pending)
+        assert(move1.gameResult.get.result == Pending)
+        assert(move2.gameResult.get.result == Pending)
+        assert(move3.gameResult.get.result == Pending)
+        assert(move4.gameResult.get.result == Pending)
+        assert(move5.gameResult.get.result == Pending)
+        assert(move6.gameResult.get.result == Pending)
+        assert(move7.gameResult.get.result == Win)
+
+        val playerX = move0.players.all(0)
+        val playerO = move0.players.all(1)
+
+        assert(move0.players.current == playerX)
+        assert(move1.players.current == playerO)
+        assert(move2.players.current == playerX)
+        assert(move3.players.current == playerO)
+        assert(move4.players.current == playerX)
+        assert(move5.players.current == playerO)
+        assert(move6.players.current == playerX)
+        assert(move7.players.current == playerO)
+
+        move9.gameResult match {
+            case Some(gameResult:GameResult) => {
+                info(s"${gameResult.result}")
+                assert(gameResult.result == Tie)
+            }
+            case None => fail
+        }
+
     }
 }

@@ -35,8 +35,12 @@ class Game(
 
     gameResult = Some(gameResult.getOrElse({
         val conditionValues:List[Boolean] = endConditions.map(endCondition => {
-            endCondition.condition(this)
+            endCondition.condition(this, endCondition.player.get(this))
         })
+        if (pieces.size > 0) {
+            val firstPiece = pieces(0)
+            val firstPlayer = players.all(0)
+        }
          
         if (history.size == 0) {
             GameResult(Pending, None)

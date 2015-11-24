@@ -16,11 +16,11 @@ object TestGameFactory {
         }, Push)
         val piece = new Piece("token", new Any, List[LegalMove](legalMove))
         val endConditions = List(
-            EndCondition(Win, new Previous, (game:Game) => {
-                game.board.nInARow(3, piece).size > 0
+            EndCondition(Win, new Previous, (game:Game, player:Player) => {
+                game.board.nInARow(3, piece.copy(player)).size > 0
             }),
-            EndCondition(Tie, new Any, (game:Game) => {
-                game.board.nInARow(3, piece).size == 0 && game.board.full()
+            EndCondition(Tie, new Any, (game:Game, player:Player) => {
+                game.board.nInARow(3, piece.copy(player)).size == 0 && game.board.full()
             })
         )
         Game()

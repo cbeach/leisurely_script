@@ -7,9 +7,16 @@ class Player(val name:String = java.util.UUID.randomUUID.toString) {
     override def toString:String = {
         s"Player(${name})"
     }
+    def get(game:Game):Player = {
+        this
+    }
 }
 
 object Player {
+    def apply(other:Player) = {
+        new Player(other.name)
+    }
+
     def apply(name:String = null):Player = {
         if (name == null) {
             new Player()

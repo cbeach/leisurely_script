@@ -2,6 +2,18 @@ package org.leisurelyscript
 
 
 class Piece(val name:String, val owner:Player, val legalMoves:List[LegalMove]) extends Equipment {
+    def this(other:Piece) = {
+        this(other.name, other.owner, other.legalMoves)
+    }
+
+    override def copy:Piece = {
+        new Piece(name, owner, legalMoves)
+    }
+
+    def copy(newOwner:Player):Piece = {
+        new Piece(name, newOwner, legalMoves)
+    }
+
     def legalMoves(game:Game, player:Player): List[Move] = {
         var moveList:List[Move] = List()
         for (legalMove <- legalMoves) {

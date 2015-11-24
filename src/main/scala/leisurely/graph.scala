@@ -36,50 +36,86 @@ class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
     }
 
     def push(thing:Equipment, coord:Coordinate):Try[Graph] = {
+        val (newNodeMap, newEdgeList) = deepCopyNodesAndEdges
         val oldNode = nodes(coord)
         val newNode = BoardNode(coord, thing :: oldNode.equipment)
-        replaceNode(newNode)
+        replaceNode(newNode, newNodeMap, newEdgeList)
     }
 
     def pop(coord:Coordinate):Try[Graph] = {
+        val (newNodeMap, newEdgeList) = deepCopyNodesAndEdges
         val oldNode = nodes(coord)
         val newNode = BoardNode(coord, oldNode.equipment.tail)
-        replaceNode(newNode)
+        replaceNode(newNode, newNodeMap, newEdgeList)
     }
 
-    def replaceNode(newNode:BoardNode):Try[Graph] = {
-        val oldNode = nodes(newNode.coord)
+    def deepCopyNodesAndEdges:Tuple2[Map[Coordinate, BoardNode], List[BoardEdge]] = {
+        val newNodeList = for (node <- nodes) yield BoardNode(
+             Coordinate(node._1.x, node._1.y))
+
+        nodes.values.zip(newNodeList).foreach({
+            case (oldNode:BoardNode, newNode:BoardNode) => {
+                newNode.equipment = oldNode.equipment.map(_.copy)
+            }
+        })
+
+        val newNodeMap:Map[Coordinate, BoardNode] = newNodeList.map(node => {
+            (node.coord, node)
+        }).toMap
+
+        val newEdgeList = edges.map(oldEdge => {
+            val a:BoardNode = newNodeMap(oldEdge.nodes._1.coord)
+            val b:BoardNode = newNodeMap(oldEdge.nodes._2.coord)
+            BoardEdge((a, b), oldEdge.direction) 
+        })
+
+        newEdgeList.foreach(edge => {
+            val sourceNode = edge.nodes._1
+            sourceNode.edges = edge :: sourceNode.edges
+        })
+        (newNodeMap, newEdgeList)
+    }
+
+    def replaceNode(newNode:BoardNode, 
+                    nodeMap:Map[Coordinate, BoardNode], 
+                    edgeList:List[BoardEdge]):Try[Graph] = {
+        //Grab the old node and update the new node's list of outgoing edges
+        val oldNode = nodeMap(newNode.coord)
         newNode.edges = oldNode.edges.map(edge => {
             BoardEdge((newNode, edge.nodes._2), edge.direction)
         })
 
-        // Create new edges for the new node
-        val newEdges:List[BoardEdge] = oldNode.edges.map(edge=>{
-            BoardEdge((newNode, edge.nodes._2), edge.direction) :: edge.nodes._2.edges.filter(e=>e.nodes._2 == oldNode).map(e=>{  
-                    BoardEdge((e.nodes._1, newNode), e.direction)
-                })
-        }).flatten
+        val updatedEdgeList:List[BoardEdge] = edgeList.map(edge => {
+            if (edge.nodes._1 == oldNode) {
+                BoardEdge((newNode, edge.nodes._2), edge.direction)
+            } else if (edge.nodes._2 == oldNode) {
+                BoardEdge((edge.nodes._1, newNode), edge.direction)
+            } else {
+                edge
+            }
+        })
 
-        // Travel to all nodes that are destinations of new node and update their edges
-        oldNode.edges.foreach(edge => {
-            edge.nodes._2.edges = edge.nodes._2.edges.map(edge2 => {
-                // If the destination of this edge is the old node 
-                if (edge2.nodes._2 eq oldNode) {
-                    // Return a new edge with a new destination
-                    edge2.copy(nodes=(edge2.nodes._1, newNode))
+        val updatedNodeMap:Map[Coordinate, BoardNode] = nodeMap.map {
+            case (coord:Coordinate, node:BoardNode) => { 
+                // If this is the old node then just return a ref to the new one
+                if (node eq oldNode) {
+                    (coord, newNode)
                 } else {
-                    // Nothing needs to be done
-                    edge2
+                    // This is not the old node. Check this node's list of outgoing edges and replace
+                    // any that point at the old node.
+                    node.edges = node.edges.map(edge => {
+                        if (edge.nodes._2 eq oldNode) {
+                            BoardEdge((node, newNode), edge.direction)
+                        } else {
+                            edge
+                        }
+                    })
+                    (coord, node)
                 }
-            })
-        })
-
-        val newNodeMap = nodes - oldNode.coord + (newNode.coord -> newNode)
-        val newEdgeList = newEdges ++ edges.filter(e => {
-            !newEdges.contains(e)
-        })
-        Try(new Graph(newNodeMap, newEdgeList))
-
+            }
+        } toMap
+        
+        Try(new Graph(updatedNodeMap, updatedEdgeList))
     }
 
     override def toString:String = {

@@ -12,7 +12,7 @@ class Board(val size:List[Int],
     val boardShape:Shape, 
     val neighborType:NeighborType, 
     val nodeShape:Shape,
-    val graph:Graph = new Graph()) extends Equipment {
+    val graph:Graph = new Graph()) {
 
     def this(other:Board) = {
         this(other.size, other.boardShape, other.neighborType, other.nodeShape, new Graph(other.graph))

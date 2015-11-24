@@ -8,6 +8,9 @@ class Previous extends Player() {
     override def toString:String = {
         "Player(Previous)"
     }
+    override def get(game:Game):Player = {
+        game.players.previous
+    }
 }
 
 class Current extends Player() {
@@ -17,6 +20,9 @@ class Current extends Player() {
     override def toString:String = {
         "Player(Current)"
     }
+    override def get(game:Game):Player = {
+        game.players.current
+    }
 }
 
 class Next extends Player() {
@@ -25,6 +31,9 @@ class Next extends Player() {
     }
     override def toString:String = {
         "Player(Next)"
+    }
+    override def get(game:Game):Player = {
+        game.players.next
     }
 }
 

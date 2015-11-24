@@ -1,6 +1,7 @@
 package org.leisurelyscript
 
-case class BoardNode(coord:Coordinate, 
+case class BoardNode(
+    val coord:Coordinate, 
     var equipment:List[Equipment]=List()) {
     var edges:List[BoardEdge]=List()
     var label:String = _
