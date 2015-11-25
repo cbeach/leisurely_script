@@ -7,12 +7,15 @@ import org.scalatest.FunSuite
 import org.leisurelyscript.test.util.TestGameFactory
 import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
 
+//import org.leisurelyscript.ImplicitDefs.Player._
+
 import Direction._
 import GameStatus._
 import GameResultState._
 import MoveAction._
 import NeighborType._
 import Shape._
+
 
 
 class GameTreeTests extends FunSuite {
@@ -114,17 +117,19 @@ class GameTreeTests extends FunSuite {
     }
 
     test("The user can push a piece into a node in the board") {
-        val board = Board(List(3, 3), Square, Direct, Square) 
-        val piece = new Piece("token", Player("1"), List[LegalMove]())
-        val newBoard = board.push(piece, Coordinate(0, 0)).get
+        val board = Board(List(3, 3), Square, Direct, Square)
+        val player1 = Player("1")
+        val piece = new PieceRule("token", player1, List[LegalMove]())
+        val newBoard = board.push(piece.getPhysicalPiece(player1), Coordinate(0, 0)).get
 
         assert(!newBoard.empty() && !newBoard.full())
     }
 
     test("The user can pop a piece out of a node in the board") {
-        val board = Board(List(3, 3), Square, Direct, Square) 
-        val piece = new Piece("token", Player("1"), List[LegalMove]())
-        val firstNewBoard = board.push(piece, Coordinate(0, 0)).get
+        val board = Board(List(3, 3), Square, Direct, Square)
+        val player1 = Player("1")
+        val piece = new PieceRule("token", player1, List[LegalMove]())
+        val firstNewBoard = board.push(piece.getPhysicalPiece(player1), Coordinate(0, 0)).get
         val secondNewBoard = firstNewBoard.pop(Coordinate(0, 0)).get
 
         assert(secondNewBoard.empty())
@@ -132,16 +137,17 @@ class GameTreeTests extends FunSuite {
     }
 
     test("Board.full should return true when called on a full board") {
-        var board = Board(List(3, 3), Square, Direct, Square) 
+        var board = Board(List(3, 3), Square, Direct, Square)
+        val player1 = Player("1")
         for (node <- board.graph.nodes) {
-            board = board.push(new Piece("token", Player("1"), List[LegalMove]()), node._1).get
+            board = board.push(PhysicalPiece("token", player1), node._1).get
         }
         assert(board.full())
     }
 
     test("Board.nInARow should detect rows that are 3 long") {
         val player1 = Player("1")
-        val piece1 = new Piece("token", player1, List[LegalMove]())
+        val piece1 = new PhysicalPiece("token", player1)
         val horizontalBoard = Board(List(3, 3), Square, Indirect, Square)
             .push(piece1, Coordinate(0, 0))
             .flatMap(b => b.push(piece1, Coordinate(0, 1)))
@@ -160,7 +166,7 @@ class GameTreeTests extends FunSuite {
         val emptyBoard = Board(List(3, 3), Square, Indirect, Square) 
 
         val player2 = Player("2")
-        val piece2 = new Piece("token", player2, List[LegalMove]())
+        val piece2 = new PhysicalPiece("token", player2)
         val diagonalBoardAlternatingPlayers = Board(List(3, 3), Square, Indirect, Square)
             .push(piece1, Coordinate(0, 0))
             .flatMap(b => b.push(piece2, Coordinate(1, 1)))
@@ -176,7 +182,7 @@ class GameTreeTests extends FunSuite {
 
     test("A user should be able to get the number of pieces that occupy a board") {
         val player = Player("1")
-        val piece = new Piece("token", player, List[LegalMove]())
+        val piece = new PhysicalPiece("token", player)
         val board = Board(List(3, 3), Square, Indirect, Square) 
             .push(piece, Coordinate(0, 0))
             .flatMap(b => b.push(piece, Coordinate(0, 1)))
@@ -186,9 +192,10 @@ class GameTreeTests extends FunSuite {
 
     test("Performing a push move should return a new game with a board that has 1 piece in it") {
         val game = TestGameFactory.ticTacToe.startGame()
-        assert(game.applyMove(new Move(game.pieces(0), game.players.current, Push, 
+        val xPiece = game.pieces(0).getPhysicalPiece(game.players.all(0))
+        assert(game.applyMove(new Move(xPiece, game.players.current, Push, 
         game.board.graph.nodes(Coordinate(0, 1)))) match {
-            case Success(newGame) => newGame.board.numberOfPieces() == 1
+            case Success(newGame:Game) => newGame.board.numberOfPieces() == 1
             case Failure(ex) => throw(ex)
         })
     }
@@ -216,7 +223,8 @@ class GameTreeTests extends FunSuite {
 
     test("Making a move should result in a completely new game with a different board") {
         val game:Game = TestGameFactory.ticTacToe.startGame()
-        val firstMove:Game = game.applyMove(new Move(game.pieces(0), game.players.current, Push, 
+        val xPiece = game.pieces(0).getPhysicalPiece(game.players.all(0))
+        val firstMove:Game = game.applyMove(new Move(xPiece, game.players.current, Push, 
         game.board.graph.nodes(Coordinate(0, 1)))).get
 
         assert(!(game eq firstMove))
@@ -228,8 +236,8 @@ class GameTreeTests extends FunSuite {
         val board = Board(List(3, 3), Square, Indirect, Square) 
         val player = Player("1")
         val legalMove = new LegalMove(player, precondition, Push)
-        val piece = new Piece("token", player, List[LegalMove](legalMove))
-        val move = new Move(piece, player, Push, board.graph.nodes(Coordinate(0, 0)))
+        val piece = new PieceRule("token", player, List[LegalMove](legalMove))
+        val move = new Move(piece.getPhysicalPiece(player), player, Push, board.graph.nodes(Coordinate(0, 0)))
 
         val game = Game().add(board).add(List(piece))
         assert(precondition(game, move))
@@ -244,7 +252,7 @@ class GameTreeTests extends FunSuite {
 
     test("game.isMoveLegal should return true if a move is legal, false otherwise") {
         val game = TestGameFactory.ticTacToe.startGame()
-        val move = new Move(game.pieces(0), game.players.current, Push, 
+        val move = new Move(game.pieces(0).getPhysicalPiece(game.players.current), game.players.current, Push, 
             game.board.graph.nodes(Coordinate(0, 1)))
 
         assert(game.isMoveLegal(move))
@@ -255,7 +263,7 @@ class GameTreeTests extends FunSuite {
 
     test("The game should only allow legal moves to be applied") {
         val game = TestGameFactory.ticTacToe.startGame()
-        val move = new Move(game.pieces(0), game.players.current, Push, 
+        val move = new Move(game.pieces(0).getPhysicalPiece(game.players.current), game.players.current, Push, 
             game.board.graph.nodes(Coordinate(0, 1)))
         assert(game.isMoveLegal(move))
 
@@ -273,44 +281,44 @@ class GameTreeTests extends FunSuite {
         val players = List(Player("1"), Player("2"), Player("3"), Player("4"), Player("5"))
         val player = players(0)
         val legalMove = new LegalMove(player, precondition, Push)
-        val piece = new Piece("token", player, List[LegalMove](legalMove))
+        val piece = new PieceRule("token", player, List[LegalMove](legalMove))
         val endCondition = EndCondition(Win, player, (game, player) => {
-            game.board.nInARow(3, piece).size > 0
+            game.board.nInARow(3, piece.getPhysicalPiece(player)).size > 0
         })
         val game = Game().add(board).add(List(piece)).add(List(endCondition)).add(players)
 
-        val aFewPlayers = List(players(1), players(2), players(3))
-        val Previous = new Previous()
-        val Current = new Current()
-        val Next = new Next()
-        val Any = new Any()
-        val All = new All()
-        val SomePlayers = new SomePlayers(aFewPlayers)
-        val NoPlayer = new NoPlayer()
+        val aFewPlayers = Set(players(1), players(2), players(3))
+        val previous = Previous
+        val current = Current
+        val next = Next
+        val any = Any
+        val all = All
+        val somePlayers = SomePlayers(aFewPlayers)
+        val noPlayer = NoPlayer
 
-        assert(Previous.valid(game, players(4)) == true)
-        assert(Previous.valid(game, players(1)) != true)
-        assert(Current.valid(game, players(0)) == true)
-        assert(Next.valid(game, players(1)) == true)
-        assert(Any.valid(game, players(0)) == true)
-        assert(All.valid(game, players) == true)
-        assert(SomePlayers.valid(game, aFewPlayers) == true)
-        assert(NoPlayer.valid(game, players(0)) == false)
+        assert(previous.playersValid(game, players(4)) == true)
+        assert(previous.playersValid(game, players(1)) != true)
+        assert(current.playersValid(game, players(0)) == true)
+        assert(next.playersValid(game, players(1)) == true)
+        assert(any.playersValid(game, players(0)) == true)
+        assert(all.playersValid(game, players.toSet) == true)
+        assert(somePlayers.playersValid(game, aFewPlayers) == true)
+        assert(noPlayer.playersValid(game, players(0)) == false)
     }
     
     test("The game checks for validity and updates the game status accordingly.") {
         val board = Board(List(3, 3), Square, Indirect, Square) 
         val players = new Players(List(Player("X"), Player("O")))
-        val legalMove = new LegalMove(new Any(), (game:Game, move:Move) => {
+        val legalMove = new LegalMove(Any, (game:Game, move:Move) => {
             game.board.graph.nodes(move.node.coord).empty()
         }, Push)
-        val piece = new Piece("token", new Any(), List[LegalMove](legalMove))
+        val piece = new PieceRule("token", Any, List[LegalMove](legalMove))
         val endConditions = List(
-            EndCondition(Win, new Previous(), (game:Game, player:Player) => {
-                game.board.nInARow(3, piece).size > 0
+            EndCondition(Win, Previous, (game:Game, player:Player) => {
+                game.board.nInARow(3, piece.getPhysicalPiece(player)).size > 0
             }),
-            EndCondition(Tie, new All(), (game:Game, player:Player) => {
-                game.board.nInARow(3, piece).size == 0 && game.board.full()
+            EndCondition(Tie, All, (game:Game, player:Player) => {
+                game.board.nInARow(3, piece.getPhysicalPiece(player)).size == 0 && game.board.full()
             })
         )
 
@@ -338,8 +346,8 @@ class GameTreeTests extends FunSuite {
     test("New graphs don't change as the game progresses") {
         val tie = movesFromTiedGame
 
-        val xPiece = tie(0).pieces(0).copy(tie(0).players.all(0))
-        val oPiece = tie(0).pieces(0).copy(tie(0).players.all(1))
+        val xPiece = tie(0).pieces(0).getPhysicalPiece(tie(0).players.all(0))
+        val oPiece = tie(0).pieces(0).getPhysicalPiece(tie(0).players.all(1))
 
         assert(tie(0).board.nInARow(3, xPiece).size == 0)
         assert(tie(1).board.nInARow(3, xPiece).size == 0)

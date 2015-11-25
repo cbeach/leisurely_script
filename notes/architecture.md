@@ -146,6 +146,7 @@ It needs to handle
     * All
     * SomePlayers
     * NoPlayer
+    * Specific
 
 I could use:
     Almost all of these run into a chicken and egg problem, just write a simple kludge and refactor later.

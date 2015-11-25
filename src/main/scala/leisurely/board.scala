@@ -7,7 +7,6 @@ import Direction._
 import NeighborType._
 import Shape._
 
-
 class Board(val size:List[Int], 
     val boardShape:Shape, 
     val neighborType:NeighborType, 
@@ -130,11 +129,11 @@ class Board(val size:List[Int],
         Try(new Board(size, boardShape, neighborType, nodeShape, graph.pop(coord).get))
     }
 
-    def nInARow(n:Int, piece:Piece, neighborType:NeighborType=null):Set[Player] = {
-        def recursiveWalk(x:Int, n:Int, thisNode:BoardNode, piece:Piece, direction:Direction=null):Boolean = {
+    def nInARow(n:Int, piece:PhysicalPiece, neighborType:NeighborType=null):Set[ConcretelyKnownPlayer] = {
+        def recursiveWalk(x:Int, n:Int, thisNode:BoardNode, piece:PhysicalPiece, direction:Direction=null):Boolean = {
             val matchingPieces = thisNode.equipment.filter(eq => {
                 eq match {
-                    case p:Piece => piece.name == p.name && piece.owner == p.owner
+                    case p:PhysicalPiece => piece.name == p.name && piece.owner.getPlayers == p.owner.getPlayers
                     case _ => false
                 }
             })
@@ -156,10 +155,13 @@ class Board(val size:List[Int],
             }
         }
 
-        var players:Set[Player] = Set()
+        var players:Set[ConcretelyKnownPlayer] = Set()
         for ((coord, node) <- graph.nodes) {
             if (recursiveWalk(0, n, node, piece)) {
-                players += piece.owner
+                piece.owner match {
+                    case tempPlayers:ConcretelyKnownPlayer => players = players ++ tempPlayers.getPlayers
+                    case _ => throw new IllegalPlayerException("Equipment that has been placed on the board must be owned by ConcretelyKnownPlayers.")
+                }
             }
         }
         return players
@@ -180,4 +182,3 @@ object Board {
         board
     }
 }
-

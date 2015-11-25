@@ -2,6 +2,10 @@ package org.leisurelyscript
 
 
 class Players(players:List[Player]) {
+    if (players.size != players.toSet.size) {
+        throw new IllegalPlayerException("Duplicate players are not allowed")
+    }
+
     def this(players:Player*) = {
         this(players.toList)
     }

@@ -11,16 +11,16 @@ object TestGameFactory {
     def ticTacToe:Game = {
         val board = Board(List(3, 3), Square, Indirect, Square) 
         val players = new Players(List(Player("X"), Player("O")))
-        val legalMove = new LegalMove(new Current, (game:Game, move:Move) => {
+        val legalMove = new LegalMove(Current, (game:Game, move:Move) => {
             game.board.graph.nodes(move.node.coord).empty()
         }, Push)
-        val piece = new Piece("token", new Any, List[LegalMove](legalMove))
+        val piece = new PieceRule("token", Any, List[LegalMove](legalMove))
         val endConditions = List(
-            EndCondition(Win, new Previous, (game:Game, player:Player) => {
-                game.board.nInARow(3, piece.copy(player)).size > 0
+            EndCondition(Win, Previous, (game:Game, player:Player) => {
+                game.board.nInARow(3, piece.getPhysicalPiece(player)).size > 0
             }),
-            EndCondition(Tie, new Any, (game:Game, player:Player) => {
-                game.board.nInARow(3, piece.copy(player)).size == 0 && game.board.full()
+            EndCondition(Tie, Any, (game:Game, player:Player) => {
+                game.board.nInARow(3, piece.getPhysicalPiece(player)).size == 0 && game.board.full()
             })
         )
         Game()

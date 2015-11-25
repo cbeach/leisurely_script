@@ -11,7 +11,7 @@ class Game(
     val name:String,
 	val players:Players,
 	val board:Board,
-	val pieces:List[Piece],
+	val pieces:List[PieceRule],
 	val endConditions:List[EndCondition],
 	val history:List[Game]=List[Game](),
     var gameResult:Option[GameResult]=None,
@@ -35,7 +35,11 @@ class Game(
 
     gameResult = Some(gameResult.getOrElse({
         val conditionValues:List[Boolean] = endConditions.map(endCondition => {
-            endCondition.condition(this, endCondition.player.get(this))
+            val affectedPlayerSet = endCondition.affectedPlayer.getPlayers(this)
+            if (affectedPlayerSet.size != 1) {
+                throw new IllegalPlayerException("EndConditions currently only support single players as affectedPlayers.")  
+            }
+            endCondition.conditionMet(this, affectedPlayerSet.head)
         })
          
         if (history.size == 0) {
@@ -50,7 +54,10 @@ class Game(
                         val winner:Option[Player] = endResult match {
                             case Win => {
                                 players.all.find(p => {
-                                    conditionThatWasMet.player.valid(this, p)
+                                    if (conditionThatWasMet.affectedPlayer.getPlayers(this).size != 1) {
+                                        throw new IllegalPlayerException("Only one winning player is currently supported")
+                                    }
+                                    p == conditionThatWasMet.affectedPlayer.getPlayers(this).head
                                 })
                             }
                             case _ => None
@@ -107,7 +114,7 @@ class Game(
     def add[T](list:List[T]):Game = { 
         list match {
             case (first:Player)::(rest:List[Player]) => Game(this, new Players(first::rest))
-            case (first:Piece)::(rest:List[Piece]) => Game(this, list)
+            case (first:PieceRule)::(rest:List[PieceRule]) => Game(this, list)
             case (first:EndCondition)::(rest:List[EndCondition]) => Game(this, list)
             case _ => throw(new IllegalGameAttributeException("Can not add object to game. Invalid type."))
         }
@@ -240,7 +247,7 @@ object Game {
     def apply(name:String = java.util.UUID.randomUUID.toString, 
               players:Players = new Players(List[Player]()), 
               board:Board = null,
-              pieces:List[Piece] = List[Piece](),
+              pieces:List[PieceRule] = List[PieceRule](),
               endConditions:List[EndCondition] = List[EndCondition]()
               ):Game = new Game(name, players, board, pieces, endConditions)
     private def apply(game:Game, board:Board):Game 
@@ -249,7 +256,7 @@ object Game {
         list match {
             case (pl:Player)::(pls:List[Player]) => 
                 new Game(game.name, new Players(pl::pls), game.board, game.pieces, game.endConditions)
-            case (pi:Piece)::(pis:List[Piece]) => 
+            case (pi:PieceRule)::(pis:List[PieceRule]) => 
                 new Game(game.name, game.players, game.board, pi:: pis, game.endConditions)
             case (eC:EndCondition)::(eCs:List[EndCondition]) => 
                 new Game(game.name, game.players, game.board, game.pieces, eC::eCs)
