@@ -15,7 +15,14 @@ trait ConcretelyKnownPlayer {
 
 case class SpecificPlayer(player:Player) extends PlayerValidator with ConcretelyKnownPlayer {
     override def playersValid(game:Game, players:Set[Player]):Boolean = {
-        players.size == 1 && players == Set(player)
+        if (players.size != 1) {
+            if (players.size < 1) {
+                throw new IllegalPlayerException("Team play and alliances are not supported yet")
+            } else {
+                throw new IllegalPlayerException("No player was provided for validation.")
+            }
+        }
+        players.head == player
     }
     def playerValid(game:Game, player:Player):Boolean = {
         player == this.player
@@ -31,8 +38,15 @@ case class SpecificPlayer(player:Player) extends PlayerValidator with Concretely
 }
 
 case object Previous extends PlayerValidator {
-    override def playersValid(game:Game, player:Set[Player]):Boolean = {
-        player == game.players.previous 
+    override def playersValid(game:Game, players:Set[Player]):Boolean = {
+        if (players.size != 1) {
+            if (players.size < 1) {
+                throw new IllegalPlayerException("Team play and alliances are not supported yet")
+            } else {
+                throw new IllegalPlayerException("No player was provided for validation.")
+            }
+        }
+        players.head == game.players.previous
     }
     def playerValid(game:Game, player:Player):Boolean = {
         playersValid(game, Set(player))
@@ -46,8 +60,15 @@ case object Previous extends PlayerValidator {
 }
 
 case object Current extends PlayerValidator {
-    override def playersValid(game:Game, player:Set[Player]):Boolean = {
-        player == game.players.current 
+    override def playersValid(game:Game, players:Set[Player]):Boolean = {
+        if (players.size != 1) {
+            if (players.size < 1) {
+                throw new IllegalPlayerException("Team play and alliances are not supported yet")
+            } else {
+                throw new IllegalPlayerException("No player was provided for validation.")
+            }
+        }
+        players.head == game.players.current
     }
     def playerValid(game:Game, player:Player):Boolean = {
         playersValid(game, Set(player))
@@ -61,8 +82,15 @@ case object Current extends PlayerValidator {
 }
 
 case object Next extends PlayerValidator {
-    override def playersValid(game:Game, player:Set[Player]):Boolean = {
-        player == game.players.next 
+    override def playersValid(game:Game, players:Set[Player]):Boolean = {
+        if (players.size != 1) {
+            if (players.size < 1) {
+                throw new IllegalPlayerException("Team play and alliances are not supported yet")
+            } else {
+                throw new IllegalPlayerException("No player was provided for validation.")
+            }
+        }
+        players.head == game.players.next
     }
     def playerValid(game:Game, player:Player):Boolean = {
         playersValid(game, Set(player))

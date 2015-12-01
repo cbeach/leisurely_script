@@ -36,9 +36,6 @@ class Game(
     gameResult = Some(gameResult.getOrElse({
         val conditionValues:List[Boolean] = endConditions.map(endCondition => {
             val affectedPlayerSet = endCondition.affectedPlayer.getPlayers(this)
-            if (affectedPlayerSet.size != 1) {
-                throw new IllegalPlayerException("EndConditions currently only support single players as affectedPlayers.")  
-            }
             endCondition.conditionMet(this, affectedPlayerSet.head)
         })
          

@@ -137,35 +137,10 @@ Class members
 
 
 ### Player
-How should I handle things like Piece("name", player=all...)
-It needs to handle 
-    * Previous
-    * Current
-    * Next
-    * Any
-    * All
-    * SomePlayers
-    * NoPlayer
-    * Specific
-
-I could use:
-    Almost all of these run into a chicken and egg problem, just write a simple kludge and refactor later.
-    1. Companion object and a set of sub-classes
-        Most versitile solution so far
-        More complex than an enumeration or a function
-        Difficult to get the correct game object into the mix
-    2. A class and an enumeration
-        Set player constraint on instantiation
-        Method to check whether player p is valid given the constraint
-        Difficult to get the correct game object into the mix
-    2. A class and an enumeration
-        Difficult to get the correct game object into the mix
-    3. An enumeration.
-        Easy, simple, very limited
-    4. Functions that return the proper players
-    5. A set of objects that extend Player
-    6. Could be member functions of the Players class
-        Already has the complete list of players
+This is all wrong. I should not make a class that I plan to instantiate the base class of the hierarchy. Bad Casey!
+Implement two traites. PlayerValidator and ConcretelyKnownPlayer. The first provides methods that return whether the player is
+valid or not. The second is a static, known, group of one or more players that requires no outside information to do its job.
+It is used to set ownership _during_ game play.
 
 class Player(...) {...}
 object Player {

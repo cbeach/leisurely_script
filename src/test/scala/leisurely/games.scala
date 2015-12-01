@@ -19,7 +19,7 @@ object TestGameFactory {
             EndCondition(Win, Previous, (game:Game, player:Player) => {
                 game.board.nInARow(3, piece.getPhysicalPiece(player)).size > 0
             }),
-            EndCondition(Tie, Any, (game:Game, player:Player) => {
+            EndCondition(Tie, All, (game:Game, player:Player) => {
                 game.board.nInARow(3, piece.getPhysicalPiece(player)).size == 0 && game.board.full()
             })
         )
