@@ -7,6 +7,10 @@ import GameResultState._
 import MoveAction._
 
 
+case class PlayerListWrapper(val list:List[Player]) {}
+case class PieceRuleListWrapper(val list:List[PieceRule]) {}
+case class EndConditionListWrapper(val list:List[EndCondition]) {}
+
 class Game(
     val name:String,
 	val players:Players,
@@ -97,24 +101,24 @@ class Game(
     }
 
     def this(game:Game) = {
-        this(game.name, game.players, game.board, game.pieces, game.endConditions, game.history)
+        this(game.name, game.players, game.board, game.pieces, game.endConditions, game.history, game.gameResult, game.status)
     }
 
     def add(board:Board):Game = {
-        Game(this, board)
+        new Game(name, players, board, pieces, endConditions, history, gameResult, status)
     }
 
     def add(players:Players):Game = {
-        Game(this, players)
+        new Game(name, players, board, pieces, endConditions, history, gameResult, status)
     }
-
-    def add[T](list:List[T]):Game = { 
-        list match {
-            case (first:Player)::(rest:List[Player]) => Game(this, new Players(first::rest))
-            case (first:PieceRule)::(rest:List[PieceRule]) => Game(this, list)
-            case (first:EndCondition)::(rest:List[EndCondition]) => Game(this, list)
-            case _ => throw(new IllegalGameAttributeException("Can not add object to game. Invalid type."))
-        }
+    def add(players:PlayerListWrapper):Game = { 
+        new Game(name, new Players(players.list), board, pieces, endConditions, history, gameResult, status)
+    }
+    def add(pieces:PieceRuleListWrapper):Game = { 
+        new Game(name, players, board, pieces.list, endConditions, history, gameResult, status)
+    }
+    def add(endConditions:EndConditionListWrapper):Game = { 
+        new Game(name, players, board, pieces, endConditions.list, history, gameResult, status)
     }
 
     def startGame():Game = {
@@ -247,20 +251,4 @@ object Game {
               pieces:List[PieceRule] = List[PieceRule](),
               endConditions:List[EndCondition] = List[EndCondition]()
               ):Game = new Game(name, players, board, pieces, endConditions)
-    private def apply(game:Game, board:Board):Game 
-        = new Game(game.name, game.players, board, game.pieces, game.endConditions)
-    private def apply[T](game:Game, list:List[T]):Game = {
-        list match {
-            case (pl:Player)::(pls:List[Player]) => 
-                new Game(game.name, new Players(pl::pls), game.board, game.pieces, game.endConditions)
-            case (pi:PieceRule)::(pis:List[PieceRule]) => 
-                new Game(game.name, game.players, game.board, pi:: pis, game.endConditions)
-            case (eC:EndCondition)::(eCs:List[EndCondition]) => 
-                new Game(game.name, game.players, game.board, game.pieces, eC::eCs)
-            case _ => throw(new IllegalGameAttributeException("How did you get in here. You shouldn't be in here..."))
-        }
-    }
-    private def apply(game:Game, players:Players) = {
-        new Game(game.name, players, game.board, game.pieces, game.endConditions)
-    }
 }

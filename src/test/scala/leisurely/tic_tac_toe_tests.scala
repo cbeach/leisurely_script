@@ -8,6 +8,8 @@ import org.scalatest.TryValues._
 import org.leisurelyscript.test.util.TestGameFactory
 import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
 
+import org.leisurelyscript.ImplicitDefs.Views.Game._
+
 import Direction._
 import GameStatus._
 import GameResultState._

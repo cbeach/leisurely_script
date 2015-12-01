@@ -74,7 +74,15 @@ Requests a serialized game definition from a repository. Possible sources:
 - various getters and setters
     - board(): Board
 
-// Now that I'm using Scala I probably don't need this stuff until much, much later.
+
+#### Future
+
+A feature that might be interesting to try a state/history management technique similar to the way lightning finds its way to the ground.
+During AI game play, a LOT of branches are search while deciding which path to take down the tree. These don't affect the actual game until the move is made.
+Tracking this information might make it easier to keep track of certain types of information. Then again it violates immutability and encapsulation, so it's 
+probably more trouble than it's worth. Might deserve further research.
+
+Now that I'm using Scala I probably don't need this stuff until much, much later.
 - process: process all of the objects that have been added to the game and return the game's oracle.
 - transpile(str <target language>): Produces the code for the oracle in the target language
 - compile(str <compiler command>): Compile a static library from the code that was generated with the transpile method, and registers is with the game repo. The library includes python language hooks.
@@ -135,6 +143,11 @@ Class members
 - empty:Boolean
 - pieces(): List[Piece]
 
+
+### ConcretelyKnownPlayer
+Used for setting ownership during game player. Should be required by pieces of equipment.
+- Future:
+    - This may be relaxed at a later date
 
 ### Player
 This is all wrong. I should not make a class that I plan to instantiate the base class of the hierarchy. Bad Casey!
