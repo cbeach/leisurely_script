@@ -1,7 +1,7 @@
 package org.leisurelyscript.test.util
 
-import org.leisurelyscript.MoveAction._
-import org.leisurelyscript._
+import org.leisurelyscript.gdl._
+import MoveAction._
 
 
 object GraphUtilities {

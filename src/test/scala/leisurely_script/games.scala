@@ -1,9 +1,7 @@
 package org.leisurelyscript.test.util
 
-import org.leisurelyscript._
-import org.leisurelyscript.ImplicitDefs.Views.Game._
-
-import org.leisurelyscript.ImplicitDefs.Views.Game._
+import org.leisurelyscript.gdl._
+import org.leisurelyscript.gdl.ImplicitDefs.Views.Game._
 
 import GameResultState._
 import MoveAction._

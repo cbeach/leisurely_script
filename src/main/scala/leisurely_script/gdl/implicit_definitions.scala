@@ -1,4 +1,4 @@
-package org.leisurelyscript.ImplicitDefs
+package org.leisurelyscript.gdl.ImplicitDefs
 
 import org.leisurelyscript.gdl.{Player => PlayerClass, PlayerValidator, EndCondition, PieceRule,
     SpecificPlayer, PlayerListWrapper, PieceRuleListWrapper, EndConditionListWrapper}

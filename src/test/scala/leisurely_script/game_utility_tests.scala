@@ -1,4 +1,4 @@
-package org.leisurelyscript
+package org.leisurelyscript.test.suites
 
 import scala.util.{Try, Success, Failure}
 
@@ -7,6 +7,9 @@ import org.scalatest.TryValues._
 
 import org.leisurelyscript.test.util.TestGameFactory
 import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
+
+import org.leisurelyscript.gdl._
+import org.leisurelyscript.gdl.ImplicitDefs.Views.Game._
 
 import Direction._
 import GameStatus._
