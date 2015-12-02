@@ -30,13 +30,13 @@ Requests a serialized game definition from a repository. Possible sources:
 * GameFile: from the file system 
 * WebGames: from a web-api
 
-- submit(game:Game): Try
+- submit(game:Game):Unit
     - Put a game into the repo
-- load(gameID:String): Try
+- load(gameID:String):Try[Game]
     - Read a game from the repo
-- update(gameID:String, game:Game): Try
+- update(gameID:String, game:Game):Unit
     - Update an existing game
-- remove(gameID:String)
+- remove(gameID:String):Unit
 
 
 ### Game (class)

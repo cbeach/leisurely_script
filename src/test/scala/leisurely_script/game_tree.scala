@@ -4,11 +4,11 @@ import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
 
-import org.leisurelyscript.test.util.TestGameFactory
-import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
 
 import org.leisurelyscript.gdl._
 import org.leisurelyscript.gdl.ImplicitDefs.Views.Game._
+import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
+import org.leisurelyscript.repository.LocalStaticRepository
 
 import Direction._
 import GameStatus._
@@ -16,7 +16,6 @@ import GameResultState._
 import MoveAction._
 import NeighborType._
 import Shape._
-
 
 
 class GameTreeTests extends FunSuite {
@@ -177,7 +176,10 @@ class GameTreeTests extends FunSuite {
     }
 
     test("Performing a push move should return a new game with a board that has 1 piece in it") {
-        val game = TestGameFactory.ticTacToe.startGame()
+        val game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val xPiece = game.pieces(0).getPhysicalPiece(game.players.all(0))
         assert(game.applyMove(new Move(xPiece, game.players.current, Push, 
         game.board.graph.nodes(Coordinate(0, 1)))) match {
@@ -208,7 +210,10 @@ class GameTreeTests extends FunSuite {
     }
 
     test("Making a move should result in a completely new game with a different board") {
-        val game:Game = TestGameFactory.ticTacToe.startGame()
+        val game:Game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val xPiece = game.pieces(0).getPhysicalPiece(game.players.all(0))
         val firstMove:Game = game.applyMove(new Move(xPiece, game.players.current, Push, 
         game.board.graph.nodes(Coordinate(0, 1)))).get
@@ -237,7 +242,10 @@ class GameTreeTests extends FunSuite {
     }
 
     test("game.isMoveLegal should return true if a move is legal, false otherwise") {
-        val game = TestGameFactory.ticTacToe.startGame()
+        val game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val move = new Move(game.pieces(0).getPhysicalPiece(game.players.current), game.players.current, Push, 
             game.board.graph.nodes(Coordinate(0, 1)))
 
@@ -248,7 +256,10 @@ class GameTreeTests extends FunSuite {
     }
 
     test("The game should only allow legal moves to be applied") {
-        val game = TestGameFactory.ticTacToe.startGame()
+        val game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val move = new Move(game.pieces(0).getPhysicalPiece(game.players.current), game.players.current, Push, 
             game.board.graph.nodes(Coordinate(0, 1)))
         assert(game.isMoveLegal(move))
@@ -330,7 +341,7 @@ class GameTreeTests extends FunSuite {
     }
 
     test("New graphs don't change as the game progresses") {
-        val tie = movesFromTiedGame
+        val tie = movesFromTiedGame(None)
 
         val xPiece = tie(0).pieces(0).getPhysicalPiece(tie(0).players.all(0))
         val oPiece = tie(0).pieces(0).getPhysicalPiece(tie(0).players.all(1))

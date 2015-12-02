@@ -1,7 +1,10 @@
 package org.leisurelyscript.test.util
 
+import scala.util.{Try, Success, Failure}
+
 import org.leisurelyscript.gdl._
 import MoveAction._
+import org.leisurelyscript.repository.LocalStaticRepository
 
 
 object GraphUtilities {
@@ -38,8 +41,15 @@ package GameUtilities {
             s"\n ${strList.slice(0, 3).mkString("")} \n ${strList.slice(3, 6).mkString("")} \n ${strList.slice(6, 9).mkString("")}"
         }
 
-        def movesFromTiedGame:List[Game] = {
-            val move0:Game = TestGameFactory.ticTacToe.startGame()
+        def movesFromTiedGame(game:Option[Game]=None):List[Game] = {
+            val move0:Game = {
+                game getOrElse { 
+                    LocalStaticRepository.load("TicTacToe") match {
+                        case Success(tTT:Game) => tTT.startGame()
+                        case Failure(ex) => throw ex
+                    }
+                }
+            }.startGame()
             val move1 = move0.applyMove(Move(move0.pieces(0).getPhysicalPiece(move0.players.current), move0.players.current, Push, move0.board.graph.nodes(Coordinate(1, 1)))).get
             val move2 = move1.applyMove(Move(move1.pieces(0).getPhysicalPiece(move1.players.current), move1.players.current, Push, move1.board.graph.nodes(Coordinate(0, 0)))).get
             val move3 = move2.applyMove(Move(move2.pieces(0).getPhysicalPiece(move2.players.current), move2.players.current, Push, move2.board.graph.nodes(Coordinate(0, 1)))).get

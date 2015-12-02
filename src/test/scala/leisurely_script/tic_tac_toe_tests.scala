@@ -5,11 +5,11 @@ import scala.util.{Try, Success, Failure}
 import org.scalatest.FunSuite
 import org.scalatest.TryValues._
 
-import org.leisurelyscript.test.util.TestGameFactory
-import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
 
 import org.leisurelyscript.gdl._
 import org.leisurelyscript.gdl.ImplicitDefs.Views.Game._
+import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
+import org.leisurelyscript.repository.LocalStaticRepository
 
 import Direction._
 import GameStatus._
@@ -43,10 +43,12 @@ class TicTacToeTests extends FunSuite {
     }
 
     test("The game should advance to the next player after applyMove is called") {
-        val ticTacToe:Game = TestGameFactory.ticTacToe
+        val ticTacToe:Game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val legalMoves:List[Move] = ticTacToe.legalMoves(ticTacToe.players.current)
         assert(ticTacToe.players.current == ticTacToe.players.all(0)) 
-        ticTacToe.startGame()
         val playerX = ticTacToe.players.all(0)
         val playerO = ticTacToe.players.all(1)
         val pieceRule = ticTacToe.pieces(0)
@@ -58,7 +60,10 @@ class TicTacToeTests extends FunSuite {
     }
 
     test("A user should be able to get a valid list of legal moves.") {
-        val ticTacToe:Game = TestGameFactory.ticTacToe.startGame()
+        val ticTacToe:Game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val legalMoves:List[Move] = ticTacToe.legalMoves(ticTacToe.players.current)
         assert(legalMoves.size == 9) 
         legalMoves.foreach(move => {
@@ -81,8 +86,10 @@ class TicTacToeTests extends FunSuite {
     }
 
     test("A full game of TicTacToe should be possible") {
-        val ticTacToe:Game = TestGameFactory.ticTacToe.startGame()
-
+        val ticTacToe:Game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val playerX = ticTacToe.players.all(0)
         val playerO = ticTacToe.players.all(1)
         val pieceRule = ticTacToe.pieces(0)
@@ -106,8 +113,10 @@ class TicTacToeTests extends FunSuite {
     }
 
     test("No more moves are possible after a player has won.") {
-        val ticTacToe:Game = TestGameFactory.ticTacToe.startGame()
-
+        val ticTacToe:Game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val playerX = ticTacToe.players.all(0)
         val playerO = ticTacToe.players.all(1)
 
@@ -127,8 +136,10 @@ class TicTacToeTests extends FunSuite {
     }
 
     test("The game history is well formed.") {
-        val move0:Game = TestGameFactory.ticTacToe.startGame()
-
+        val move0:Game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val pieceRule = move0.pieces(0)
         val playerX = move0.players.all(0)
         val playerO = move0.players.all(1)
@@ -155,7 +166,10 @@ class TicTacToeTests extends FunSuite {
         assert(move5.history(4) eq move0)
     }
     test("Players can't move out of turn") {
-        val ticTacToe:Game = TestGameFactory.ticTacToe.startGame()
+        val ticTacToe:Game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val playerX = ticTacToe.players.all(0)
         val playerO = ticTacToe.players.all(1)
 
@@ -173,8 +187,10 @@ class TicTacToeTests extends FunSuite {
     }
 
     test("nInARow should not return true for tic-tac-toe if the pieces belong to different players.") {
-        val ticTacToe = TestGameFactory.ticTacToe.startGame()
-
+        val ticTacToe = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val playerX = ticTacToe.players.all(0)
         val playerO = ticTacToe.players.all(1)
         val pieceRule = ticTacToe.pieces(0)
@@ -188,8 +204,10 @@ class TicTacToeTests extends FunSuite {
     }
 
     test("What about a tied game?") {
-        val move0:Game = TestGameFactory.ticTacToe.startGame()
-
+        val move0:Game = LocalStaticRepository.load("TicTacToe") match {
+            case Success(tTT) => tTT.startGame()
+            case Failure(ex) => fail
+        }
         val playerX = move0.players.all(0)
         val playerO = move0.players.all(1)
         val pieceRule = move0.pieces(0)
