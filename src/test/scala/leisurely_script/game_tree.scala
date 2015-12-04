@@ -400,4 +400,11 @@ class GameTreeTests extends FunSuite {
             case None => fail
         }
     }
+    test("Legal moves should not be available after the end of the game") {
+        val tie = movesFromTiedGame(None)
+        assert(tie.last.legalMoves(tie.last.players.current).isEmpty)
+
+        val fastXWin = movesFromFastestXWin(None).last
+        assert(fastXWin.legalMoves(fastXWin.players.current).isEmpty)
+    }
 }

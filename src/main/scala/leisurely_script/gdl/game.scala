@@ -161,7 +161,11 @@ class Game(
     }
 
     def legalMoves(player:Player):List[Move] = {
-        pieces.flatMap(piece => piece.legalMoves(this, player))
+        status match {
+            case Finished => List[Move]()
+            case InProgress => pieces.flatMap (piece => piece.legalMoves (this, player) )
+            case _ => throw new IllegalGameException("This game has not even started yet. Legal moves are not available at this time.")
+        }
     }
 
     def partialScore: List[Double] = {
