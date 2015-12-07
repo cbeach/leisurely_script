@@ -20,9 +20,9 @@ class GameUtilityTests extends FunSuite {
         assert(boardToString(tiedGame.last.board) == "\n OXX \n XXO \n OOX") 
 
         val fastWinForX = movesFromFastestXWin(None)
-        assert(tiedGame.size == 6)
-        assert(tiedGame.last.gameResult.get.result == Win)
-        assert(boardToString(tiedGame.last.board) == "\n XXX \n OO- \n ---") 
+        assert(fastWinForX.size == 6)
+        assert(fastWinForX.last.gameResult.get.result == Win)
+        assert(boardToString(fastWinForX.last.board) == "\n XXX \n OO- \n ---")
 
     }
 }
