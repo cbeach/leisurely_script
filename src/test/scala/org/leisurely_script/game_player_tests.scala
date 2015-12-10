@@ -16,7 +16,7 @@ class GamePlayerTests extends FunSuite {
     test("Solve TicTacToe") {
         val numberOfPossibleGames = 255168
         var entryQueue = Queue[Game](LocalStaticRepository.load(TicTacToe).get.startGame())
-        var exitQueue = Queue[Game]()
+        var leafNodeCount = 0
         var counter = 0
         while(entryQueue.nonEmpty) {
             val head = entryQueue.dequeue()
@@ -34,12 +34,11 @@ class GamePlayerTests extends FunSuite {
                     }
                 })
             } else {
-                exitQueue += head
+                leafNodeCount += 1
             }
 
             counter += 1
         }
-        assert(exitQueue.size == numberOfPossibleGames)
-        info(s"${counter} nodes processed.")
+        assert(leafNodeCount == numberOfPossibleGames)
     }
 }
