@@ -1,6 +1,7 @@
 package org.leisurelyscript.gdl
 
-class Player(val name:String = java.util.UUID.randomUUID.toString) extends ConcretelyKnownPlayer with PlayerValidator {
+
+case class Player(val name:String = java.util.UUID.randomUUID.toString) extends ConcretelyKnownPlayer with PlayerValidator {
     override def playersValid(game:Game, players:Set[Player]):Boolean = {
         if (players.size != 1) {
             false
@@ -28,11 +29,11 @@ object Player {
         new Player(other.name)
     }
 
-    def apply(name:String = null):Player = {
-        if (name == null) {
-            new Player()
-        } else {
-            new Player(name)
-        }
-    }
+    //def apply(name:String = null):Player = {
+    //    if (name == null) {
+    //        new Player()
+    //    } else {
+    //        new Player(name)
+    //    }
+    //}
 }

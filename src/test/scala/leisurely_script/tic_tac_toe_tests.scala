@@ -23,15 +23,15 @@ class TicTacToeTests extends FunSuite {
     test("Create a TicTacToe game object") {
         val board = Board(List(3, 3), Square, Indirect, Square) 
         val players = new Players(List(Player("X"), Player("O")))
-        val legalMove = new LegalMove(Current, (game:Game, move:Move) => {
+        val legalMove = new LegalMove(CurrentPlayer, (game:Game, move:Move) => {
             game.board.graph.nodes(move.node.coord).empty()
         }, Push)
-        val piece = new PieceRule("token", Current, List[LegalMove](legalMove))
+        val piece = new PieceRule("token", CurrentPlayer, List[LegalMove](legalMove))
         val endConditions = List(
-            EndCondition(Win, Previous, (game:Game, player:Player) => {
+            EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
                 game.board.nInARow(3, piece.getPhysicalPiece(player)).size > 0
             }),
-            EndCondition(Tie, All, (game:Game, player:Player) => {
+            EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
                 game.board.nInARow(3, piece.getPhysicalPiece(player)).size == 0 && game.board.full()
             })
         )

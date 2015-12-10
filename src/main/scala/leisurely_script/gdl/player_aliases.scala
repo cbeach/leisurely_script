@@ -37,7 +37,7 @@ case class SpecificPlayer(player:Player) extends PlayerValidator with Concretely
 
 }
 
-case object Previous extends PlayerValidator {
+case object PreviousPlayer extends PlayerValidator {
     override def playersValid(game:Game, players:Set[Player]):Boolean = {
         if (players.size != 1) {
             if (players.size < 1) {
@@ -59,7 +59,7 @@ case object Previous extends PlayerValidator {
     }
 }
 
-case object Current extends PlayerValidator {
+case object CurrentPlayer extends PlayerValidator {
     override def playersValid(game:Game, players:Set[Player]):Boolean = {
         if (players.size != 1) {
             if (players.size < 1) {
@@ -81,7 +81,7 @@ case object Current extends PlayerValidator {
     }
 }
 
-case object Next extends PlayerValidator {
+case object NextPlayer extends PlayerValidator {
     override def playersValid(game:Game, players:Set[Player]):Boolean = {
         if (players.size != 1) {
             if (players.size < 1) {
@@ -144,7 +144,7 @@ case object NoPlayer extends PlayerValidator with ConcretelyKnownPlayer {
     }
 }
 
-case object Any extends PlayerValidator {
+case object AnyPlayer extends PlayerValidator {
     override def playersValid(game:Game, players:Set[Player]):Boolean = {
         if (players.size == 0) {
             false 
@@ -165,14 +165,3 @@ case object Any extends PlayerValidator {
     }
 }
 
-case object All extends PlayerValidator {
-    override def playersValid(game:Game, players:Set[Player]):Boolean = {
-        game.players.all.toSet == players
-    }
-    override def toString:String = {
-        "Player(All)"
-    }
-    override def getPlayers(game:Game):Set[Player] = {
-        game.players.all.toSet
-    }
-}
