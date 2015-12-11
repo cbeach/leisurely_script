@@ -39,10 +39,10 @@ object GameFactory {
         val piece = new PieceRule("token", AnyPlayer, List[LegalMove](legalMove))
         val endConditions = List(
             EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
-                game.board.nInARow(3, piece.getPhysicalPiece(player)).size > 0
+                game.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size > 0
             }),
             EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
-                game.board.nInARow(3, piece.getPhysicalPiece(player)).size == 0 && game.board.full()
+                game.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size == 0 && game.board.full()
             })
         )
         Game()

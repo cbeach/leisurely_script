@@ -7,7 +7,7 @@ import Direction._
 import NeighborType._
 import Shape._
 
-class Board(val size:List[Int], 
+case class Board(val size:List[Int],
     val boardShape:Shape, 
     val neighborType:NeighborType, 
     val nodeShape:Shape,

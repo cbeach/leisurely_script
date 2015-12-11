@@ -100,7 +100,7 @@ class SerializationTests extends FunSuite {
         })
     }
     test("Coordinate serialization") {
-        val coordJson = Coordinate(1, 1).toJson
+        val coordJson = Coordinate(1, 2).toJson
         assert(coordJson.convertTo[Coordinate].x == 1)
         assert(coordJson.convertTo[Coordinate].y == 2)
     }
@@ -129,6 +129,11 @@ class SerializationTests extends FunSuite {
         assert(legalMove.toJson.convertTo[LegalMove].precondition(null, null) == legalMove.precondition(null, null))
         assert(legalMove.toJson.convertTo[LegalMove].action == legalMove.action)
         assert(legalMove.toJson.convertTo[LegalMove].postcondition(null, null) == legalMove.postcondition(null, null))
+
+        val ticTacToeLegalMove = new LegalMove(CurrentPlayer, (game:Game, move:Move) => {
+            game.board.graph.nodes(move.node.coord).empty()
+        }, Push)
+        ticTacToeLegalMove.toJson.convertTo[LegalMove]
     }
     test("PieceRule serialization") {
         val condition = (game:Game, move:Move) => {
@@ -145,5 +150,45 @@ class SerializationTests extends FunSuite {
         assert(converted.legalMoves(0).postcondition(null, null) == legalMove.postcondition(null, null))
     }
     test("EndCondition serialization") {
+        val eC = EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
+            true
+        })
+        val converted = eC.toJson.convertTo[EndCondition]
+        assert(converted.result == eC.result)
+        assert(converted.affectedPlayer == eC.affectedPlayer)
+        assert(converted.conditionMet(null, null) == eC.conditionMet(null, null))
+        val ticTacToeEndConditions = List(
+            EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
+                game.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size > 0
+            }),
+            EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
+                game.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size == 0 && game.board.full()
+            })
+        )
+        ticTacToeEndConditions.toJson
+        ticTacToeEndConditions.toJson.convertTo[List[EndCondition]]
+    }
+    test("Board serialization") {
+        val board = Board(List(3, 3), Square, Indirect, Square)
+        val converted = board.toJson.convertTo[Board]
+        assert(converted == board)
+    }
+    test("Players serialization") {
+        val playerNames = List[String]("Anne", "Bob", "Carol", "Dave", "Fran")
+        val playerList = playerNames.map(name => {
+            Player(name)
+        })
+        val players = new Players(playerList)
+        val converted = players.toJson.convertTo[Players]
+        assert(converted == players)
+    }
+    test("TicTacToe serialization") {
+        import org.leisurelyscript.repository.LocalStaticRepository
+        import org.leisurelyscript.repository.LocalStaticRepository.availableGames._
+        import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
+
+        val ticTacToe = LocalStaticRepository.load(TicTacToe).get
+        val converted = ticTacToe.toJson.convertTo[Game]
+        val tiedGame:List[Game] = movesFromTiedGame(converted)
     }
 }
