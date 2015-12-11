@@ -5,7 +5,7 @@ import scala.util.{Try, Success, Failure}
 import Direction._
 
 
-class Graph(var nodes:Map[Coordinate, BoardNode]=Map(), 
+case class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
     var edges:List[BoardEdge]=List()) {
 
     def this(other:Graph) = {

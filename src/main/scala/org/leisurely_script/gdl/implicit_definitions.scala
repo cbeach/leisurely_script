@@ -12,8 +12,8 @@ package TypeClasses {
     import java.io.{ObjectInputStream, ByteArrayInputStream, ObjectOutputStream, ByteArrayOutputStream}
     import org.leisurelyscript.gdl._
     object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
-        sealed case class LegalMoveConditionWrapper(func:(Game, Move)=>Boolean) {}
-        sealed case class EndConditionFunctionWrapper(func:(Game, PlayerClass)=>Boolean) {}
+        private case class LegalMoveConditionWrapper(func:(Game, Move)=>Boolean) {}
+        private case class EndConditionFunctionWrapper(func:(Game, PlayerClass)=>Boolean) {}
         implicit object legalMoveConditionFormatter extends RootJsonFormat[(Game, Move)=>Boolean] {
             def write(func:(Game, Move)=>Boolean):JsValue = {
                 val byteStream = new ByteArrayOutputStream()
@@ -64,12 +64,19 @@ package TypeClasses {
         }
         implicit object ConcretelyKnownFormatter extends RootJsonFormat[ConcretelyKnownPlayer] {
             def write(cKP:ConcretelyKnownPlayer):JsValue = cKP match {
+                case NoPlayer => JsObject(("_type", JsString("NoPlayer")))
                 case p:PlayerClass => p.toJson
+                case p:SomePlayers => p.toJson
+                case p:SubsetOfPlayers => p.toJson
             }
-            def read(json:JsValue):ConcretelyKnownPlayer = json match {
-                case JsObject(fields) if fields.isDefinedAt("_type") && fields("_type") == "Player" =>
-                    json.convertTo[PlayerClass]
-                case _ => deserializationError("Not a concretely known player.")
+            def read(json:JsValue):ConcretelyKnownPlayer = {
+                json.asJsObject.fields("_type") match {
+                    case JsString("NoPlayer") => NoPlayer
+                    case JsString("Player") => json.convertTo[PlayerClass]
+                    case JsString("SomePlayers") => json.convertTo[SomePlayers]
+                    case JsString("SubsetOfPlayers") => json.convertTo[SubsetOfPlayers]
+                    case err => deserializationError("not a PlayerValidator")
+                }
             }
         }
         implicit object SomePlayersFormatter extends RootJsonFormat[SomePlayers] {
@@ -101,7 +108,7 @@ package TypeClasses {
             }
         }
         implicit object PlayerValidatorFormatter extends RootJsonFormat[PlayerValidator] {
-            def write(cKP:PlayerValidator):JsValue = cKP match {
+            def write(playerValidator:PlayerValidator):JsValue = playerValidator match {
                 case AllPlayers => JsObject(("_type", JsString("AllPlayers")))
                 case AnyPlayer => JsObject(("_type", JsString("AnyPlayer")))
                 case PreviousPlayer => JsObject(("_type", JsString("PreviousPlayer")))
@@ -134,8 +141,13 @@ package TypeClasses {
             def write(node:BoardNode):JsValue = {
                 JsObject(("coord", node.coord.toJson))
             }
-            def read(v:JsValue):BoardNode = {
-                v.convertTo[BoardNode]
+            def read(json:JsValue):BoardNode = {
+                json match {
+                    case JsObject(fields) => {
+                        BoardNode(fields("coord").convertTo[Coordinate])
+                    }
+                    case _ => deserializationError("Not a BoardNode")
+                }
             }
         }
         implicit object BoardEdgeFormatter extends JsonFormat[BoardEdge] {
@@ -166,7 +178,6 @@ package TypeClasses {
     }
 }
 package Views {
-
     object Game {
         implicit def playerListToPlayerListWrapper(
             players:List[PlayerClass]):PlayerListWrapper = PlayerListWrapper(players)
