@@ -10,6 +10,7 @@ import GameFactory.AvailableGames._
 
 
 case object LocalStaticRepository extends GameRepository {
+    val availableGames = GameFactory.AvailableGames
     override def submit(game:Game):Unit = {
         throw new IllegalOperationException("Error submitting game. The local static repository is read only")
     }

@@ -1,7 +1,7 @@
 package org.leisurelyscript.gdl
 
 
-class Players(players:List[Player]) {
+case class Players(val players:List[Player]) {
     if (players.size != players.toSet.size) {
         throw new IllegalPlayerException("Duplicate players are not allowed")
     }

@@ -20,7 +20,7 @@ class Game(
 	val history:List[Game]=List[Game](),
     var gameResult:Option[GameResult]=None,
     var status:GameStatus.Value=Invalid,
-    private var playerScoringFunction:Option[(Player, GameResultState.Value, Option[Player])=>Double]=None) {
+    var playerScoringFunction:Option[(Player, GameResultState.Value, Option[Player])=>Double]=None) {
 
     playerScoringFunction = Some(playerScoringFunction.getOrElse(
         (player:Player, resultState:GameResultState.Value, winner:Option[Player])=>{

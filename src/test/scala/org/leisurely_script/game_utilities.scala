@@ -91,7 +91,9 @@ package GameUtilities {
             
             List[Game](move0, move1, move2, move3, move4, move5, move6, move7, move8, move9)
         }
-
+        def movesFromTiedGame(game:Game):List[Game] = {
+            movesFromTiedGame(Some(game))
+        }
         def movesFromFastestXWin(game:Option[Game]=None):List[Game] = {
             val move0:Game = {
                 game getOrElse { 
@@ -107,6 +109,9 @@ package GameUtilities {
             val move4 = move3.applyMove(Move(move3.pieces(0).getPhysicalPiece(move3.players.current), move3.players.current, Push, move3.board.graph.nodes(Coordinate(1, 1)))).get
             val move5 = move4.applyMove(Move(move4.pieces(0).getPhysicalPiece(move4.players.current), move4.players.current, Push, move4.board.graph.nodes(Coordinate(0, 2)))).get
             List[Game](move0, move1, move2, move3, move4, move5)
+        }
+        def movesFromFastestXWin(game:Game):List[Game] = {
+            movesFromFastestXWin(Some(game))
         }
     }
 }
