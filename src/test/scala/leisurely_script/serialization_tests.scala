@@ -10,12 +10,14 @@ import org.leisurelyscript.gdl._
 import org.leisurelyscript.gdl.ImplicitDefs.TypeClasses.LeisurelyScriptJSONProtocol._
 import org.leisurelyscript.gdl.Shape._
 import org.leisurelyscript.gdl.NeighborType._
+import org.leisurelyscript.gdl.GameResultState._
+import org.leisurelyscript.gdl.MoveAction._
 
 /**
   * Created by mcsmash on 12/9/15.
   */
 class SerializationTests extends FunSuite {
-    test("Test Player serialization") {
+    test("Player serialization") {
         assert(Player("Frank").toJson.convertTo[Player].name == "Frank")
     }
     test("Serialize anonymous functions") {
@@ -27,7 +29,7 @@ class SerializationTests extends FunSuite {
         val encoder:sun.misc.BASE64Encoder = new sun.misc.BASE64Encoder()
         val base64String = encoder.encode(byteStream.toByteArray())
     }
-    test("Test json serialization for (Game, Move) => Boolean") {
+    test("json serialization for (Game, Move) => Boolean") {
         val func1:(Game, Move)=>Boolean = (game:Game, move:Move) => {
             true
         }
@@ -35,7 +37,7 @@ class SerializationTests extends FunSuite {
         val func2:(Game, Move)=>Boolean = json.convertTo[(Game, Move)=>Boolean]
         assert(func2(null, null))
     }
-    test("Test PlayerValidator serialization") {
+    test("PlayerValidator serialization") {
         val playerNames = List[String]("Anne", "Bob", "Carol")
         val players = playerNames.map(name => {
             Player(name)
@@ -72,7 +74,7 @@ class SerializationTests extends FunSuite {
             assert(validator.toJson.convertTo[PlayerValidator] == player)
         })
     }
-    test("Test ConcretelyKnownPlayer serialization") {
+    test("ConcretelyKnownPlayer serialization") {
         val playerNames = List[String]("Anne", "Bob", "Carol")
         val players = playerNames.map(name => {
             Player(name)
@@ -97,27 +99,51 @@ class SerializationTests extends FunSuite {
             assert(validator.toJson.convertTo[PlayerValidator] == player)
         })
     }
-    test("Test Coordinate serialization") {
+    test("Coordinate serialization") {
         val coordJson = Coordinate(1, 1).toJson
         assert(coordJson.convertTo[Coordinate].x == 1)
         assert(coordJson.convertTo[Coordinate].y == 2)
     }
-    test("Test BoardNode serialization") {
+    test("BoardNode serialization") {
         val node = new BoardNode(Coordinate(0, 0))
         assert(node.toJson.convertTo[BoardNode] == node)
     }
-    test("Test BoardEdge serialization") {
+    test("BoardEdge serialization") {
         val node1 = new BoardNode(Coordinate(0, 0))
         val node2 = new BoardNode(Coordinate(0, 0))
         val edge = new BoardEdge((node1, node2), Direction.N)
         assert(edge.toJson.convertTo[BoardEdge] == edge)
     }
-    test("Test Graph serialization") {
+    test("Graph serialization") {
         val graph1 = Board(List(3, 3), Square, Indirect, Square).graph
         val graph2 = Board(List(3, 3), Square, Indirect, Square).graph
         assert(graph1 == graph2)
         assert(graph1.toJson.convertTo[Graph] == graph1)
     }
+    test("LegalMove serialization") {
+        val condition = (game:Game, move:Move) => {
+            true
+        }
+        val legalMove = new LegalMove(AnyPlayer, condition, Push, condition)
+        assert(legalMove.toJson.convertTo[LegalMove].owner == legalMove.owner)
+        assert(legalMove.toJson.convertTo[LegalMove].precondition(null, null) == legalMove.precondition(null, null))
+        assert(legalMove.toJson.convertTo[LegalMove].action == legalMove.action)
+        assert(legalMove.toJson.convertTo[LegalMove].postcondition(null, null) == legalMove.postcondition(null, null))
+    }
+    test("PieceRule serialization") {
+        val condition = (game:Game, move:Move) => {
+            true
+        }
+        val legalMove = new LegalMove(AnyPlayer, condition, Push, condition)
+        val pieceRule = PieceRule("token", AnyPlayer, List(legalMove))
+        val converted = pieceRule.toJson.convertTo[PieceRule]
+        assert(converted.name == pieceRule.name)
+        assert(converted.owner == pieceRule.owner)
+        assert(converted.legalMoves(0).owner == legalMove.owner)
+        assert(converted.legalMoves(0).precondition(null, null) == legalMove.precondition(null, null))
+        assert(converted.legalMoves(0).action == legalMove.action)
+        assert(converted.legalMoves(0).postcondition(null, null) == legalMove.postcondition(null, null))
+    }
+    test("EndCondition serialization") {
+    }
 }
-
-

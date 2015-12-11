@@ -7,7 +7,7 @@ case class PhysicalPiece(val name:String, val owner:ConcretelyKnownPlayer) exten
     }
 }
 
-class PieceRule(val name:String, val owner:PlayerValidator, val legalMoves:List[LegalMove]) {
+case class PieceRule(val name:String, val owner:PlayerValidator, val legalMoves:List[LegalMove]) {
     def getPhysicalPiece(player:ConcretelyKnownPlayer):PhysicalPiece = {
         PhysicalPiece(name, player)
     }
