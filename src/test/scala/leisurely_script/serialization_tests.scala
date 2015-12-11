@@ -44,4 +44,41 @@ class SerializationTests extends FunSuite {
         val func2:(Game, Move)=>Boolean = json.convertTo[(Game, Move)=>Boolean]
         assert(func2(null, null))
     }
+    test("Test PlayerValidator") {
+        val playerNames = List[String]("Anne", "Bob", "Carol")
+        val players = playerNames.map(name => {
+            Player(name)
+        })
+        var validator:PlayerValidator = AllPlayers
+        assert(validator.toJson.convertTo[PlayerValidator] == AllPlayers)
+
+        validator = AnyPlayer
+        assert(validator.toJson.convertTo[PlayerValidator] == AnyPlayer)
+
+        validator = PreviousPlayer
+        assert(validator.toJson.convertTo[PlayerValidator] == PreviousPlayer)
+
+        validator = CurrentPlayer
+        assert(validator.toJson.convertTo[PlayerValidator] == CurrentPlayer)
+
+        validator = NextPlayer
+        assert(validator.toJson.convertTo[PlayerValidator] == NextPlayer)
+
+        validator = NoPlayer
+        assert(validator.toJson.convertTo[PlayerValidator] == NoPlayer)
+
+        val playerSubset = SubsetOfPlayers(players.toSet.filter(_ != Player("Bob")))
+        validator = playerSubset
+        val result = validator.toJson.convertTo[PlayerValidator]
+        assert(result == playerSubset)
+
+        val somePlayers = SomePlayers(players.toSet)
+        validator = somePlayers
+        assert(validator.toJson.convertTo[PlayerValidator] == somePlayers)
+
+        players.foreach(player => {
+            validator = player
+            assert(validator.toJson.convertTo[PlayerValidator] == player)
+        })
+    }
 }

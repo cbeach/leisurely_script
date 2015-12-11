@@ -13,28 +13,16 @@ trait ConcretelyKnownPlayer {
     def getPlayers:Set[Player]
 }
 
-case class SpecificPlayer(player:Player) extends PlayerValidator with ConcretelyKnownPlayer {
+case object AllPlayers extends PlayerValidator {
     override def playersValid(game:Game, players:Set[Player]):Boolean = {
-        if (players.size != 1) {
-            if (players.size < 1) {
-                throw new IllegalPlayerException("Team play and alliances are not supported yet")
-            } else {
-                throw new IllegalPlayerException("No player was provided for validation.")
-            }
-        }
-        players.head == player
-    }
-    def playerValid(game:Game, player:Player):Boolean = {
-        player == this.player
+        game.players.all.toSet == players
     }
     override def toString:String = {
-        "Player(Previous)"
+        "Player(All)"
     }
     override def getPlayers(game:Game):Set[Player] = {
-        Set(player)
+        game.players.all.toSet
     }
-    override def getPlayers:Set[Player] = Set(player)
-
 }
 
 case object PreviousPlayer extends PlayerValidator {
