@@ -8,12 +8,13 @@ import org.scalatest.FunSuite
 import org.leisurelyscript.gdl._
 import GameStatus._
 import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
+import org.leisurelyscript.test.util.LongRunningTests
 import org.leisurelyscript.repository.LocalStaticRepository
 import org.leisurelyscript.repository.GameFactory.AvailableGames._
 
 
 class GamePlayerTests extends FunSuite {
-    test("Solve TicTacToe") {
+    test("Solve TicTacToe", LongRunningTests) {
         val numberOfPossibleGames = 255168
         var entryQueue = Queue[Game](LocalStaticRepository.load(TicTacToe).get.startGame())
         var leafNodeCount = 0

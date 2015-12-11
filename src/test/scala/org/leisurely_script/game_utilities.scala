@@ -2,10 +2,14 @@ package org.leisurelyscript.test.util
 
 import scala.util.{Try, Success, Failure}
 
+import org.scalatest.Tag
+
 import org.leisurelyscript.gdl._
 import MoveAction._
 import org.leisurelyscript.repository.LocalStaticRepository
 
+
+object LongRunningTests extends Tag("LongRunngingTests")
 
 object GraphUtilities {
     def sortEdges(game:Game):Iterable[BoardEdge] = {
