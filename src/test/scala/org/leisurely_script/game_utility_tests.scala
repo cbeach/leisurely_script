@@ -13,16 +13,16 @@ import GameResultState._
 
 
 class GameUtilityTests extends FunSuite {
-    test("The TicTacToeUtilities utility functions should work properly") {
-        val tiedGame = movesFromTiedGame(None)
-        assert(tiedGame.size == 10)
-        assert(tiedGame.last.gameResult.get.result == Tie)
-        assert(boardToString(tiedGame.last.board) == "\n OXX \n XXO \n OOX") 
+  test("The TicTacToeUtilities utility functions should work properly") {
+    val tiedGame = movesFromTiedGame(None)
+    assert(tiedGame.size == 10)
+    assert(tiedGame.last.gameResult.get.result == Tie)
+    assert(boardToString(tiedGame.last.board) == "\n OXX \n XXO \n OOX")
 
-        val fastWinForX = movesFromFastestXWin(None)
-        assert(fastWinForX.size == 6)
-        assert(fastWinForX.last.gameResult.get.result == Win)
-        assert(boardToString(fastWinForX.last.board) == "\n XXX \n OO- \n ---")
+    val fastWinForX = movesFromFastestXWin(None)
+    assert(fastWinForX.size == 6)
+    assert(fastWinForX.last.gameResult.get.result == Win)
+    assert(boardToString(fastWinForX.last.board) == "\n XXX \n OO- \n ---")
 
-    }
+  }
 }

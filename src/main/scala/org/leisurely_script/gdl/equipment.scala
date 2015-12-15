@@ -2,5 +2,5 @@ package org.leisurelyscript.gdl
 
 
 trait Equipment {
-    def copy:Equipment
+  def copy:Equipment
 }

@@ -1,4 +1,4 @@
 package org.leisurelyscript.gdl
 
 
-class IllegalGameException(message:String) extends Exception {}
+class IllegalGameException(message:String) extends Exception(message) {}

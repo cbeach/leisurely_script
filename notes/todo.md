@@ -1,5 +1,10 @@
 # Refactor
 
+## Update style
+
+Changes the tabs and formatting to be consistent with the scala style guidelines
+
+
 ## Class structure
 
 Separate Rule definition classes from Play time classes.

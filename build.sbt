@@ -2,9 +2,9 @@ import sbt._
 import Keys._
 
 
+// Create a main class (for development purposes only!)
 mainClass in (Compile, run) := Some("org.leisurelyscript.gdl.Main")
-//fork := true
-//javaOptions in test += "-Xms4G -Xmx4G -Xss10M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=1024M"
+
 lazy val root = (project in file(".")).
     settings(
         name := "leisurely_script",

@@ -8,177 +8,177 @@ import NeighborType._
 import Shape._
 
 case class Board(val size:List[Int],
-    val boardShape:Shape, 
-    val neighborType:NeighborType, 
-    val nodeShape:Shape,
-    val graph:Graph = new Graph()) {
+  val boardShape:Shape,
+  val neighborType:NeighborType,
+  val nodeShape:Shape,
+  val graph:Graph = new Graph()) {
 
-    def this(other:Board) = {
-        this(other.size, other.boardShape, other.neighborType, other.nodeShape, new Graph(other.graph))
+  def this(other:Board) = {
+    this(other.size, other.boardShape, other.neighborType, other.nodeShape, new Graph(other.graph))
+  }
+
+  def nodes() = {
+    graph.nodes
+  }
+
+  def generateGraph() = {
+    generateNodes()
+    generateEdges()
+  }
+
+  def generateNodes() = {
+    for (i <- 0 until size(0)) {
+      for (j <- 0 until size(1)) {
+        graph.add(BoardNode(Coordinate(i, j)))
+      }
     }
+  }
 
-    def nodes() = {
-        graph.nodes
-    }
+  def generateEdges() = {
+    for (i <- 0 until size(0)) {
+      for (j <- 0 until size(1)) {
+        if (neighborType != NoDirect) {
+          // N
+          if (j > 0) {
+            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i, j - 1))) , N))
+          }
 
-    def generateGraph() = {
-        generateNodes()
-        generateEdges()
-    }
+          // S
+          if (j < size(1) - 1) {
+            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i, j + 1))), S))
+          }
 
-    def generateNodes() = {
-        for (i <- 0 until size(0)) {
-            for (j <- 0 until size(1)) {
-                graph.add(BoardNode(Coordinate(i, j)))
-            }
+          // E
+          if (i > 0) {
+            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j))), E))
+          }
+
+          // W
+          if (i < size(0) - 1) {
+            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j))), W))
+          }
         }
-    }
 
-    def generateEdges() = {
-        for (i <- 0 until size(0)) {
-            for (j <- 0 until size(1)) {
-                if (neighborType != NoDirect) {
-                    // N
-                    if (j > 0) {
-                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i, j - 1))) , N))
-                    }
+        if (neighborType == Indirect) {
+          // NE
+          if (i > 0 && j > 0) {
+            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j - 1))), NE))
+          }
 
-                    // S
-                    if (j < size(1) - 1) {
-                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i, j + 1))), S))
-                    }
+          // NW
+          if (i < size(0) - 1 && j > 0) {
+            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j - 1))), NW))
+          }
 
-                    // E
-                    if (i > 0) {
-                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j))), E))
-                    }
+          // SE
+          if (i > 0 && j < size(1) - 1) {
+            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j + 1))) , SE))
+          }
 
-                    // W
-                    if (i < size(0) - 1) {
-                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j))), W))
-                    }
-                }
-
-                if (neighborType == Indirect) {
-                    // NE
-                    if (i > 0 && j > 0) { 
-                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j - 1))), NE))
-                    }
-
-                    // NW
-                    if (i < size(0) - 1 && j > 0) { 
-                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j - 1))), NW))
-                    }
-                    
-                    // SE
-                    if (i > 0 && j < size(1) - 1) { 
-                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j + 1))) , SE))
-                    }
-                    
-                    // SW
-                    if (i < size(0) - 1 && j < size(1) - 1) { 
-                        graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j + 1))), SW))
-                    }
-                }
-            }
+          // SW
+          if (i < size(0) - 1 && j < size(1) - 1) {
+            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j + 1))), SW))
+          }
         }
+      }
     }
+  }
 
-    /** 
-     * Is the board empty?
-     *
-     * @return Boolean  true if there are no pieces on the board, false if there are
-     */
-    def empty(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
-        for (node <- graph.nodes) {
-            if (node._2.empty(truthFunction) == false) {
-                return false
-            }
+  /**
+   * Is the board empty?
+   *
+   * @return Boolean  true if there are no pieces on the board, false if there are
+   */
+  def empty(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
+    for (node <- graph.nodes) {
+      if (node._2.empty(truthFunction) == false) {
+        return false
+      }
+    }
+    true
+  }
+
+  /**
+   * Is the board full?
+   *
+   * @return Boolean  true if there are no more empty nodes on the board, false if there are
+   */
+  def full(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
+    for (node <- graph.nodes) {
+      if (node._2.empty(truthFunction) == true) {
+        return false
+      }
+    }
+    true
+  }
+
+  def numberOfPieces(pieceCounter:(BoardNode)=>Int=null):Int = {
+    graph.nodes.map(node => {
+      pieceCounter match {
+        case func:((BoardNode)=>Int) => func(node._2)
+        case _ => node._2.equipment.size
+      }
+    }).reduce(_+_)
+  }
+
+  def push(thing:Equipment, coord:Coordinate):Try[Board] = {
+    Try(new Board(size, boardShape, neighborType, nodeShape, graph.push(thing, coord).get))
+  }
+
+  def pop(coord:Coordinate):Try[Board] = {
+    Try(new Board(size, boardShape, neighborType, nodeShape, graph.pop(coord).get))
+  }
+
+  def nInARow(n:Int, piece:PhysicalPiece, neighborType:NeighborType=null):Set[ConcretelyKnownPlayer] = {
+    def recursiveWalk(x:Int, n:Int, thisNode:BoardNode, piece:PhysicalPiece, direction:Direction=null):Boolean = {
+      val matchingPieces = thisNode.equipment.filter(eq => {
+        eq match {
+          case p:PhysicalPiece => piece.name == p.name && piece.owner.getPlayers == p.owner.getPlayers
+          case _ => false
         }
+      })
+
+      val edges = direction match {
+        case null => thisNode.edges
+        case _ => thisNode.edges.filter(edge => direction == edge.direction)
+      }
+
+      if (matchingPieces.length == 0
+      || (x != n - 1 && edges.length == 0)) {
+        false
+      } else if (x != n - 1) {
+        (for (e <- edges) yield recursiveWalk(x + 1, n, e.nodes._2, piece, e.direction)).exists(x => x == true)
+      } else if (x == n - 1 && matchingPieces.length > 0) {
         true
+      } else {
+        false
+      }
     }
 
-    /** 
-     * Is the board full?
-     *
-     * @return Boolean  true if there are no more empty nodes on the board, false if there are
-     */
-    def full(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
-        for (node <- graph.nodes) {
-            if (node._2.empty(truthFunction) == true) {
-                return false
-            }
+    var players:Set[ConcretelyKnownPlayer] = Set()
+    for ((coord, node) <- graph.nodes) {
+      if (recursiveWalk(0, n, node, piece)) {
+        piece.owner match {
+          case tempPlayers:ConcretelyKnownPlayer => players = players ++ tempPlayers.getPlayers
+          case _ => throw new IllegalPlayerException("Equipment that has been placed on the board must be owned by ConcretelyKnownPlayers.")
         }
-        true
+      }
     }
+    return players
+  }
 
-    def numberOfPieces(pieceCounter:(BoardNode)=>Int=null):Int = {
-        graph.nodes.map(node => {
-            pieceCounter match {
-                case func:((BoardNode)=>Int) => func(node._2)
-                case _ => node._2.equipment.size
-            }
-        }).reduce(_+_)
+  def wellFormed:Unit = {
+    if (graph.nodes.size == 0) {
+      throw new IllegalBoardException("The board must have nodes, no nodes found.")
     }
-
-    def push(thing:Equipment, coord:Coordinate):Try[Board] = {
-        Try(new Board(size, boardShape, neighborType, nodeShape, graph.push(thing, coord).get))
-    }
-
-    def pop(coord:Coordinate):Try[Board] = {
-        Try(new Board(size, boardShape, neighborType, nodeShape, graph.pop(coord).get))
-    }
-
-    def nInARow(n:Int, piece:PhysicalPiece, neighborType:NeighborType=null):Set[ConcretelyKnownPlayer] = {
-        def recursiveWalk(x:Int, n:Int, thisNode:BoardNode, piece:PhysicalPiece, direction:Direction=null):Boolean = {
-            val matchingPieces = thisNode.equipment.filter(eq => {
-                eq match {
-                    case p:PhysicalPiece => piece.name == p.name && piece.owner.getPlayers == p.owner.getPlayers
-                    case _ => false
-                }
-            })
-
-            val edges = direction match {
-                case null => thisNode.edges
-                case _ => thisNode.edges.filter(edge => direction == edge.direction)
-            }
-
-            if (matchingPieces.length == 0 
-            || (x != n - 1 && edges.length == 0)) {
-                false
-            } else if (x != n - 1) {
-                (for (e <- edges) yield recursiveWalk(x + 1, n, e.nodes._2, piece, e.direction)).exists(x => x == true)
-            } else if (x == n - 1 && matchingPieces.length > 0) {
-                true
-            } else {
-                false
-            }
-        }
-
-        var players:Set[ConcretelyKnownPlayer] = Set()
-        for ((coord, node) <- graph.nodes) {
-            if (recursiveWalk(0, n, node, piece)) {
-                piece.owner match {
-                    case tempPlayers:ConcretelyKnownPlayer => players = players ++ tempPlayers.getPlayers
-                    case _ => throw new IllegalPlayerException("Equipment that has been placed on the board must be owned by ConcretelyKnownPlayers.")
-                }
-            }
-        }
-        return players
-    }
-    
-    def wellFormed:Unit = {
-        if (graph.nodes.size == 0) {
-            throw new IllegalBoardException("The board must have nodes, no nodes found.")
-        }
-    }
+  }
 }
 
 
 object Board {
-    def apply(size:List[Int], boardShape:Shape, neighborType:NeighborType, nodeShape:Shape):Board = {
-        val board = new Board(size, boardShape, neighborType, nodeShape)
-        board.generateGraph()
-        board
-    }
+  def apply(size:List[Int], boardShape:Shape, neighborType:NeighborType, nodeShape:Shape):Board = {
+    val board = new Board(size, boardShape, neighborType, nodeShape)
+    board.generateGraph()
+    board
+  }
 }
