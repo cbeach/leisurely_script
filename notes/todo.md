@@ -23,6 +23,11 @@ There are much better (efficient) ways of keeping track of game states.
 The Game and Board classes are a little more complex than most of the other classes in the game tree. They should probably have better builder classes
 to aid game creation.
 
+Here are some interesting articles on type safe builder patterns in scala (I'm getting a serious black magic vibe from these things)
+http://jim-mcbeath.blogspot.com/2009/09/type-safe-builder-in-scala-part-3.html
+http://dcsobral.blogspot.com/2009/09/type-safe-builder-pattern.html#sthash.0EbyrUSx.dpuf
+http://www.tikalk.com/java/type-safe-builder-scala-using-type-constraints/
+
 
 ## Take the "edges" variable out of the BoardNode definition.
 

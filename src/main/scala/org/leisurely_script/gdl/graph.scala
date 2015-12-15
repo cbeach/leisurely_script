@@ -1,12 +1,16 @@
 package org.leisurelyscript.gdl
 
 import scala.util.{Try, Success, Failure}
-
-import Direction._
+import scala.collection.mutable
 
 
 case class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
-  var edges:List[BoardEdge]=List()) {
+                 var edges:List[BoardEdge]=List(),
+                 val outEdges:mutable.HashMap[Coordinate, List[BoardEdge]]=mutable.HashMap()) {
+
+  outEdges ++= edges.groupBy[Coordinate](edge => {
+    edge.nodes._1.coord
+  })
 
   def this(other:Graph) = {
     this(other.nodes, other.edges)
@@ -22,15 +26,16 @@ case class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
       if (!nodes.contains(edge.nodes._2.coord)) {
         throw(new IllegalBoardEdgeException("The destination node does not exist in this graph instance"))
       }
-      val sourceNode = edge.nodes._1
-      sourceNode.edges.foreach(e => {
+      val sourceNode = edge.nodes._1.coord
+      // Make sure that the source node doesn't already have an edge that travels in the given direction
+      val sourceNodeOutEdges = outEdges(sourceNode)
+      sourceNodeOutEdges.foreach(e => {
         if (edge.direction == e.direction) {
           throw(new IllegalBoardEdgeException("A node can not have two edges with the same direction."))
         }
       })
       edges = edge :: edges
-      val source = this.nodes(edge.nodes._1.coord)
-      source.edges = edge :: source.edges
+      outEdges + (sourceNode -> (edge :: outEdges(sourceNode)))
     } else {
       throw(new IllegalBoardEdgeException("The source node does not exist in this graph instance"))
     }
@@ -73,7 +78,7 @@ case class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
 
     newEdgeList.foreach(edge => {
       val sourceNode = edge.nodes._1
-      sourceNode.edges = edge :: sourceNode.edges
+      outEdges + (sourceNode.coord -> (edge :: outEdges(sourceNode.coord)))
     })
     (newNodeMap, newEdgeList)
   }
@@ -83,9 +88,9 @@ case class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
           edgeList:List[BoardEdge]):Try[Graph] = {
     //Grab the old node and update the new node's list of outgoing edges
     val oldNode = nodeMap(newNode.coord)
-    newNode.edges = oldNode.edges.map(edge => {
+    outEdges + (newNode.coord -> outEdges(oldNode.coord).map(edge => {
       BoardEdge((newNode, edge.nodes._2), edge.direction)
-    })
+    }))
 
     val updatedEdgeList:List[BoardEdge] = edgeList.map(edge => {
       if (edge.nodes._1 == oldNode) {
@@ -103,19 +108,10 @@ case class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
         if (node eq oldNode) {
           (coord, newNode)
         } else {
-          // This is not the old node. Check this node's list of outgoing edges and replace
-          // any that point at the old node.
-          node.edges = node.edges.map(edge => {
-            if (edge.nodes._2 eq oldNode) {
-              BoardEdge((node, newNode), edge.direction)
-            } else {
-              edge
-            }
-          })
           (coord, node)
         }
       }
-    } toMap
+    }
 
     Try(new Graph(updatedNodeMap, updatedEdgeList))
   }
@@ -124,10 +120,14 @@ case class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
     var string:String = ""
     nodes.foreach(pair => {
       string += s"${pair._2.label}: (${pair._2.coord.x}, ${pair._2.coord.y})\n"
-      pair._2.edges.foreach(edge => {
+      outEdges(pair._2.coord).foreach(edge => {
         string += s"\t-> ${edge.nodes._2.label}: (${edge.nodes._2.coord.x}, ${edge.nodes._2.coord.y})\n"
       })
     })
     string
   }
+}
+
+object Graph {
+
 }

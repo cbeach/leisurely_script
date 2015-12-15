@@ -139,8 +139,8 @@ case class Board(val size:List[Int],
       })
 
       val edges = direction match {
-        case null => thisNode.edges
-        case _ => thisNode.edges.filter(edge => direction == edge.direction)
+        case null => graph.outEdges(thisNode.coord)
+        case _ => graph.outEdges(thisNode.coord).filter(edge => direction == edge.direction)
       }
 
       if (matchingPieces.length == 0

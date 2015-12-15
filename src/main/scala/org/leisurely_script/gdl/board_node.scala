@@ -3,7 +3,6 @@ package org.leisurelyscript.gdl
 case class BoardNode(
   val coord:Coordinate,
   var equipment:List[Equipment]=List()) {
-  var edges:List[BoardEdge]=List()
   var label:String = _
 
   def empty(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
