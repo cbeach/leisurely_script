@@ -27,3 +27,8 @@ to aid game creation.
 ## Take the "edges" variable out of the BoardNode definition.
 
 Moving the references out of the BoardNodes will allow BoardNodes to be immutable.
+
+
+## refactor package names
+
+The package names should reflect the directory structure.

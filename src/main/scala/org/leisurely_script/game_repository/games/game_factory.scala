@@ -45,7 +45,7 @@ object GameFactory {
         game.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size == 0 && game.board.full()
       })
     )
-    Game()
+    Game("TicTacToe")
       .add(players)
       .add(board)
       .add(List(piece))
