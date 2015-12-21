@@ -1,12 +1,12 @@
-package org.leisurelyscript.gdl
+package org.leisurely_script.gdl
 
 import scala.util.{Try, Success, Failure}
 import scala.collection.mutable.Queue
 
-import org.leisurelyscript.gdl._
+import org.leisurely_script.gdl._
 import GameStatus._
-import org.leisurelyscript.repository.LocalStaticRepository
-import org.leisurelyscript.repository.GameFactory.AvailableGames._
+import org.leisurely_script.repository.LocalStaticRepository
+import org.leisurely_script.repository.GameFactory.AvailableGames._
 
 
 object Main {

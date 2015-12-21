@@ -1,16 +1,16 @@
-package org.leisurelyscript.gdl.ImplicitDefs
+package org.leisurely_script.gdl.ImplicitDefs
 
 import org.apache.commons.codec.binary.Base64
 
-import org.leisurelyscript.gdl.PieceRule
-import org.leisurelyscript.gdl.{Player => PlayerClass, EndCondition, PlayerListWrapper,
+import org.leisurely_script.gdl.PieceRule
+import org.leisurely_script.gdl.{Player => PlayerClass, EndCondition, PlayerListWrapper,
   PieceRuleListWrapper, EndConditionListWrapper}
 import spray.json._
 
 
 package TypeClasses {
   import java.io.{ObjectInputStream, ByteArrayInputStream, ObjectOutputStream, ByteArrayOutputStream}
-  import org.leisurelyscript.gdl._
+  import org.leisurely_script.gdl._
   object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     implicit object PlayerFormatter extends RootJsonFormat[PlayerClass] {
       def write(player:PlayerClass):JsValue = {

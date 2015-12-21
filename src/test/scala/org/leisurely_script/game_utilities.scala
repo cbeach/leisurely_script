@@ -1,12 +1,12 @@
-package org.leisurelyscript.test.util
+package org.leisurely_script.test.util
 
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.Tag
 
-import org.leisurelyscript.gdl._
+import org.leisurely_script.gdl._
 import MoveAction._
-import org.leisurelyscript.repository.LocalStaticRepository
+import org.leisurely_script.repository.LocalStaticRepository
 
 
 object LongRunningTests extends Tag("LongRunngingTests")

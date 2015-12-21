@@ -1,9 +1,9 @@
-package org.leisurelyscript.repository
+package org.leisurely_script.repository
 
 import scala.util.{Try, Success, Failure}
 
-import org.leisurelyscript.gdl._
-import org.leisurelyscript.gdl.ImplicitDefs.Views.Game._
+import org.leisurely_script.gdl._
+import org.leisurely_script.gdl.ImplicitDefs.Views.Game._
 
 trait GameRepository {
   def submit(game:Game):Unit

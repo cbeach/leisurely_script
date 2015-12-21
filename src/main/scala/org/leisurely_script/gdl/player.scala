@@ -1,4 +1,4 @@
-package org.leisurelyscript.gdl
+package org.leisurely_script.gdl
 
 
 case class Player(val name:String = java.util.UUID.randomUUID.toString) extends ConcretelyKnownPlayer with PlayerValidator {

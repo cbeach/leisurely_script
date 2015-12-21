@@ -1,4 +1,4 @@
-package org.leisurelyscript.gdl
+package org.leisurely_script.gdl
 
 import scala.util.{Try, Success, Failure}
 import scala.util.control.Breaks._
