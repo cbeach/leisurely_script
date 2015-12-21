@@ -58,7 +58,7 @@ class GameTreeTests extends FunSuite {
   test("A 3x3 board with indirect neighbors should have 40 well formed edges") {
     val board = Board(List(3, 3), Square, Indirect, Square)
     assert(board.graph.edges.length == 40)
-    val edges = board.graph.nodes(Coordinate(0, 0)).edges
+    val edges = board.graph.outEdges(Coordinate(0, 0))
     edges.foreach(e => e.direction match {
       case S => if (!(e.nodes._1.coord.x == 0 && e.nodes._1.coord.y == 0
            && e.nodes._2.coord.x == 0 && e.nodes._2.coord.y == 1)) {
@@ -78,7 +78,7 @@ class GameTreeTests extends FunSuite {
 
   test("Node (0, 0) on a 3x3 board with indirect neighbors should have 3 edges") {
     val board = Board(List(3, 3), Square, Indirect, Square)
-    assert(board.graph.nodes(Coordinate(0, 0)).edges.length == 3)
+    assert(board.graph.outEdges(Coordinate(0, 0)).length == 3)
   }
 
   test("A 3x3 board with direct neighbors should have 24 edges") {
