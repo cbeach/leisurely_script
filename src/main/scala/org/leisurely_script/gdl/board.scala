@@ -16,16 +16,13 @@ case class Board(val size:List[Int],
   def this(other:Board) = {
     this(other.size, other.boardShape, other.neighborType, other.nodeShape, new Graph(other.graph))
   }
-
   def nodes() = {
     graph.nodes
   }
-
   def generateGraph() = {
     generateNodes()
     generateEdges()
   }
-
   def generateNodes() = {
     for (i <- 0 until size(0)) {
       for (j <- 0 until size(1)) {
@@ -33,7 +30,6 @@ case class Board(val size:List[Int],
       }
     }
   }
-
   def generateEdges() = {
     for (i <- 0 until size(0)) {
       for (j <- 0 until size(1)) {
@@ -83,7 +79,6 @@ case class Board(val size:List[Int],
       }
     }
   }
-
   /**
    * Is the board empty?
    *
@@ -97,7 +92,6 @@ case class Board(val size:List[Int],
     }
     true
   }
-
   /**
    * Is the board full?
    *
@@ -111,7 +105,6 @@ case class Board(val size:List[Int],
     }
     true
   }
-
   def numberOfPieces(pieceCounter:(BoardNode)=>Int=null):Int = {
     graph.nodes.map(node => {
       pieceCounter match {
@@ -120,15 +113,12 @@ case class Board(val size:List[Int],
       }
     }).reduce(_+_)
   }
-
   def push(thing:Equipment, coord:Coordinate):Try[Board] = {
     Try(new Board(size, boardShape, neighborType, nodeShape, graph.push(thing, coord).get))
   }
-
   def pop(coord:Coordinate):Try[Board] = {
     Try(new Board(size, boardShape, neighborType, nodeShape, graph.pop(coord).get))
   }
-
   def nInARow(n:Int, piece:PhysicalPiece, neighborType:NeighborType=null):Set[ConcretelyKnownPlayer] = {
     def recursiveWalk(x:Int, n:Int, thisNode:BoardNode, piece:PhysicalPiece, direction:Direction=null):Boolean = {
       val matchingPieces = thisNode.equipment.filter(eq => {
@@ -166,7 +156,6 @@ case class Board(val size:List[Int],
     }
     return players
   }
-
   def wellFormed:Unit = {
     if (graph.nodes.size == 0) {
       throw new IllegalBoardException("The board must have nodes, no nodes found.")

@@ -7,55 +7,56 @@ import scala.collection.mutable
 case class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
                  var edges:List[BoardEdge]=List(),
                  val outEdges:mutable.HashMap[Coordinate, List[BoardEdge]]=mutable.HashMap()) {
-
   outEdges ++= edges.groupBy[Coordinate](edge => {
     edge.nodes._1.coord
   })
-
   def this(other:Graph) = {
-    this(other.nodes, other.edges)
+    this(other.nodes, other.edges, other.outEdges)
   }
-
   def add(node:BoardNode):Graph = {
     nodes += (node.coord -> node)
     this
   }
-
   def add(edge:BoardEdge):Graph = {
     if (nodes.contains(edge.nodes._1.coord)) {
       if (!nodes.contains(edge.nodes._2.coord)) {
         throw(new IllegalBoardEdgeException("The destination node does not exist in this graph instance"))
       }
-      val sourceNode = edge.nodes._1.coord
+      val sourceNodeCoordinate = edge.nodes._1.coord
       // Make sure that the source node doesn't already have an edge that travels in the given direction
-      val sourceNodeOutEdges = outEdges(sourceNode)
-      sourceNodeOutEdges.foreach(e => {
-        if (edge.direction == e.direction) {
-          throw(new IllegalBoardEdgeException("A node can not have two edges with the same direction."))
+      outEdges.get(sourceNodeCoordinate) match {
+        case Some(newOutEdges:List[BoardEdge]) => {
+          newOutEdges.foreach(e => {
+            if (edge.direction == e.direction) {
+              throw (new IllegalBoardEdgeException("A node can not have two edges with the same direction."))
+            }
+          })
         }
-      })
+        case None => {} //Do nothing. This just means that this is the first edge to leave this particular node.
+      }
       edges = edge :: edges
-      outEdges + (sourceNode -> (edge :: outEdges(sourceNode)))
+      outEdges.get(sourceNodeCoordinate) match {
+        case Some(existingEdges:List[BoardEdge]) =>
+          outEdges += (sourceNodeCoordinate -> (edge :: existingEdges))
+        case None => outEdges += (sourceNodeCoordinate -> List(edge))
+      }
     } else {
       throw(new IllegalBoardEdgeException("The source node does not exist in this graph instance"))
     }
     this
   }
-
   def push(thing:Equipment, coord:Coordinate):Try[Graph] = {
     val (newNodeMap, newEdgeList) = deepCopyNodesAndEdges
     val oldNode = nodes(coord)
     val newNode = BoardNode(coord, thing :: oldNode.equipment)
     replaceNode(newNode, newNodeMap, newEdgeList)
   }
-
   def pop(coord:Coordinate):Try[Graph] = {
     val (newNodeMap, newEdgeList) = deepCopyNodesAndEdges
     val oldNode = nodes(coord)
     val newNode = BoardNode(coord, oldNode.equipment.tail)
     replaceNode(newNode, newNodeMap, newEdgeList)
   }
-
   def deepCopyNodesAndEdges:Tuple2[Map[Coordinate, BoardNode], List[BoardEdge]] = {
     val newNodeList = for (node <- nodes) yield BoardNode(
        Coordinate(node._1.x, node._1.y))
@@ -82,7 +83,6 @@ case class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
     })
     (newNodeMap, newEdgeList)
   }
-
   def replaceNode(newNode:BoardNode,
           nodeMap:Map[Coordinate, BoardNode],
           edgeList:List[BoardEdge]):Try[Graph] = {
@@ -115,7 +115,6 @@ case class Graph(var nodes:Map[Coordinate, BoardNode]=Map(),
 
     Try(new Graph(updatedNodeMap, updatedEdgeList))
   }
-
   override def toString:String = {
     var string:String = ""
     nodes.foreach(pair => {
