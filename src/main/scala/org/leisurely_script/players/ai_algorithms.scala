@@ -1,8 +1,10 @@
 package org.leiesurelyscript.players
 
+import org.leisurely_script.implementation.Game
+
 import scala.util.Random
 
-import org.leisurely_script.gdl.{Move, Game}
+import org.leisurely_script.gdl.{Move, GameRuleSet}
 
 
 class BreadthFirstPlayer extends GamePlayer {

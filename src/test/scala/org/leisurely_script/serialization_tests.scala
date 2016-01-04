@@ -1,6 +1,8 @@
 package org.leisurely_script.test.suites
 
 import java.io.{ObjectOutputStream, ByteArrayOutputStream}
+import org.leisurely_script.implementation.Game
+
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
@@ -188,7 +190,7 @@ class SerializationTests extends FunSuite {
     import org.leisurely_script.test.util.GameUtilities.TicTacToeUtilities._
 
     val ticTacToe = LocalStaticRepository.load(TicTacToe).get
-    val converted = ticTacToe.toJson.convertTo[Game]
+    val converted = ticTacToe.toJson.convertTo[GameRuleSet]
     val tiedGame:List[Game] = movesFromTiedGame(converted)
   }
 }

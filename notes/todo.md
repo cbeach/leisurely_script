@@ -1,5 +1,10 @@
 # Refactor
 
+## Explore genetic recombination for conditionals
+
+The conditional statements support general code, and may not be suitable for genetic modification.
+This may not be too bad if I can get access to the scala ast. Then again, that might be excessively complicated.
+
 ## Update style
 
 Changes the tabs and formatting to be consistent with the scala style guidelines

@@ -1,5 +1,7 @@
 package org.leisurely_script.test.suites
 
+import org.leisurely_script.implementation.Game
+
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
@@ -35,10 +37,10 @@ class GameTreeTests extends FunSuite {
     }
   }
   test("Game() should produce a game object without error") {
-    val game = Game()
+    val game = GameRuleSet()
   }
   test("Creating a game without a name results in a UUID being generated") {
-    val noName = Game()
+    val noName = GameRuleSet()
     val uuidRegex = """^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$""".r
     uuidRegex findFirstIn noName.name match {
       case None => fail
@@ -46,7 +48,7 @@ class GameTreeTests extends FunSuite {
     }
   }
   test("Game.players.all should return all players.") {
-    val game = Game().add(List(Player("Andrew"), Player("Bill"), Player("Carol")))
+    val game = GameRuleSet().add(List(Player("Andrew"), Player("Bill"), Player("Carol")))
     assert(game.players.all.length == 3)
   }
 
@@ -196,14 +198,14 @@ class GameTreeTests extends FunSuite {
   }
 
   test("The game object should be able to return the previous, current, and next players.") {
-    val game = Game().add(List(Player("A"), Player("B"), Player("C")))
+    val game = GameRuleSet().add(List(Player("A"), Player("B"), Player("C")))
     assert(game.players.current.name == "A")
     assert(game.players.next.name == "B")
     assert(game.players.previous.name == "C")
   }
 
   test("Ending a player's turn should advance the game to the next player.") {
-    val game = Game().add(List(Player("A"), Player("B"), Player("C")))
+    val game = GameRuleSet().add(List(Player("A"), Player("B"), Player("C")))
     assert(game.players.current.name == "A")
     val players = game.players.endTurn
     assert(players.current.name == "B")
@@ -229,8 +231,16 @@ class GameTreeTests extends FunSuite {
     val legalMove = new LegalMove(player, precondition, Push)
     val piece = new PieceRule("token", player, List[LegalMove](legalMove))
     val move = new Move(piece.getPhysicalPiece(player), player, Push, board.graph.nodes(Coordinate(0, 0)))
+    val endCondition = new EndCondition(Win, player, (game:Game, player:Player) => {
+      false
+    })
 
-    val game = Game().add(board).add(List(piece))
+    val game = GameRuleSet()
+      .add(board)
+      .add(List(piece))
+      .add(new Players(player))
+      .add(List(endCondition))
+      .startGame()
     assert(precondition(game, move))
 
     val firstMove:Game = game.nonValidatedApplyMove(move) getOrElse fail
@@ -280,9 +290,9 @@ class GameTreeTests extends FunSuite {
     val legalMove = new LegalMove(player, precondition, Push)
     val piece = new PieceRule("token", player, List[LegalMove](legalMove))
     val endCondition = EndCondition(Win, player, (game, player) => {
-      game.board.nInARow(3, piece.getPhysicalPiece(player)).size > 0
+      game.board.nInARow(3, piece.getPhysicalPiece(player)).nonEmpty
     })
-    val game = Game().add(board).add(List(piece)).add(List(endCondition)).add(players)
+    val game = GameRuleSet().add(board).add(List(piece)).add(List(endCondition)).add(players).startGame()
 
     val aFewPlayers = Set(players(1), players(2), players(3))
     val previous = PreviousPlayer
@@ -312,14 +322,14 @@ class GameTreeTests extends FunSuite {
     val piece = new PieceRule("token", AnyPlayer, List[LegalMove](legalMove))
     val endConditions = List(
       EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
-        game.board.nInARow(3, piece.getPhysicalPiece(player)).size > 0
+        game.board.nInARow(3, piece.getPhysicalPiece(player)).nonEmpty
       }),
       EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
-        game.board.nInARow(3, piece.getPhysicalPiece(player)).size == 0 && game.board.full()
+        game.board.nInARow(3, piece.getPhysicalPiece(player)).isEmpty && game.board.full()
       })
     )
 
-    val game = Game()
+    val game = GameRuleSet()
     val gameWithPlayers = game.add(players)
     val gameWithBoard = gameWithPlayers.add(board)
     val gameWithPieces = gameWithBoard.add(List(piece))
@@ -346,27 +356,30 @@ class GameTreeTests extends FunSuite {
     val xPiece = tie(0).pieces(0).getPhysicalPiece(tie(0).players.all(0))
     val oPiece = tie(0).pieces(0).getPhysicalPiece(tie(0).players.all(1))
 
-    assert(tie(0).board.nInARow(3, xPiece).size == 0)
-    assert(tie(1).board.nInARow(3, xPiece).size == 0)
-    assert(tie(2).board.nInARow(3, xPiece).size == 0)
-    assert(tie(3).board.nInARow(3, xPiece).size == 0)
-    assert(tie(4).board.nInARow(3, xPiece).size == 0)
-    assert(tie(5).board.nInARow(3, xPiece).size == 0)
-    assert(tie(6).board.nInARow(3, xPiece).size == 0)
-    assert(tie(7).board.nInARow(3, xPiece).size == 0)
-    assert(tie(8).board.nInARow(3, xPiece).size == 0)
-    assert(tie(9).board.nInARow(3, xPiece).size == 0)
+    val move9 = tie(8).applyMove(Move(tie(8).pieces(0).getPhysicalPiece(tie(8).players.current),
+      tie(8).players.current, Push, tie(8).board.graph.nodes(Coordinate(2, 2)))).get
 
-    assert(tie(0).board.nInARow(3, oPiece).size == 0)
-    assert(tie(1).board.nInARow(3, oPiece).size == 0)
-    assert(tie(2).board.nInARow(3, oPiece).size == 0)
-    assert(tie(3).board.nInARow(3, oPiece).size == 0)
-    assert(tie(4).board.nInARow(3, oPiece).size == 0)
-    assert(tie(5).board.nInARow(3, oPiece).size == 0)
-    assert(tie(6).board.nInARow(3, oPiece).size == 0)
-    assert(tie(7).board.nInARow(3, oPiece).size == 0)
-    assert(tie(8).board.nInARow(3, oPiece).size == 0)
-    assert(tie(9).board.nInARow(3, oPiece).size == 0)
+    assert(tie(0).board.nInARow(3, xPiece).isEmpty)
+    assert(tie(1).board.nInARow(3, xPiece).isEmpty)
+    assert(tie(2).board.nInARow(3, xPiece).isEmpty)
+    assert(tie(3).board.nInARow(3, xPiece).isEmpty)
+    assert(tie(4).board.nInARow(3, xPiece).isEmpty)
+    assert(tie(5).board.nInARow(3, xPiece).isEmpty)
+    assert(tie(6).board.nInARow(3, xPiece).isEmpty)
+    assert(tie(7).board.nInARow(3, xPiece).isEmpty)
+    assert(tie(8).board.nInARow(3, xPiece).isEmpty)
+    assert(tie(9).board.nInARow(3, xPiece).isEmpty)
+
+    assert(tie(0).board.nInARow(3, oPiece).isEmpty)
+    assert(tie(1).board.nInARow(3, oPiece).isEmpty)
+    assert(tie(2).board.nInARow(3, oPiece).isEmpty)
+    assert(tie(3).board.nInARow(3, oPiece).isEmpty)
+    assert(tie(4).board.nInARow(3, oPiece).isEmpty)
+    assert(tie(5).board.nInARow(3, oPiece).isEmpty)
+    assert(tie(6).board.nInARow(3, oPiece).isEmpty)
+    assert(tie(7).board.nInARow(3, oPiece).isEmpty)
+    assert(tie(8).board.nInARow(3, oPiece).isEmpty)
+    assert(tie(9).board.nInARow(3, oPiece).isEmpty)
 
     assert(tie(0).gameResult.get.result == Pending)
     assert(tie(1).gameResult.get.result == Pending)
@@ -405,6 +418,9 @@ class GameTreeTests extends FunSuite {
     assert(tie.last.legalMoves(tie.last.players.current).isEmpty)
 
     val fastXWin = movesFromFastestXWin(None).last
+    val move4 = movesFromFastestXWin(None)(4)
+    val move5 = move4.applyMove(Move(move4.pieces(0).getPhysicalPiece(move4.players.current), move4.players.current, Push, move4.board.graph.nodes(Coordinate(0, 2)))).get
+    println(boardToString(move5.board))
     assert(fastXWin.legalMoves(fastXWin.players.current).isEmpty)
   }
 }

@@ -6,8 +6,8 @@ import org.leisurely_script.gdl._
 import org.leisurely_script.gdl.ImplicitDefs.Views.Game._
 
 trait GameRepository {
-  def submit(game:Game):Unit
-  def load(gameID:String):Try[Game]
-  def update(gameID:String, game:Game):Unit
+  def submit(game:GameRuleSet):Unit
+  def load(gameID:String):Try[GameRuleSet]
+  def update(gameID:String, game:GameRuleSet):Unit
   def remove(gameID:String):Unit
 }

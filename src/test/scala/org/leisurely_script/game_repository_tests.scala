@@ -21,7 +21,7 @@ import Shape._
 class StaticLocalGameRepoTests extends FunSuite {
   test("The TicTacToe factory should work.") {
     val ticTacToe = LocalStaticRepository.load("TicTacToe") match {
-      case Success(tTT:Game) => tTT
+      case Success(tTT:GameRuleSet) => tTT
       case Failure(ex) => throw ex
     }
 

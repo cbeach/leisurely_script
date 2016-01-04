@@ -1,5 +1,7 @@
 package org.leisurely_script.test.suites
 
+import org.leisurely_script.implementation.Game
+
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
@@ -35,7 +37,7 @@ class TicTacToeTests extends FunSuite {
         game.board.nInARow(3, piece.getPhysicalPiece(player)).size == 0 && game.board.full()
       })
     )
-    val first = Game()
+    val first = GameRuleSet()
     val second = first.add(players)
     val third = second.add(board)
     val fourth = third.add(List(piece))

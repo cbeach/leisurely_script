@@ -12,7 +12,7 @@ import org.leisurely_script.repository.LocalStaticRepository
 object LongRunningTests extends Tag("LongRunngingTests")
 
 object GraphUtilities {
-  def sortEdges(game:Game):Iterable[BoardEdge] = {
+  def sortEdges(game:GameRuleSet):Iterable[BoardEdge] = {
     game.board.graph.edges.sortWith((e1, e2) => {
       if (e1.nodes._1.coord.x == e2.nodes._1.coord.x) {
         e1.nodes._2.coord.x < e2.nodes._2.coord.x
@@ -24,7 +24,10 @@ object GraphUtilities {
 }
 
 package GameUtilities {
-  object TicTacToeUtilities {
+
+import org.leisurely_script.implementation.Game
+
+object TicTacToeUtilities {
     def boardToString(board:Board):String = {
       val strList = for (i <- 0 until 3; j <- 0 until 3) yield {
         val equipment = board.graph.nodes(Coordinate(i, j)).equipment
@@ -74,15 +77,13 @@ package GameUtilities {
       }
       returnInt
     }
-    def movesFromTiedGame(game:Option[Game]=None):List[Game] = {
-      val move0:Game = {
-        game getOrElse {
+    def movesFromTiedGame(game:Option[GameRuleSet]=None):List[Game] = {
+      val move0:Game = game.getOrElse({
           LocalStaticRepository.load("TicTacToe") match {
-            case Success(tTT:Game) => tTT.startGame()
+            case Success(tTT:GameRuleSet) => tTT
             case Failure(ex) => throw ex
           }
-        }
-      }.startGame()
+        }).startGame()
       val move1 = move0.applyMove(Move(move0.pieces(0).getPhysicalPiece(move0.players.current), move0.players.current, Push, move0.board.graph.nodes(Coordinate(1, 1)))).get
       val move2 = move1.applyMove(Move(move1.pieces(0).getPhysicalPiece(move1.players.current), move1.players.current, Push, move1.board.graph.nodes(Coordinate(0, 0)))).get
       val move3 = move2.applyMove(Move(move2.pieces(0).getPhysicalPiece(move2.players.current), move2.players.current, Push, move2.board.graph.nodes(Coordinate(0, 1)))).get
@@ -95,18 +96,16 @@ package GameUtilities {
 
       List[Game](move0, move1, move2, move3, move4, move5, move6, move7, move8, move9)
     }
-    def movesFromTiedGame(game:Game):List[Game] = {
+    def movesFromTiedGame(game:GameRuleSet):List[Game] = {
       movesFromTiedGame(Some(game))
     }
-    def movesFromFastestXWin(game:Option[Game]=None):List[Game] = {
-      val move0:Game = {
-        game getOrElse {
+    def movesFromFastestXWin(game:Option[GameRuleSet]=None):List[Game] = {
+      val move0:Game = game.getOrElse({
           LocalStaticRepository.load("TicTacToe") match {
-            case Success(tTT:Game) => tTT.startGame()
+            case Success(tTT:GameRuleSet) => tTT
             case Failure(ex) => throw ex
           }
-        }
-      }.startGame()
+        }).startGame()
       val move1 = move0.applyMove(Move(move0.pieces(0).getPhysicalPiece(move0.players.current), move0.players.current, Push, move0.board.graph.nodes(Coordinate(0, 0)))).get
       val move2 = move1.applyMove(Move(move1.pieces(0).getPhysicalPiece(move1.players.current), move1.players.current, Push, move1.board.graph.nodes(Coordinate(1, 0)))).get
       val move3 = move2.applyMove(Move(move2.pieces(0).getPhysicalPiece(move2.players.current), move2.players.current, Push, move2.board.graph.nodes(Coordinate(0, 1)))).get
@@ -114,7 +113,7 @@ package GameUtilities {
       val move5 = move4.applyMove(Move(move4.pieces(0).getPhysicalPiece(move4.players.current), move4.players.current, Push, move4.board.graph.nodes(Coordinate(0, 2)))).get
       List[Game](move0, move1, move2, move3, move4, move5)
     }
-    def movesFromFastestXWin(game:Game):List[Game] = {
+    def movesFromFastestXWin(game:GameRuleSet):List[Game] = {
       movesFromFastestXWin(Some(game))
     }
   }

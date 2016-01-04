@@ -11,7 +11,9 @@ import spray.json._
 package TypeClasses {
   import java.io.{ObjectInputStream, ByteArrayInputStream, ObjectOutputStream, ByteArrayOutputStream}
   import org.leisurely_script.gdl._
-  object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
+import org.leisurely_script.implementation.Game
+
+object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     implicit object PlayerFormatter extends RootJsonFormat[PlayerClass] {
       def write(player:PlayerClass):JsValue = {
         JsObject(("_type", JsString("Player")), ("name", JsString(player.name)))
@@ -280,29 +282,24 @@ package TypeClasses {
       def read(json:JsValue):GameStatus.Value = GameStatus.withName(json.convertTo[String])
     }
     implicit val gameResultFormatter = jsonFormat3(GameResult)
-    implicit object GameFormatter extends RootJsonFormat[Game] {
-      def write(game:Game):JsValue = {
+    implicit object GameFormatter extends RootJsonFormat[GameRuleSet] {
+      def write(game:GameRuleSet):JsValue = {
         JsObject(
           ("name", game.name.toJson),
           ("players", game.players.toJson),
           ("board", game.board.toJson),
           ("pieces", game.pieces.toJson),
           ("endConditions", game.endConditions.toJson),
-          ("gameResult", game.gameResult.toJson),
-          ("status", game.status.toJson),
           ("scoringFunction", game.playerScoringFunction.toJson)
         )
       }
-      def read(json:JsValue):Game = json match {
-        case JsObject(fields) => new Game(
+      def read(json:JsValue):GameRuleSet = json match {
+        case JsObject(fields) => new GameRuleSet(
           fields("name").convertTo[String],
           fields("players").convertTo[Players],
           fields("board").convertTo[Board],
           fields("pieces").convertTo[List[PieceRule]],
           fields("endConditions").convertTo[List[EndCondition]],
-          List[Game](),
-          Some(fields("gameResult").convertTo[GameResult]),
-          fields("status").convertTo[GameStatus.Value],
           Some(fields("scoringFunction").convertTo[(Player, GameResultState.Value, Option[Player])=>Double])
         )
         case thing => deserializationError(s"Expected Game, got $thing")

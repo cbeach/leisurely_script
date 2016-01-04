@@ -1,5 +1,7 @@
 package org.leisurely_script.gdl
 
+import org.leisurely_script.implementation.Game
+
 
 case class PhysicalPiece(val name:String, val owner:ConcretelyKnownPlayer) extends Equipment {
   override def copy:Equipment = {

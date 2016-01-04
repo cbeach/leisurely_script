@@ -1,5 +1,7 @@
 package org.leisurely_script.gdl
 
+import org.leisurely_script.implementation.Game
+
 
 trait PlayerValidator {
   def playersValid(game:Game, players:Set[Player]):Boolean

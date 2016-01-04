@@ -1,5 +1,7 @@
 package org.leisurely_script.gdl
 
+import org.leisurely_script.implementation.Game
+
 
 case class Player(val name:String = java.util.UUID.randomUUID.toString) extends ConcretelyKnownPlayer with PlayerValidator {
   override def playersValid(game:Game, players:Set[Player]):Boolean = {
@@ -13,13 +15,13 @@ case class Player(val name:String = java.util.UUID.randomUUID.toString) extends 
   override def getPlayers:Set[Player] = {
     Set(this)
   }
-  def valid(game:Game, player:Player):Boolean = {
+  def valid(game:GameRuleSet, player:Player):Boolean = {
     player == this
   }
   override def toString:String = {
     s"Player(${name})"
   }
-  def get(game:Game):Player = {
+  def get(game:GameRuleSet):Player = {
     this
   }
 }
