@@ -124,7 +124,7 @@ class GameTreeTests extends FunSuite {
   test("Board.full should return true when called on a full board") {
     var board = Board(List(3, 3), Square, Direct, Square)
     val player1 = Player("1")
-    for (node <- board.graph.nodes) {
+    for (node <- board.graph.nodesByCoord) {
       board = board.push(PhysicalPiece("token", player1), node._1).get
     }
     assert(board.full())
@@ -182,7 +182,7 @@ class GameTreeTests extends FunSuite {
     }
     val xPiece = game.pieces(0).getPhysicalPiece(game.players.all(0))
     assert(game.applyMove(new Move(xPiece, game.players.current, Push,
-    game.board.graph.nodes(Coordinate(0, 1)))) match {
+    game.board.graph.nodesByCoord(Coordinate(0, 1)))) match {
       case Success(newGame:Game) => newGame.board.numberOfPieces() == 1
       case Failure(ex) => throw(ex)
     })
@@ -216,19 +216,19 @@ class GameTreeTests extends FunSuite {
     }
     val xPiece = game.pieces(0).getPhysicalPiece(game.players.all(0))
     val firstMove:Game = game.applyMove(new Move(xPiece, game.players.current, Push,
-    game.board.graph.nodes(Coordinate(0, 1)))).get
+    game.board.graph.nodesByCoord(Coordinate(0, 1)))).get
 
     assert(!(game eq firstMove))
     assert(!(game.board eq firstMove.board))
   }
 
   test("The precondition in LegalMoves should return false for illegal moves") {
-    val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
+    val precondition = (game:Game, move:Move)=>game.board.graph.nodesByCoord(move.node.coord).empty()
     val board = Board(List(3, 3), Square, Indirect, Square)
     val player = Player("1")
     val legalMove = new LegalMove(player, precondition, Push)
     val piece = new PieceRule("token", player, List[LegalMove](legalMove))
-    val move = new Move(piece.getPhysicalPiece(player), player, Push, board.graph.nodes(Coordinate(0, 0)))
+    val move = new Move(piece.getPhysicalPiece(player), player, Push, board.graph.nodesByCoord(Coordinate(0, 0)))
 
     val game = Game().add(board).add(List(piece))
     assert(precondition(game, move))
@@ -247,7 +247,7 @@ class GameTreeTests extends FunSuite {
       case Failure(ex) => fail
     }
     val move = new Move(game.pieces(0).getPhysicalPiece(game.players.current), game.players.current, Push,
-      game.board.graph.nodes(Coordinate(0, 1)))
+      game.board.graph.nodesByCoord(Coordinate(0, 1)))
 
     assert(game.isMoveLegal(move))
 
@@ -261,7 +261,7 @@ class GameTreeTests extends FunSuite {
       case Failure(ex) => fail
     }
     val move = new Move(game.pieces(0).getPhysicalPiece(game.players.current), game.players.current, Push,
-      game.board.graph.nodes(Coordinate(0, 1)))
+      game.board.graph.nodesByCoord(Coordinate(0, 1)))
     assert(game.isMoveLegal(move))
 
     val firstMove:Game = game.applyMove(move).get
@@ -273,7 +273,7 @@ class GameTreeTests extends FunSuite {
   }
 
   test("The special player objects (Any, All, SomePlayers, NoPlayer, etc.) should condence into the proper player") {
-    val precondition = (game:Game, move:Move)=>game.board.graph.nodes(move.node.coord).empty()
+    val precondition = (game:Game, move:Move)=>game.board.graph.nodesByCoord(move.node.coord).empty()
     val board = Board(List(3, 3), Square, Indirect, Square)
     val players = List(Player("1"), Player("2"), Player("3"), Player("4"), Player("5"))
     val player = players(0)
@@ -307,7 +307,7 @@ class GameTreeTests extends FunSuite {
     val board = Board(List(3, 3), Square, Indirect, Square)
     val players = new Players(List(Player("X"), Player("O")))
     val legalMove = new LegalMove(AnyPlayer, (game:Game, move:Move) => {
-      game.board.graph.nodes(move.node.coord).empty()
+      game.board.graph.nodesByCoord(move.node.coord).empty()
     }, Push)
     val piece = new PieceRule("token", AnyPlayer, List[LegalMove](legalMove))
     val endConditions = List(

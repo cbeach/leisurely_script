@@ -34,7 +34,7 @@ object GameFactory {
     val board = Board(List(3, 3), Square, Indirect, Square)
     val players = new Players(List(Player("X"), Player("O")))
     val legalMove = new LegalMove(CurrentPlayer, (game:Game, move:Move) => {
-      game.board.graph.nodes(move.node.coord).empty()
+      game.board.graph.nodesByCoord(move.node.coord).empty()
     }, Push)
     val piece = new PieceRule("token", AnyPlayer, List[LegalMove](legalMove))
     val endConditions = List(

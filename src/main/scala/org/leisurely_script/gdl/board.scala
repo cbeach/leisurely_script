@@ -7,17 +7,17 @@ import Direction._
 import NeighborType._
 import Shape._
 
-case class Board(val size:List[Int],
-  val boardShape:Shape,
-  val neighborType:NeighborType,
-  val nodeShape:Shape,
-  val graph:Graph = new Graph()) {
+case class Board(size:List[Int],
+  boardShape:Shape,
+  neighborType:NeighborType,
+  nodeShape:Shape,
+  graph:Graph = new Graph()) {
 
   def this(other:Board) = {
     this(other.size, other.boardShape, other.neighborType, other.nodeShape, new Graph(other.graph))
   }
   def nodes() = {
-    graph.nodes
+    graph.nodesByCoord
   }
   def generateGraph() = {
     generateNodes()
@@ -36,44 +36,44 @@ case class Board(val size:List[Int],
         if (neighborType != NoDirect) {
           // N
           if (j > 0) {
-            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i, j - 1))) , N))
+            graph.add(BoardEdge((graph.nodesByCoord(Coordinate(i, j)), graph.nodesByCoord(Coordinate(i, j - 1))) , N))
           }
 
           // S
           if (j < size(1) - 1) {
-            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i, j + 1))), S))
+            graph.add(BoardEdge((graph.nodesByCoord(Coordinate(i, j)), graph.nodesByCoord(Coordinate(i, j + 1))), S))
           }
 
           // E
           if (i > 0) {
-            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j))), E))
+            graph.add(BoardEdge((graph.nodesByCoord(Coordinate(i, j)), graph.nodesByCoord(Coordinate(i - 1, j))), E))
           }
 
           // W
           if (i < size(0) - 1) {
-            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j))), W))
+            graph.add(BoardEdge((graph.nodesByCoord(Coordinate(i, j)), graph.nodesByCoord(Coordinate(i + 1, j))), W))
           }
         }
 
         if (neighborType == Indirect) {
           // NE
           if (i > 0 && j > 0) {
-            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j - 1))), NE))
+            graph.add(BoardEdge((graph.nodesByCoord(Coordinate(i, j)), graph.nodesByCoord(Coordinate(i - 1, j - 1))), NE))
           }
 
           // NW
           if (i < size(0) - 1 && j > 0) {
-            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j - 1))), NW))
+            graph.add(BoardEdge((graph.nodesByCoord(Coordinate(i, j)), graph.nodesByCoord(Coordinate(i + 1, j - 1))), NW))
           }
 
           // SE
           if (i > 0 && j < size(1) - 1) {
-            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i - 1, j + 1))) , SE))
+            graph.add(BoardEdge((graph.nodesByCoord(Coordinate(i, j)), graph.nodesByCoord(Coordinate(i - 1, j + 1))) , SE))
           }
 
           // SW
           if (i < size(0) - 1 && j < size(1) - 1) {
-            graph.add(BoardEdge((graph.nodes(Coordinate(i, j)), graph.nodes(Coordinate(i + 1, j + 1))), SW))
+            graph.add(BoardEdge((graph.nodesByCoord(Coordinate(i, j)), graph.nodesByCoord(Coordinate(i + 1, j + 1))), SW))
           }
         }
       }
@@ -85,7 +85,7 @@ case class Board(val size:List[Int],
    * @return Boolean  true if there are no pieces on the board, false if there are
    */
   def empty(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
-    for (node <- graph.nodes) {
+    for (node <- graph.nodesByCoord) {
       if (node._2.empty(truthFunction) == false) {
         return false
       }
@@ -98,7 +98,7 @@ case class Board(val size:List[Int],
    * @return Boolean  true if there are no more empty nodes on the board, false if there are
    */
   def full(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
-    for (node <- graph.nodes) {
+    for (node <- graph.nodesByCoord) {
       if (node._2.empty(truthFunction) == true) {
         return false
       }
@@ -106,7 +106,7 @@ case class Board(val size:List[Int],
     true
   }
   def numberOfPieces(pieceCounter:(BoardNode)=>Int=null):Int = {
-    graph.nodes.map(node => {
+    graph.nodesByCoord.map(node => {
       pieceCounter match {
         case func:((BoardNode)=>Int) => func(node._2)
         case _ => node._2.equipment.size
@@ -146,7 +146,7 @@ case class Board(val size:List[Int],
     }
 
     var players:Set[ConcretelyKnownPlayer] = Set()
-    for ((coord, node) <- graph.nodes) {
+    for ((coord, node) <- graph.nodesByCoord) {
       if (recursiveWalk(0, n, node, piece)) {
         piece.owner match {
           case tempPlayers:ConcretelyKnownPlayer => players = players ++ tempPlayers.getPlayers
@@ -157,7 +157,7 @@ case class Board(val size:List[Int],
     return players
   }
   def wellFormed:Unit = {
-    if (graph.nodes.size == 0) {
+    if (graph.nodesByCoord.size == 0) {
       throw new IllegalBoardException("The board must have nodes, no nodes found.")
     }
   }

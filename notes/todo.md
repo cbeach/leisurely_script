@@ -29,11 +29,6 @@ http://dcsobral.blogspot.com/2009/09/type-safe-builder-pattern.html#sthash.0Ebyr
 http://www.tikalk.com/java/type-safe-builder-scala-using-type-constraints/
 
 
-## Take the "edges" variable out of the BoardNode definition.
-
-Moving the references out of the BoardNodes will allow BoardNodes to be immutable.
-
-
 ## refactor package names
 
 The package names should reflect the directory structure.

@@ -131,7 +131,7 @@ class SerializationTests extends FunSuite {
     assert(legalMove.toJson.convertTo[LegalMove].postcondition(null, null) == legalMove.postcondition(null, null))
 
     val ticTacToeLegalMove = new LegalMove(CurrentPlayer, (game:Game, move:Move) => {
-      game.board.graph.nodes(move.node.coord).empty()
+      game.board.graph.nodesByCoord(move.node.coord).empty()
     }, Push)
     ticTacToeLegalMove.toJson.convertTo[LegalMove]
   }
