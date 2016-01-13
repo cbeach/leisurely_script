@@ -137,15 +137,12 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     }
     implicit object GraphFormatter extends JsonFormat[Graph] {
       def write(graph:Graph):JsValue = {
-        JsObject(("nodes", graph.nodes.map(_._2).toJson), ("edges", graph.edges.toJson))
+        JsObject(("nodes", graph.nodes.toList.toJson), ("edges", graph.edges.toList.toJson))
       }
       def read(json:JsValue):Graph = {
         val fields = json.asJsObject.fields
-        val nodes:Map[Coordinate, BoardNode] =
-          fields("nodes").convertTo[List[BoardNode]].map(node => {
-          (node.coord, node)
-        }).toMap
-        new Graph(nodes, fields("edges").convertTo[List[BoardEdge]])
+        new Graph(fields("nodes").convertTo[List[BoardNode]],
+          fields("edges").convertTo[List[BoardEdge]])
       }
     }
     implicit val shapeFormatter = new JsonFormat[Shape.Value] {

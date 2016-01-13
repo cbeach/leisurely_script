@@ -298,51 +298,9 @@ How do I get the information from the input to the destination variable?
 ### Interface
 - Interface(inputs:List[Input], players:Player)
 
-## Open questions
+## Conditional mini-language
 
-Player validation: I would like to use readable values like Previous, Current, Next, All, Any, etc. to identify players.
-    Problems
-        1. The functional design of the game play makes this difficult. A new game object and list of players is created for each turn. Any references to 
-           the list of players after that is out of date.
-
-
-
-
-### Order of Implementation
-Start at the leaves and work your way up
-
-Game
-    Player
-    Board
-        Node
-    Piece
-        Player
-        LegalMove
-        MoveAction
-    EndConditions
-        Player
-        GameResult
-
-1. Player
-2. Game
-    - Stub with methods for getting players (current, previous, next, all, etc.)
-3. MoveAction
-4. LegalMove
-    - Requires Game to have an applyMove method
-5. Piece
-6. GameResult
-7. EndConditions
-8. Board
-9. Graph
-    - Node needs to contain references to its contents
-10. Move
-11. Game
-    - applyMove
-12. GameFactory
-13. Input
-14. Game
-    - inputs
-15. Interface
-16. Game
-    - interface
-17. GameRepository
+The conditionals (first class functions for LegalMoves and EndConditions) are problematic.
+Arbitrary code executions leads to an inability to pre-compute things like n in a row, and will lead to major problems
+during genetic recombination. Creating custom objects for some of the boolean functions (nInARow, full, empty, etc.) will
+allow pre-computation, but genetic recombination will still be a problem.

@@ -2,8 +2,16 @@ package org.leisurely_script.gdl
 
 import org.leisurely_script.implementation.Game
 
+import java.io.PrintWriter
+
+import com.ning.http.client.RequestBuilder
+
 import scala.util.{Try, Success, Failure}
 import scala.collection.mutable.Queue
+import spray.json._
+import DefaultJsonProtocol._
+import org.leisurelyscript.gdl.ImplicitDefs.TypeClasses.LeisurelyScriptJSONProtocol._
+import dispatch._, Defaults._
 
 import org.leisurely_script.gdl._
 import GameStatus._
@@ -12,38 +20,15 @@ import org.leisurely_script.repository.GameFactory.AvailableGames._
 
 
 object Main {
+  def gameRepositoryService(game:String): Req = {
+    host("127.0.0.1", 8080) / game
+  }
   def main(args:Array[String]) {
-    val numberOfPossibleGames = 255168
-    var entryQueue = Queue[Game](LocalStaticRepository.load(TicTacToe).get.startGame())
-    var exitQueue = Queue[Game]()
-    var counter = 0
-    var lastDiff = 0
-    var currentDiff = 0
-    var currentSum = 0
-    while(entryQueue.nonEmpty && counter < 100000) {
-      //currentSum = entryQueue.size + exitQueue.size
-      //currentDiff = entryQueue.size - exitQueue.size
-      //println(s"${entryQueue.size} -> ${exitQueue.size} \n\tsum: ${currentSum}\n\tdelta: ${lastDiff - currentDiff}")
-      //lastDiff = currentDiff
-      counter += 1
-      val head = entryQueue.dequeue()
-      val legalMoves = head.legalMoves(head.players.current)
-      if (head.status != Finished) {
-        legalMoves.foreach(move => {
-          entryQueue += {
-            head.applyMove(move) match {
-              case Success(nS) => nS
-              case Failure(_) => {
-                //println(s"An illegal move was provided by Game.legalMoves. Move: ${move}\n Current player: ${head.players.current}\n Board: ${boardToString(head.board)}.")
-                throw new IllegalPlayerException("An illegal move was provided by Game.legalMoves.")
-              }
-            }
-          }
-        })
-      } else {
-        exitQueue += head
-      }
-    }
-    //println(s"exitQueue.size: ${exitQueue.size}")
+    val ticTacToe = LocalStaticRepository.load(TicTacToe).get.startGame()
+    val request:Req = gameRepositoryService("TicTacToe")
+      .PUT
+      .setContentType("application/json", "UTF-8")
+      .setBody(ticTacToe.toJson.toString)
+    Http(request OK as.String)
   }
 }

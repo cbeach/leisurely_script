@@ -30,7 +30,7 @@ import org.leisurely_script.implementation.Game
 object TicTacToeUtilities {
     def boardToString(board:Board):String = {
       val strList = for (i <- 0 until 3; j <- 0 until 3) yield {
-        val equipment = board.graph.nodes(Coordinate(i, j)).equipment
+        val equipment = board.graph.nodesByCoord(Coordinate(i, j)).equipment
         if (equipment.size == 0) {
           "-"
         } else {
@@ -49,7 +49,7 @@ object TicTacToeUtilities {
     }
     def boardToInt(board:Board):Int = {
       val intList = for (i <- 0 until 3; j <- 0 until 3) yield {
-        val equipment = board.graph.nodes(Coordinate(i, j)).equipment
+        val equipment = board.graph.nodesByCoord(Coordinate(i, j)).equipment
         if (equipment.size == 0) {
           0
         } else {
