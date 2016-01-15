@@ -12,10 +12,6 @@ spray-json
 
     libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
 
-scala-graph
-
-    libraryDependencies += "com.assembla.scala-incubator" %% "graph-core" % "1.9.4"
-
 
 ## Classes and Functions
 
@@ -298,9 +294,85 @@ How do I get the information from the input to the destination variable?
 ### Interface
 - Interface(inputs:List[Input], players:Player)
 
-## Conditional mini-language
+## Refactoring
 
-The conditionals (first class functions for LegalMoves and EndConditions) are problematic.
-Arbitrary code executions leads to an inability to pre-compute things like n in a row, and will lead to major problems
-during genetic recombination. Creating custom objects for some of the boolean functions (nInARow, full, empty, etc.) will
-allow pre-computation, but genetic recombination will still be a problem.
+### Separate the language and implementation.
+
+The "AST" should not be playable, but instead should generate a playable data structure.
+
+#### Game/GameRuleSet
+
+Fairly straight forward, already mostly done.
+
+#### Board/BoardRuleSet
+
+This is more complicated. 
+Things I have to decide: 
+ * How I want to represent the board's data
+ * Whether and how to pre-compute:
+   * Victory conditions
+   * Legal moves
+
+Data representations
+    * The board is represented by a 2D array of linked lists and a list of matrices. 
+    * The 2D array of linked list represents the order of stacks.
+    * A cell in the array contains a linked list if and only if there is a _stack_ of pieces in the corresponding node. i.e. the cell will contain a linked list
+      if there is a stack of pieces (like in checkers), but not if there is just a _group_ of pieces (such as in mancala).
+    * A matrix has type Int.
+    * There is a matrix for each type of piece defined in the GameRuleSet.
+    * Each cell in a matrix represents a count of pieces (that that matrix represents) contained in the corresponding node.
+    * Each cell in a matrix represents a node in the graph. 
+    * For all matrices the position (x, y) refers to the same node in the graph. 
+
+Methods
+    * All play methods in BoardRuleSet
+    * Undo method
+
+NInARow Pre-computation
+    1. BoardRuleSet.getPlayableBoard is called
+    2. getPlayableBoard looks at Conditionals and pre-computes the necessary values
+
+### Conditions
+
+Allowing arbitrary code in conditions is a bit of a problem. It reduces the power of pre-computing board states/transformations.
+I could create a sub-dsl that has the required expressiveness while sufficiently reducing the set cardinality of equivalent rules.
+
+Are the previous statements correct? Couldn't a change to the boolean methods be a reasonable alternative?
+For instance nInARow could generate its own pre-computed boolean expression and return an object with the appropriate operators overloaded
+I.e. de-sugaring game.ruleSet.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)) would return an object of type NInARow that overloads 
+all of the boolean operators (&, |, !, ==, etc.).
+
+Yes, the original statement is correct. The alternative allows pre-computation, but not genetic recombination.
+
+#### Examples
+
+EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
+    game.ruleSet.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size > 0
+}) ==>
+
+iff nInARow(<Int>, <PhysicalPiece>, <Board>) then previous player wins 
+
+EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
+    game.ruleSet.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size == 0 && game.board.full()
+})
+
+iff full <board> and not nInARow(<Int>, <PhysicalPiece>, <Board>) then all players tie 
+
+#### Details
+
+iff:Condition
+nInARow
+full
+empty
+and
+not
+
+
+previous
+player
+wins
+
+package object conditionals {
+
+
+}

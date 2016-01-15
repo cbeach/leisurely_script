@@ -131,4 +131,7 @@ case class Graph(val nodes:mutable.ListBuffer[BoardNode]=mutable.ListBuffer(),
     })
     string
   }
+  //def setOfNLengthRows(n:Int): List[List[BoardNode]] = {
+  //  //TODO: this
+  //}
 }

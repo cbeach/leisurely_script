@@ -155,20 +155,22 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
       def read(json:JsValue):NeighborType.Value =
         NeighborType.withName(json.convertTo[String])
     }
-    implicit object BoardFormatter extends JsonFormat[Board] {
-      def write(board:Board):JsValue = {
+    implicit object BoardFormatter extends JsonFormat[BoardRuleSet] {
+      def write(board:BoardRuleSet):JsValue = {
         JsObject(("size", board.size.toJson),
           ("boardShape", board.boardShape.toJson),
           ("neighborType", board.neighborType.toJson),
           ("nodeShape", board.nodeShape.toJson),
+          ("pieces", board.pieces.toJson),
           ("graph", board.graph.toJson))
       }
-      def read(json:JsValue):Board = {
+      def read(json:JsValue):BoardRuleSet = {
         json match {
-          case JsObject(fields) => new Board(fields("size").convertTo[List[Int]],
+          case JsObject(fields) => new BoardRuleSet(fields("size").convertTo[List[Int]],
             fields("boardShape").convertTo[Shape.Value],
             fields("neighborType").convertTo[NeighborType.Value],
             fields("nodeShape").convertTo[Shape.Value],
+            fields("pieces").convertTo[List[PieceRule]],
             fields("graph").convertTo[Graph])
           case thing => deserializationError(s"Expected Board, got $thing")
         }
@@ -294,7 +296,7 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
         case JsObject(fields) => new GameRuleSet(
           fields("name").convertTo[String],
           fields("players").convertTo[Players],
-          fields("board").convertTo[Board],
+          fields("board").convertTo[BoardRuleSet],
           fields("pieces").convertTo[List[PieceRule]],
           fields("endConditions").convertTo[List[EndCondition]],
           Some(fields("scoringFunction").convertTo[(Player, GameResultState.Value, Option[Player])=>Double])

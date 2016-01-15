@@ -13,7 +13,7 @@ import MoveAction._
 class Game(val ruleSet:GameRuleSet,
            val name:String,
            val players:Players,
-           val board:Board,
+           val board:BoardRuleSet,
            val pieces:List[PieceRule],
            val endConditions:List[EndCondition],
            val history:List[Game]=List[Game](),

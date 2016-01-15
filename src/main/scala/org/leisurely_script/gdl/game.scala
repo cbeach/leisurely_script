@@ -16,7 +16,7 @@ case class EndConditionListWrapper(val list:List[EndCondition]) {}
 class GameRuleSet(
                    val name:String,
                    val players:Players,
-                   val board:Board,
+                   val board:BoardRuleSet,
                    val pieces:List[PieceRule],
                    val endConditions:List[EndCondition],
                    var playerScoringFunction:Option[(Player, GameResultState.Value, Option[Player])=>Double]=None) {
@@ -37,7 +37,7 @@ class GameRuleSet(
   def this(game:GameRuleSet) = {
     this(game.name, game.players, game.board, game.pieces, game.endConditions)
   }
-  def add(board:Board):GameRuleSet = {
+  def add(board:BoardRuleSet):GameRuleSet = {
     new GameRuleSet(name, players, board, pieces, endConditions)
   }
   def add(players:Players):GameRuleSet = {
@@ -97,9 +97,9 @@ class GameRuleSet(
 
 object GameRuleSet {
   def apply(name:String = java.util.UUID.randomUUID.toString,
-        players:Players = new Players(List[Player]()),
-        board:Board = null,
-        pieces:List[PieceRule] = List[PieceRule](),
-        endConditions:List[EndCondition] = List[EndCondition]()
+            players:Players = new Players(List[Player]()),
+            board:BoardRuleSet = null,
+            pieces:List[PieceRule] = List[PieceRule](),
+            endConditions:List[EndCondition] = List[EndCondition]()
         ):GameRuleSet = new GameRuleSet(name, players, board, pieces, endConditions)
 }

@@ -23,7 +23,7 @@ import Shape._
 
 class TicTacToeTests extends FunSuite {
   test("Create a TicTacToe game object") {
-    val board = Board(List(3, 3), Square, Indirect, Square)
+    val board = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
     val players = new Players(List(Player("X"), Player("O")))
     val legalMove = new LegalMove(CurrentPlayer, (game:Game, move:Move) => {
       game.board.graph.nodesByCoord(move.node.coord).empty()
@@ -54,8 +54,8 @@ class TicTacToeTests extends FunSuite {
     val playerX = ticTacToe.players.all(0)
     val playerO = ticTacToe.players.all(1)
     val pieceRule = ticTacToe.pieces(0)
-    val xPiece = PhysicalPiece(pieceRule.name, playerX)
-    val oPiece = PhysicalPiece(pieceRule.name, playerO)
+    val xPiece = pieceRule.getPhysicalPiece(playerX)
+    val oPiece = pieceRule.getPhysicalPiece(playerO)
 
     val firstMove = ticTacToe.applyMove(Move(xPiece, ticTacToe.players.current, Push, ticTacToe.board.graph.nodesByCoord(Coordinate(1, 1)))).get
     assert(firstMove.players.current == ticTacToe.players.all(1))
@@ -75,8 +75,8 @@ class TicTacToeTests extends FunSuite {
     val playerX = ticTacToe.players.all(0)
     val playerO = ticTacToe.players.all(1)
     val pieceRule = ticTacToe.pieces(0)
-    val xPiece = PhysicalPiece(pieceRule.name, playerX)
-    val oPiece = PhysicalPiece(pieceRule.name, playerO)
+    val xPiece = pieceRule.getPhysicalPiece(playerX)
+    val oPiece = pieceRule.getPhysicalPiece(playerO)
     val firstMove = ticTacToe.applyMove(Move(xPiece, ticTacToe.players.current, Push, ticTacToe.board.graph.nodesByCoord(Coordinate(1, 1)))).get
     val legalMovesForTurn2:List[Move] = firstMove.legalMoves(firstMove.players.current)
 
@@ -95,8 +95,8 @@ class TicTacToeTests extends FunSuite {
     val playerX = ticTacToe.players.all(0)
     val playerO = ticTacToe.players.all(1)
     val pieceRule = ticTacToe.pieces(0)
-    val xPiece = PhysicalPiece(pieceRule.name, playerX)
-    val oPiece = PhysicalPiece(pieceRule.name, playerO)
+    val xPiece = pieceRule.getPhysicalPiece(playerX)
+    val oPiece = pieceRule.getPhysicalPiece(playerO)
 
     val move1 = ticTacToe.applyMove(Move(xPiece, ticTacToe.players.current, Push, ticTacToe.board.graph.nodesByCoord(Coordinate(0, 0)))).get
     val move2 = move1.applyMove(Move(oPiece, move1.players.current, Push, move1.board.graph.nodesByCoord(Coordinate(1, 0)))).get
@@ -124,8 +124,8 @@ class TicTacToeTests extends FunSuite {
 
     val pieceRule = ticTacToe.pieces(0)
 
-    val xPiece = PhysicalPiece(pieceRule.name, playerX)
-    val oPiece = PhysicalPiece(pieceRule.name, playerO)
+    val xPiece = pieceRule.getPhysicalPiece(playerX)
+    val oPiece = pieceRule.getPhysicalPiece(playerO)
 
     val move1 = ticTacToe.applyMove(Move(xPiece, ticTacToe.players.current, Push, ticTacToe.board.graph.nodesByCoord(Coordinate(0, 0)))).get
     val move2 = move1.applyMove(Move(oPiece, move1.players.current, Push, move1.board.graph.nodesByCoord(Coordinate(1, 0)))).get
@@ -145,8 +145,8 @@ class TicTacToeTests extends FunSuite {
     val pieceRule = move0.pieces(0)
     val playerX = move0.players.all(0)
     val playerO = move0.players.all(1)
-    val xPiece = PhysicalPiece(pieceRule.name, playerX)
-    val oPiece = PhysicalPiece(pieceRule.name, playerO)
+    val xPiece = pieceRule.getPhysicalPiece(playerX)
+    val oPiece = pieceRule.getPhysicalPiece(playerO)
 
     val move1 = move0.applyMove(Move(xPiece, move0.players.current, Push, move0.board.graph.nodesByCoord(Coordinate(0, 0)))).get
     val move2 = move1.applyMove(Move(oPiece, move1.players.current, Push, move1.board.graph.nodesByCoord(Coordinate(2, 0)))).get
@@ -177,8 +177,8 @@ class TicTacToeTests extends FunSuite {
 
     val pieceRule = ticTacToe.pieces(0)
 
-    val xPiece = PhysicalPiece(pieceRule.name, playerX)
-    val oPiece = PhysicalPiece(pieceRule.name, playerO)
+    val xPiece = pieceRule.getPhysicalPiece(playerX)
+    val oPiece = pieceRule.getPhysicalPiece(playerO)
 
     val move1 = ticTacToe.applyMove(Move(xPiece, ticTacToe.players.all(0), Push,
       ticTacToe.board.graph.nodesByCoord(Coordinate(0, 0)))).get
@@ -196,8 +196,8 @@ class TicTacToeTests extends FunSuite {
     val playerX = ticTacToe.players.all(0)
     val playerO = ticTacToe.players.all(1)
     val pieceRule = ticTacToe.pieces(0)
-    val xPiece = PhysicalPiece(pieceRule.name, playerX)
-    val oPiece = PhysicalPiece(pieceRule.name, playerO)
+    val xPiece = pieceRule.getPhysicalPiece(playerX)
+    val oPiece = pieceRule.getPhysicalPiece(playerO)
 
     val move1 = ticTacToe.applyMove(new Move(xPiece, ticTacToe.players.current, Push, ticTacToe.board.graph.nodesByCoord(Coordinate(0, 0)))).get
     val move2 = move1.applyMove(new Move(oPiece, move1.players.current, Push, move1.board.graph.nodesByCoord(Coordinate(0, 1)))).get
@@ -213,8 +213,8 @@ class TicTacToeTests extends FunSuite {
     val playerX = move0.players.all(0)
     val playerO = move0.players.all(1)
     val pieceRule = move0.pieces(0)
-    val xPiece = PhysicalPiece(pieceRule.name, playerX)
-    val oPiece = PhysicalPiece(pieceRule.name, playerO)
+    val xPiece = pieceRule.getPhysicalPiece(playerX)
+    val oPiece = pieceRule.getPhysicalPiece(playerO)
 
     val move1 = move0.applyMove(Move(xPiece, move0.players.current, Push, move0.board.graph.nodesByCoord(Coordinate(1, 1)))).get
     val move2 = move1.applyMove(Move(oPiece, move1.players.current, Push, move1.board.graph.nodesByCoord(Coordinate(0, 0)))).get

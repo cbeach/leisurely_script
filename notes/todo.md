@@ -2,7 +2,7 @@
 
 ## Explore genetic recombination for conditionals
 
-The conditional statements support general code, and may not be suitable for genetic modification.
+The conditional statements support general code, and may not be suitable for genetic recombination and manipulation.
 This may not be too bad if I can get access to the scala ast. Then again, that might be excessively complicated.
 
 ## Update style
@@ -33,6 +33,9 @@ http://jim-mcbeath.blogspot.com/2009/09/type-safe-builder-in-scala-part-3.html
 http://dcsobral.blogspot.com/2009/09/type-safe-builder-pattern.html#sthash.0EbyrUSx.dpuf
 http://www.tikalk.com/java/type-safe-builder-scala-using-type-constraints/
 
+## Change class constructors
+
+I corrected a missconception I had about Scala class parameters. I should fix all of my class declarations.
 
 #Done
 

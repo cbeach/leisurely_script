@@ -33,12 +33,12 @@ object GameFactory {
   }
 
   def ticTacToe:GameRuleSet = {
-    val board = Board(List(3, 3), Square, Indirect, Square)
     val players = new Players(List(Player("X"), Player("O")))
     val legalMove = new LegalMove(CurrentPlayer, (game:Game, move:Move) => {
       game.ruleSet.board.graph.nodesByCoord(move.node.coord).empty()
     }, Push)
     val piece = new PieceRule("token", AnyPlayer, List[LegalMove](legalMove))
+    val board = BoardRuleSet(List(3, 3), Square, Indirect, Square, List(piece))
     val endConditions = List(
       EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
         game.ruleSet.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size > 0

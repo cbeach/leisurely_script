@@ -117,8 +117,8 @@ class SerializationTests extends FunSuite {
     assert(edge.toJson.convertTo[BoardEdge] == edge)
   }
   test("Graph serialization") {
-    val graph1 = Board(List(3, 3), Square, Indirect, Square).graph
-    val graph2 = Board(List(3, 3), Square, Indirect, Square).graph
+    val graph1 = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]()).graph
+    val graph2 = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]()).graph
     assert(graph1 == graph2)
     assert(graph1.toJson.convertTo[Graph] == graph1)
   }
@@ -171,8 +171,8 @@ class SerializationTests extends FunSuite {
     ticTacToeEndConditions.toJson.convertTo[List[EndCondition]]
   }
   test("Board serialization") {
-    val board = Board(List(3, 3), Square, Indirect, Square)
-    val converted = board.toJson.convertTo[Board]
+    val board = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
+    val converted = board.toJson.convertTo[BoardRuleSet]
     assert(converted == board)
   }
   test("Players serialization") {
