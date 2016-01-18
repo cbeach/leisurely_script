@@ -26,7 +26,7 @@ class ImplementationTests extends FunSuite {
       case Success(tTT: GameRuleSet) => tTT
       case Failure(ex) => throw ex
     }
-    assert(ticTacToe.board.getPlayableBoard match {
+    assert(ticTacToe.board.getPlayableBoard() match {
       case Success(_) => true
       case Failure(_) => false
     })
@@ -36,7 +36,7 @@ class ImplementationTests extends FunSuite {
       case Success(tTT: GameRuleSet) => tTT
       case Failure(ex) => throw ex
     }
-    ticTacToe.board.getPlayableBoard match {
+    ticTacToe.board.getPlayableBoard() match {
       case Success(playableBoard: Board) => assert(playableBoard.occupancyMatrices.size == 1)
       case Failure(ex) => throw ex
     }
@@ -47,7 +47,7 @@ class ImplementationTests extends FunSuite {
       case Failure(ex) => throw ex
     }
     val token = ticTacToe.pieces(0)
-    ticTacToe.board.getPlayableBoard match {
+    ticTacToe.board.getPlayableBoard() match {
       case Success(playableBoard: Board) => {
         assert(playableBoard.occupancyMatrices(token).size == 3)
         assert(playableBoard.occupancyMatrices(token)(0).size == 3)
@@ -60,7 +60,7 @@ class ImplementationTests extends FunSuite {
       case Success(tTT: GameRuleSet) => tTT
       case Failure(ex) => throw ex
     }
-    ticTacToe.board.getPlayableBoard match {
+    ticTacToe.board.getPlayableBoard() match {
       case Success(playableBoard: Board) => assert(playableBoard.empty)
       case Failure(ex) => throw ex
     }
@@ -78,7 +78,7 @@ class ImplementationTests extends FunSuite {
     val pieceX = pieceRule.getPhysicalPiece(playerX)
     val pieceO = pieceRule.getPhysicalPiece(playerO)
 
-    ticTacToe.board.getPlayableBoard match {
+    ticTacToe.board.getPlayableBoard() match {
       case Success(playableBoard: Board) => {
         playableBoard.push(pieceX, Coordinate(0, 0))
         assert(playableBoard.occupancyMatrices(pieceRule)(0)(0) == 1)
@@ -108,7 +108,7 @@ class ImplementationTests extends FunSuite {
     val pieceX = pieceRule.getPhysicalPiece(playerX)
     val pieceO = pieceRule.getPhysicalPiece(playerO)
 
-    ticTacToe.board.getPlayableBoard match {
+    ticTacToe.board.getPlayableBoard() match {
       case Success(playableBoard: Board) => {
         playableBoard.push(pieceX, Coordinate(0, 0))
         playableBoard.pop(pieceX, Coordinate(0, 0))
@@ -126,5 +126,11 @@ class ImplementationTests extends FunSuite {
       case Failure(ex) => throw ex
     }
   }
-  test("BoardRuleSet.getNInARow")
+  test("Graph.setOfNLengthRows should return 8 rows when called on a tic tac toe board.") {
+    val ticTacToe: GameRuleSet = LocalStaticRepository.load("TicTacToe") match {
+      case Success(tTT: GameRuleSet) => tTT
+      case Failure(ex) => throw ex
+    }
+    assert(ticTacToe.board.graph.setOfNLengthRows(3).size == 8)
+  }
 }

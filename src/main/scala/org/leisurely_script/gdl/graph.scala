@@ -1,5 +1,6 @@
 package org.leisurely_script.gdl
 
+import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 import scala.util.{Try, Success, Failure}
 import scala.collection.mutable
@@ -131,7 +132,34 @@ case class Graph(val nodes:mutable.ListBuffer[BoardNode]=mutable.ListBuffer(),
     })
     string
   }
-  //def setOfNLengthRows(n:Int): List[List[BoardNode]] = {
-  //  //TODO: this
-  //}
+  def setOfNLengthRows(n:Int): Set[List[Coordinate]] = {
+    @tailrec
+    def takeUntilN(accum:mutable.Queue[BoardEdge]):Option[List[Coordinate]] = {
+      if (accum.size == n - 1) {
+        return Some({
+          (accum.map(_.nodes._1.coord).toList :+ accum.last.nodes._2.coord).sorted
+        })
+      } else {
+        // There can only be one outgoing edge per direction per node, so the following expression
+        // can only yield a list with length 0 or 1.
+        val direction = accum.last.direction
+        Try(outEdges(accum.last.nodes._2.coord)).getOrElse(List[BoardEdge]()).find(_.direction == direction)
+        match {
+          case Some(edge:BoardEdge) => accum.enqueue(edge)
+          case None => return None
+        }
+      }
+      takeUntilN(accum)
+    }
+    var rowSet = Set[List[Coordinate]]()
+    for (node <- nodes) {
+      for (edge <- outEdges.getOrElse(node.coord,
+          mutable.ListBuffer[BoardEdge]()).toList) {
+        takeUntilN(mutable.Queue(edge)).foreach(list => {
+          rowSet = rowSet + list
+        })
+      }
+    }
+    rowSet
+  }
 }

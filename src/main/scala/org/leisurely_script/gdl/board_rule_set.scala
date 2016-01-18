@@ -15,7 +15,6 @@ case class BoardRuleSet(val size:List[Int],
                         val nodeShape:Shape,
                         val pieces:List[PieceRule],
                         val graph:Graph = new Graph()) {
-
   def this(other:BoardRuleSet) = {
     this(other.size, other.boardShape, other.neighborType, other.nodeShape, other.pieces, new Graph(other.graph))
   }
@@ -164,7 +163,7 @@ case class BoardRuleSet(val size:List[Int],
       throw new IllegalBoardException("The board must have nodes, no nodes found.")
     }
   }
-  def getPlayableBoard:Try[Board] = {
+  def getPlayableBoard(nInARow:Boolean=false):Try[Board] = {
     //TODO: Add error checking
     Success(new Board(this))
   }

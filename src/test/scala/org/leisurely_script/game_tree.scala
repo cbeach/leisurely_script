@@ -428,4 +428,16 @@ class GameTreeTests extends FunSuite {
     println(boardToString(move5.board))
     assert(fastXWin.legalMoves(fastXWin.players.current).isEmpty)
   }
+  test("Coordinate Sorting") {
+    import scala.util.Random
+    val list = {
+      for (x <- 0 until 3; y <- 0 until 3) yield Coordinate(x, y)
+    }.toList
+    assert(list.size == 9)
+    var shuffled = List[Coordinate]()
+    do {
+      shuffled = Random.shuffle(list)
+    } while (list == shuffled)
+    assert(shuffled.sorted == list)
+  }
 }
