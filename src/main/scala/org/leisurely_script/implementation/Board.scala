@@ -7,13 +7,17 @@ import scala.util.Try
 /**
   * Created by mcsmash on 1/13/16.
   */
-class Board(ruleSet:BoardRuleSet) {
+class Board(ruleSet:BoardRuleSet, nInARowFunction:Option[(Array[Array[Int]])=>Boolean]) {
   var occupancyMatrices:Map[PieceRule, Array[Array[Int]]] = {
     for (piece <- ruleSet.pieces)
       yield (piece -> Array.ofDim[Int](ruleSet.size(0), ruleSet.size(1)))
   }.toMap
-
-  //def nInARow(n:Int, piece:PhysicalPiece):Boolean = { }
+  def nInARow(piece:PhysicalPiece):Boolean = {
+    nInARowFunction match {
+      case Some(func) => func(occupancyMatrices(piece.rule))
+      case None => throw new IllegalExecutionException("No rule requires nInARow. nInARow is unavailable.")
+    }
+  }
   protected def findInOccupancyMatrices(truthFunction:(Int)=>Boolean):Option[(PieceRule, Coordinate)] = {
     for (pair <- occupancyMatrices) {
       pair match {
@@ -60,5 +64,4 @@ class Board(ruleSet:BoardRuleSet) {
       case Coordinate(x: Int, y: Int) => occupancyMatrices(thing.rule)(x)(y) -= 1
     }
   }
-
 }

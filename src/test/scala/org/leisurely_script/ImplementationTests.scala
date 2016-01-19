@@ -133,4 +133,27 @@ class ImplementationTests extends FunSuite {
     }
     assert(ticTacToe.board.graph.setOfNLengthRows(3).size == 8)
   }
+  test("Board.nInARow works properly.") {
+    val ticTacToe: GameRuleSet = LocalStaticRepository.load("TicTacToe") match {
+      case Success(tTT: GameRuleSet) => tTT
+      case Failure(ex) => throw ex
+    }
+
+    val playerX = ticTacToe.players.all(0)
+    val playerO = ticTacToe.players.all(1)
+
+    val pieceRule = ticTacToe.pieces(0)
+    val pieceX = pieceRule.getPhysicalPiece(playerX)
+    val pieceO = pieceRule.getPhysicalPiece(playerO)
+
+    ticTacToe.board.getPlayableBoard(nInARow = 3) match {
+      case Success(playableBoard: Board) => {
+        playableBoard.push(pieceX, Coordinate(0, 0))
+        playableBoard.push(pieceX, Coordinate(0, 1))
+        playableBoard.push(pieceX, Coordinate(0, 2))
+        assert(playableBoard.nInARow(pieceX))
+      }
+      case Failure(ex) => throw ex
+    }
+  }
 }

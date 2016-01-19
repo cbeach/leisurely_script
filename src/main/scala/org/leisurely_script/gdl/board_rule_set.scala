@@ -163,9 +163,26 @@ case class BoardRuleSet(val size:List[Int],
       throw new IllegalBoardException("The board must have nodes, no nodes found.")
     }
   }
-  def getPlayableBoard(nInARow:Boolean=false):Try[Board] = {
+  def getPlayableBoard(nInARow:Int=0):Try[Board] = {
     //TODO: Add error checking
-    Success(new Board(this))
+    var nInARowFunc:Option[(Array[Array[Int]])=>Boolean] = None
+    if (nInARow > 0) {
+      val possibleRows = graph.setOfNLengthRows(nInARow)
+      nInARowFunc = Some((matrix) => {
+        var retVal:Boolean = false
+        possibleRows.takeWhile(row => !{
+          val boolFunc: (Coordinate)=>Boolean = (coord:Coordinate) => {
+            coord match {
+              case Coordinate(x: Int, y: Int) => matrix(x)(y) > 0
+            }
+          }
+          retVal = row.map(boolFunc).reduce(_ && _)
+          retVal
+        })
+        retVal
+      })
+    }
+    Success(new Board(this, nInARowFunc))
   }
 }
 
