@@ -356,23 +356,72 @@ EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
     game.ruleSet.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size == 0 && game.board.full()
 })
 
-iff full <board> and not nInARow(<Int>, <PhysicalPiece>, <Board>) then all players tie 
+iff <board> full and not board nInARow(<Int>, <PhysicalPiece>, <Board>) then all players tie 
 
 #### Details
 
-iff:Condition
+x iff 
 nInARow
 full
 empty
 and
 not
 
-
 previous
 player
 wins
 
-package object conditionals {
+iff (<board>.full && !board.nInARow(<PhysicalPiece>)) { all players tie }
+{1} {    2      } {3}{4}{          5               }    {      6      }
 
+1. ConditionalExpression
+2. BoardRuleSet.full:BooleanExpression
+3. BooleanExpression.&&(other:BooleanExpression):BooleanExpression
+4. BooleanExpression.unary_!(other:BooleanExpression):BooleanExpression
+5. BoardRuleSet.nInARow(PhysicalPiece):BooleanExpression
+6. SequenceExpression[players].tie
+
+trait GameExpression[T] {
+    val value:T
+    def evaluate:T = value
+}
+
+trait PrimitiveExpression[+T <: AnyVal] extends GameExpression[T] {}
+
+class BooleanExpression extends GameExpression[Boolean] {
+    def &&, ||, unary_!, etc.
+}
+
+trait ConditionalExpression extends GameExpression {}
+
+class iff[T <: GameExpression] extends GameExpression[T] {
+    val condition:BooleanExpression
+    val then:T
+    val otherwise:Option[T]
+    def evaluate:T = if (condition.evaluate) {
+        
+    } else {
+        otherwise match {
+            case Some(expr:T) => expr.evaluate
+            case None => Unit
+        }
+    }
+}
+
+object iff {
+    def apply(
+}
+
+object iff extends ConditionalExpression {
+    def apply(expression:ValueExpression[Boolean]):ConditionalExpression
+}
+
+class then extends ConditionalExpression {
+    def apply(expression:GameExpression):GameExpression
+}
+
+class otherwise extends ConditionalExpression {
 
 }
+
+GameRule methods such as nInARow, full, empty, etc. must return GameExpressions. These game expressions will later be used to create the conditions for the playable game.
