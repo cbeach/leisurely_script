@@ -3,7 +3,7 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class FloatExpressionExpression(value:FloatExpression) extends GameAnyVal[FloatExpression](value) { 
+case class FloatExpression(value:Float) extends GameAnyVal[Float](value) {
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: LongExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -91,8 +91,8 @@ case class FloatExpressionExpression(value:FloatExpression) extends GameAnyVal[F
   def toInt: IntExpression = IntExpression(value.toInt)
   def toLong: LongExpression = LongExpression(value.toLong)
   def toShort: ShortExpression = ShortExpression(value.toShort)
-  def unary_+: FloatExpression = FloatExpression(+value)
-  def unary_-: FloatExpression = FloatExpression(-value)
+  def unary_+: = FloatExpression(+value)
+  def unary_-: = FloatExpression(-value)
   def abs: FloatExpression = FloatExpression(value.abs)
   def ceil: FloatExpression = FloatExpression(value.ceil)
   def floor: FloatExpression = FloatExpression(value.floor)
@@ -108,9 +108,8 @@ case class FloatExpressionExpression(value:FloatExpression) extends GameAnyVal[F
   def signum: IntExpression = IntExpression(value.signum)
   def toDegrees: FloatExpression = FloatExpression(value.toDegrees)
   def toRadians: FloatExpression = FloatExpression(value.toRadians)
-  def isInfinite(): BooleanExpression = BooleanExpression(value isInfinite other.value)
-  def isNaN(): BooleanExpression = BooleanExpression(value isNaN other.value)
-  def isWhole(): BooleanExpression = BooleanExpression(value isWhole other.value)
+  def isInfinite(): BooleanExpression = BooleanExpression(value isInfinite)
+  def isWhole(): BooleanExpression = BooleanExpression(value isWhole)
   def max(other: FloatExpression): FloatExpression = FloatExpression(value max other.value)
   def min(other: FloatExpression): FloatExpression = FloatExpression(value min other.value)
 } 
