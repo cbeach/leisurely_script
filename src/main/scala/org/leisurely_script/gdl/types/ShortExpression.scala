@@ -2,7 +2,8 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class ShortExpression(value:Short) extends GameAnyVal[Short](value) {
+case class ShortExpression(value:Short) extends AnyValExpression[Short] {
+  override def evaluate:Option[Short] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: LongExpression): BooleanExpression = BooleanExpression(value != other.value)

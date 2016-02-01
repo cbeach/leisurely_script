@@ -1,7 +1,8 @@
 package org.leisurely_script.gdl.types
 
 
-case class DoubleExpression(value:Double) extends GameAnyVal[Double](value) {
+case class DoubleExpression(value:Double) extends AnyValExpression[Double] {
+	override def evaluate:Option[Double] = Some(value)
 	def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
 	def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
 	def !=(other: LongExpression): BooleanExpression = BooleanExpression(value != other.value)

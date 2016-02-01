@@ -13,5 +13,6 @@ lazy val root = (project in file(".")).
     libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test",
     libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2",
     libraryDependencies += "commons-codec" %  "commons-codec" % "1.9",
-    libraryDependencies += "net.databinder.dispatch" %% "dispatch-core" % "0.11.2"
+    libraryDependencies += "net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
+    libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value
   )

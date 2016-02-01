@@ -3,7 +3,8 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class FloatExpression(value:Float) extends GameAnyVal[Float](value) {
+case class FloatExpression(value:Float) extends AnyValExpression[Float] {
+  override def evaluate:Option[Float] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: LongExpression): BooleanExpression = BooleanExpression(value != other.value)

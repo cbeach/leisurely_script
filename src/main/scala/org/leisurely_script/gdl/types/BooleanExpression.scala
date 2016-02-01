@@ -3,7 +3,8 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class BooleanExpression(value:Boolean) extends GameAnyVal[Boolean](value) {
+case class BooleanExpression(value:Boolean) extends AnyValExpression[Boolean] {
+  override def evaluate:Option[Boolean] = Some(value)
   def !=(other: BooleanExpression): BooleanExpression = {
     BooleanExpression(value != other.value)
 	}

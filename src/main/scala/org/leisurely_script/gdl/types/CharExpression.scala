@@ -3,7 +3,8 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class CharExpression(value:Char) extends GameAnyVal[Char](value) {
+case class CharExpression(value:Char) extends AnyValExpression[Char] {
+  override def evaluate:Option[Char] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: LongExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -103,18 +104,9 @@ case class CharExpression(value:Char) extends GameAnyVal[Char](value) {
   def |(other: CharExpression): IntExpression = IntExpression(value | other.value)
   def |(other: ShortExpression): IntExpression = IntExpression(value | other.value)
   def |(other: ByteExpression): IntExpression = IntExpression(value | other.value)
-  def byteValue(): ByteExpression = ByteExpression(value.byteValue)
-  def charValue(): CharExpression = CharExpression(value charValue)
-  def compare(other: CharExpression): IntExpression = IntExpression(value compare other.value)
-  def compareTo(other: CharExpression): IntExpression = IntExpression(value compareTo other.value)
-  def doubleValue(): DoubleExpression = DoubleExpression(value doubleValue)
-  def floatValue(): FloatExpression = FloatExpression(value floatValue)
-  def intValue(): IntExpression = IntExpression(value intValue)
   def isWhole(): BooleanExpression = BooleanExpression(value isWhole)
-  def longValue(): LongExpression = LongExpression(value longValue)
   def max(other: CharExpression): CharExpression = CharExpression(value max other.value)
   def min(other: CharExpression): CharExpression = CharExpression(value min other.value)
-  def shortValue(): ShortExpression = ShortExpression(value shortValue)
   def abs: CharExpression = CharExpression(value.abs)
   def asDigit: IntExpression = IntExpression(value.asDigit)
   def getDirectionality: ByteExpression = ByteExpression(value.getDirectionality)

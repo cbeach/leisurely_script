@@ -2,7 +2,8 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class ByteExpression(value:Byte) extends GameAnyVal[Byte](value) {
+case class ByteExpression(value:Byte) extends AnyValExpression[Byte] {
+  override def evaluate:Option[Byte] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: LongExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -99,14 +100,14 @@ case class ByteExpression(value:Byte) extends GameAnyVal[Byte](value) {
   def ^(other: ByteExpression): IntExpression = IntExpression(value ^ other.value)
   def toByte: ByteExpression = ByteExpression(value.toByte)
   def toChar: CharExpression = CharExpression(value.toChar)
-  def toDouble: DoubleExpression = DoubleExpression(value.toDoube)
+  def toDouble: DoubleExpression = DoubleExpression(value.toDouble)
   def toFloat: FloatExpression = FloatExpression(value.toFloat)
   def toInt: IntExpression = IntExpression(value.toInt)
   def toLong: LongExpression = LongExpression(value.toLong)
   def toShort: ShortExpression = ShortExpression(value.toShort)
-  def unary_+: IntExpression = IntExpression(+value)
-  def unary_-: IntExpression = IntExpression(-value)
-  def unary_~: IntExpression = IntExpression(~value)
+  def unary_+ = IntExpression(+value)
+  def unary_- = IntExpression(-value)
+  def unary_~ = IntExpression(~value)
   def |(other: LongExpression): LongExpression = LongExpression(value | other.value)
   def |(other: IntExpression): IntExpression = IntExpression(value | other.value)
   def |(other: CharExpression): IntExpression = IntExpression(value | other.value)
@@ -119,7 +120,7 @@ case class ByteExpression(value:Byte) extends GameAnyVal[Byte](value) {
   def isValidChar: BooleanExpression = BooleanExpression(value.isValidChar)
   def isValidInt: BooleanExpression = BooleanExpression(value.isValidInt)
   def isValidShort: BooleanExpression = BooleanExpression(value.isValidShort)
-  def isWhole(): BooleanExpression = BooleanExpression(value isWhole other.value)
+  def isWhole: BooleanExpression = BooleanExpression(value isWhole)
   def max(other: ByteExpression): ByteExpression = ByteExpression(value max other.value)
   def min(other: ByteExpression): ByteExpression = ByteExpression(value min other.value)
   def signum: IntExpression = IntExpression(value.signum)

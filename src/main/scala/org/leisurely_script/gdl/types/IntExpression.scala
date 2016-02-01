@@ -3,7 +3,8 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class IntExpression(value:Int) extends GameAnyVal[Int](value) {
+case class IntExpression(value:Int) extends AnyValExpression[Int] {
+  override def evaluate:Option[Int] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: LongExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -121,11 +122,11 @@ case class IntExpression(value:Int) extends GameAnyVal[Int](value) {
   def isValidIntExpression: BooleanExpression = BooleanExpression(value.isValidInt)
   def isValidLongExpression: BooleanExpression = BooleanExpression(value.isValidLong)
   def isValidShortExpression: BooleanExpression = BooleanExpression(value.isValidShort)
-  def isWhole(): BooleanExpression = BooleanExpression(value.isWhole)
+  def isWhole: BooleanExpression = BooleanExpression(value.isWhole)
   def max(other: IntExpression): IntExpression = IntExpression(value.max(other.value))
   def min(other: IntExpression): IntExpression = IntExpression(value.min(other.value))
   def signum: IntExpression = IntExpression(value.signum)
   def toBinaryStringExpression: StringExpression = StringExpression(value.toBinaryString)
   def toHexStringExpression: StringExpression = StringExpression(value.toHexString)
   def toOctalStringExpression: StringExpression = StringExpression(value.toOctalString)
-
+}

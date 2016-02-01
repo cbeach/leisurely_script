@@ -3,7 +3,8 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class LongExpression(value:Long) extends GameAnyVal[Long](value) {
+case class LongExpression(value:Long) extends AnyValExpression[Long] {
+  override def evaluate:Option[Long] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: LongExpression): BooleanExpression = BooleanExpression(value != other.value)
