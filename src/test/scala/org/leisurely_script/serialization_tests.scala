@@ -1,17 +1,15 @@
-package org.leisurelyscript.test.suites
+package org.leisurely_script
 
-import java.io.{ObjectOutputStream, ByteArrayOutputStream}
-import scala.util.{Try, Success, Failure}
+import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 
+import org.leisurelyscript.gdl.GameResultState._
+import org.leisurelyscript.gdl.ImplicitDefs.TypeClasses.LeisurelyScriptJSONProtocol._
+import org.leisurelyscript.gdl.MoveAction._
+import org.leisurelyscript.gdl.NeighborType._
+import org.leisurelyscript.gdl.Shape._
+import org.leisurelyscript.gdl._
 import org.scalatest.FunSuite
 import spray.json._
-
-import org.leisurelyscript.gdl._
-import org.leisurelyscript.gdl.ImplicitDefs.TypeClasses.LeisurelyScriptJSONProtocol._
-import org.leisurelyscript.gdl.Shape._
-import org.leisurelyscript.gdl.NeighborType._
-import org.leisurelyscript.gdl.GameResultState._
-import org.leisurelyscript.gdl.MoveAction._
 
 /**
   * Created by mcsmash on 12/9/15.

@@ -388,50 +388,6 @@ iff (<board>.full && !board.nInARow(3, <PieceRule>)) { all players tie }
 6. SequenceExpression[players].tie
 * arguments are converted to GameExpressions (3 -> IntExpression(3)
 
-trait GameExpression[T] {
-    val value:T
-    def evaluate:T = value
-}
-
-trait GameAnyVal[T] extends GameExpression[T] { }
-object UnitExpression extends GameAnyVal[Unit] {} 
-
-class BooleanExpression(value:Boolean) extends GameAnyVal[Boolean] {
-    def &&, ||, unary_!, etc.
-}
-class IntExpression(value:Int) extends GameAnyVal[Int] {
-    def +, -, *, /, %, etc.
-}
-class DoubleExpression(value:Double) extends GameAnyVal[Double] {...
-...
-...
-
-abstract class TRUE
-abstract class FALSE
-
-class ConditionalExpression[T](conditionExpr:BooleanExpression, thenExpr:T, otherwiseExpr:Option[T]=None) extends GameExpression[T] {}
-class WellFormedConditionalExpressionBuilder[HasCond, HasExpr, T <: GameExpression](conditionExpr:Option[BooleanExpression]=None, thenExpr:Option[T]=None, otherwiseExpr:Option[T]=None) extends GameExpression[T] {
-    def apply(condition:BooleanExpression):WellFormedConditionalExpressionBuilder = {
-        new WellFormedConditionalExpressionBuilder[TRUE, FALSE, T](Some(condition))
-    }
-    def apply(expr:GameExpression):WellFormedConditionalExpressionBuilder = {
-        then match {
-            case Some(then) => otherwiseExpr match {
-                case Some(_) => throw an exception
-                case None => new WellFormedConditionalExpressionBuilder[TRUE, TRUE, T](Some(condition), Some(thenExpr), Some(otherwiseExpr))
-            }
-            case None => new WellFormedConditionalExpressionBuilder[TRUE, TRUE, T](Some(condition), Some(thenExpr))
-        }
-    }
-}
-
-object iff {
-    def apply(condition:BooleanExpression) = new WellFormedConditionalExpressionBuilder[TRUE, FALSE, T](Some(condition))
-}
-
-implicit def ebableWellFormedConditionalExpressionBuilder(builder:WellFormedConditionalExpressionBuilder[TRUE, TRUE, T]) = new {
-    private[leisurely_script.gdl] def build():ConditionalExpression = new ConditionalExpression(builder.condition, builder.thenExpr, builder.otherwiseExpr)
-}
 
 implicit def DoubleToDoubleExpression(value:Double) = DoubleExpression(value)
 implicit def FloatToFloatExpression(value:Float) = FloatExpression(value)
