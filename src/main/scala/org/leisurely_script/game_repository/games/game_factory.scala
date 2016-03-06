@@ -1,9 +1,11 @@
-package org.leisurelyscript.repository
+package org.leisurely_script.repository
+
+import org.leisurely_script.implementation.Game
 
 import scala.util.{Try, Success, Failure}
 
-import org.leisurelyscript.gdl._
-import org.leisurelyscript.gdl.ImplicitDefs.Views.Game._
+import org.leisurely_script.gdl._
+import org.leisurely_script.gdl.ImplicitDefs.Views.Game._
 
 import GameResultState._
 import MoveAction._
@@ -16,13 +18,13 @@ object GameFactory {
     val TicTacToe = Value
   }
 
-  def load(gameID:String):Try[Game] = {
+  def load(gameID:String):Try[GameRuleSet] = {
     gameID match {
       case "TicTacToe" => Success(ticTacToe)
       case _ => Failure(new GameNotFoundException(s"Can not find the game ${gameID}"))
     }
   }
-  def load(gameID:AvailableGames.Value):Try[Game] = {
+  def load(gameID:AvailableGames.Value):Try[GameRuleSet] = {
     import AvailableGames._
     gameID match {
       case TicTacToe => Success(ticTacToe)
@@ -30,22 +32,22 @@ object GameFactory {
     }
   }
 
-  def ticTacToe:Game = {
-    val board = Board(List(3, 3), Square, Indirect, Square)
+  def ticTacToe:GameRuleSet = {
     val players = new Players(List(Player("X"), Player("O")))
     val legalMove = new LegalMove(CurrentPlayer, (game:Game, move:Move) => {
-      game.board.graph.nodesByCoord(move.node.coord).empty()
+      game.ruleSet.board.graph.nodesByCoord(move.node.coord).empty()
     }, Push)
     val piece = new PieceRule("token", AnyPlayer, List[LegalMove](legalMove))
+    val board = BoardRuleSet(List(3, 3), Square, Indirect, Square, List(piece))
     val endConditions = List(
       EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
-        game.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size > 0
+        game.ruleSet.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size > 0
       }),
       EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
-        game.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size == 0 && game.board.full()
+        game.ruleSet.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size == 0 && game.board.full
       })
     )
-    Game("TicTacToe")
+    GameRuleSet()
       .add(players)
       .add(board)
       .add(List(piece))

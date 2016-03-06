@@ -12,10 +12,6 @@ spray-json
 
     libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
 
-scala-graph
-
-    libraryDependencies += "com.assembla.scala-incubator" %% "graph-core" % "1.9.4"
-
 
 ## Classes and Functions
 
@@ -366,7 +362,7 @@ iff <board> full and not board nInARow(<Int>, <PhysicalPiece>, <Board>) then all
 
 Closely mimic Scala class heirarchy
 
-x iff 
+x iff
 nInARow
 full
 empty
@@ -410,5 +406,13 @@ implicit def ShortExpressionToIntExpression(shortExpr:ShortExpression) = IntExpr
 ...
 ...
 
-
 GameRule methods such as nInARow, full, empty, etc. must return GameExpressions. These game expressions will later be used to create the conditions for the playable game.
+
+##### empty, full, nInARow, etc.
+
+iff(boardRuleSet.nInARow(3, <piece_rule>)) {
+    // Do something
+}
+
+
+

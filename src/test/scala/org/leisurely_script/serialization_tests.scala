@@ -1,15 +1,19 @@
-package org.leisurely_script
+package org.leisurely_script.test.suites
 
-import java.io.{ByteArrayOutputStream, ObjectOutputStream}
+import java.io.{ObjectOutputStream, ByteArrayOutputStream}
+import org.leisurely_script.implementation.Game
 
-import org.leisurelyscript.gdl.GameResultState._
-import org.leisurelyscript.gdl.ImplicitDefs.TypeClasses.LeisurelyScriptJSONProtocol._
-import org.leisurelyscript.gdl.MoveAction._
-import org.leisurelyscript.gdl.NeighborType._
-import org.leisurelyscript.gdl.Shape._
-import org.leisurelyscript.gdl._
+import scala.util.{Try, Success, Failure}
+
 import org.scalatest.FunSuite
 import spray.json._
+
+import org.leisurely_script.gdl._
+import org.leisurely_script.gdl.ImplicitDefs.TypeClasses.LeisurelyScriptJSONProtocol._
+import org.leisurely_script.gdl.Shape._
+import org.leisurely_script.gdl.NeighborType._
+import org.leisurely_script.gdl.GameResultState._
+import org.leisurely_script.gdl.MoveAction._
 
 /**
   * Created by mcsmash on 12/9/15.
@@ -113,8 +117,8 @@ class SerializationTests extends FunSuite {
     assert(edge.toJson.convertTo[BoardEdge] == edge)
   }
   test("Graph serialization") {
-    val graph1 = Board(List(3, 3), Square, Indirect, Square).graph
-    val graph2 = Board(List(3, 3), Square, Indirect, Square).graph
+    val graph1 = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]()).graph
+    val graph2 = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]()).graph
     assert(graph1 == graph2)
     assert(graph1.toJson.convertTo[Graph] == graph1)
   }
@@ -129,7 +133,7 @@ class SerializationTests extends FunSuite {
     assert(legalMove.toJson.convertTo[LegalMove].postcondition(null, null) == legalMove.postcondition(null, null))
 
     val ticTacToeLegalMove = new LegalMove(CurrentPlayer, (game:Game, move:Move) => {
-      game.board.graph.nodesByCoord(move.node.coord).empty()
+      game.board.boardRuleSet.graph.nodesByCoord(move.node.coord).empty()
     }, Push)
     ticTacToeLegalMove.toJson.convertTo[LegalMove]
   }
@@ -157,18 +161,18 @@ class SerializationTests extends FunSuite {
     assert(converted.conditionMet(null, null) == eC.conditionMet(null, null))
     val ticTacToeEndConditions = List(
       EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
-        game.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size > 0
+        game.board.nInARow(game.pieces(0).getPhysicalPiece(player))
       }),
       EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
-        game.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size == 0 && game.board.full()
+        !game.board.nInARow(game.pieces(0).getPhysicalPiece(player)) && game.board.full
       })
     )
     ticTacToeEndConditions.toJson
     ticTacToeEndConditions.toJson.convertTo[List[EndCondition]]
   }
   test("Board serialization") {
-    val board = Board(List(3, 3), Square, Indirect, Square)
-    val converted = board.toJson.convertTo[Board]
+    val board = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
+    val converted = board.toJson.convertTo[BoardRuleSet]
     assert(converted == board)
   }
   test("Players serialization") {
@@ -181,12 +185,12 @@ class SerializationTests extends FunSuite {
     assert(converted == players)
   }
   test("TicTacToe serialization") {
-    import org.leisurelyscript.repository.LocalStaticRepository
-    import org.leisurelyscript.repository.LocalStaticRepository.availableGames._
-    import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
+    import org.leisurely_script.repository.LocalStaticRepository
+    import org.leisurely_script.repository.LocalStaticRepository.availableGames._
+    import org.leisurely_script.test.util.GameUtilities.TicTacToeUtilities._
 
     val ticTacToe = LocalStaticRepository.load(TicTacToe).get
-    val converted = ticTacToe.toJson.convertTo[Game]
+    val converted = ticTacToe.toJson.convertTo[GameRuleSet]
     val tiedGame:List[Game] = movesFromTiedGame(converted)
   }
 }

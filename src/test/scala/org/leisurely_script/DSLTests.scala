@@ -6,7 +6,7 @@ import org.scalatest.FunSuite
 
 import org.leisurely_script.gdl.types._
 import org.leisurely_script.gdl.expressions.iff
-import org.leisurelyscript.gdl._
+import org.leisurely_script.gdl._
 
 
 class DLSTests extends FunSuite {

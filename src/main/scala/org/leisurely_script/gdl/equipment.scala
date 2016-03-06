@@ -1,6 +1,6 @@
-package org.leisurelyscript.gdl
+package org.leisurely_script.gdl
 
 
-trait Equipment {
+abstract class Equipment(val rule:PieceRule) {
   def copy:Equipment
 }

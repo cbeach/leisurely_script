@@ -1,22 +1,24 @@
-package org.leisurelyscript.gdl
+package org.leisurely_script.gdl
+
+import org.leisurely_script.implementation.Game
 
 
-case class PhysicalPiece(val name:String, val owner:ConcretelyKnownPlayer) extends Equipment {
+case class PhysicalPiece(val name:String, val owner:ConcretelyKnownPlayer, override val rule:PieceRule) extends Equipment(rule) {
   override def copy:Equipment = {
-    PhysicalPiece(name, owner)
+    PhysicalPiece(name, owner, rule)
   }
 }
 
 case class PieceRule(val name:String, val owner:PlayerValidator, val legalMoves:List[LegalMove]) {
   def getPhysicalPiece(player:ConcretelyKnownPlayer):PhysicalPiece = {
-    PhysicalPiece(name, player)
+    PhysicalPiece(name, player, this)
   }
 
   def legalMoves(game:Game, player:Player): List[Move] = {
     var moveList:List[Move] = List()
     for (legalMove <- legalMoves) {
       for (node <- game.board.nodes) {
-        val newMove = Move(PhysicalPiece(name, player), player, legalMove.action, node._2)
+        val newMove = Move(PhysicalPiece(name, player, this), player, legalMove.action, node)
         if (legalMove.legal(game, newMove)) {
           moveList = newMove :: moveList
         }

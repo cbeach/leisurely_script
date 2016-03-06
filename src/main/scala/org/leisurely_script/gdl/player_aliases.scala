@@ -1,4 +1,6 @@
-package org.leisurelyscript.gdl
+package org.leisurely_script.gdl
+
+import org.leisurely_script.implementation.Game
 
 
 trait PlayerValidator {

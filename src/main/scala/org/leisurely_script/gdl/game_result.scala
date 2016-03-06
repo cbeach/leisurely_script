@@ -1,4 +1,4 @@
-package org.leisurelyscript.gdl
+package org.leisurely_script.gdl
 
 
 case class GameResult(

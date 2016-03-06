@@ -1,14 +1,14 @@
-package org.leisurelyscript.test.suites
+package org.leisurely_script.test.suites
 
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
 
-import org.leisurelyscript.test.util.GameUtilities.TicTacToeUtilities._
+import org.leisurely_script.test.util.GameUtilities.TicTacToeUtilities._
 
-import org.leisurelyscript.gdl._
-import org.leisurelyscript.gdl.ImplicitDefs.Views.Game._
-import org.leisurelyscript.repository.LocalStaticRepository
+import org.leisurely_script.gdl._
+import org.leisurely_script.gdl.ImplicitDefs.Views.Game._
+import org.leisurely_script.repository.LocalStaticRepository
 
 import Direction._
 import GameStatus._
@@ -21,7 +21,7 @@ import Shape._
 class StaticLocalGameRepoTests extends FunSuite {
   test("The TicTacToe factory should work.") {
     val ticTacToe = LocalStaticRepository.load("TicTacToe") match {
-      case Success(tTT:Game) => tTT
+      case Success(tTT:GameRuleSet) => tTT
       case Failure(ex) => throw ex
     }
 
@@ -30,27 +30,27 @@ class StaticLocalGameRepoTests extends FunSuite {
     val xPiece = tie(0).pieces(0).getPhysicalPiece(tie(0).players.all(0))
     val oPiece = tie(0).pieces(0).getPhysicalPiece(tie(0).players.all(1))
 
-    assert(tie(0).board.nInARow(3, xPiece).size == 0)
-    assert(tie(1).board.nInARow(3, xPiece).size == 0)
-    assert(tie(2).board.nInARow(3, xPiece).size == 0)
-    assert(tie(3).board.nInARow(3, xPiece).size == 0)
-    assert(tie(4).board.nInARow(3, xPiece).size == 0)
-    assert(tie(5).board.nInARow(3, xPiece).size == 0)
-    assert(tie(6).board.nInARow(3, xPiece).size == 0)
-    assert(tie(7).board.nInARow(3, xPiece).size == 0)
-    assert(tie(8).board.nInARow(3, xPiece).size == 0)
-    assert(tie(9).board.nInARow(3, xPiece).size == 0)
+    assert(tie(0).board.nInARow(xPiece) == false)
+    assert(tie(1).board.nInARow(xPiece) == false)
+    assert(tie(2).board.nInARow(xPiece) == false)
+    assert(tie(3).board.nInARow(xPiece) == false)
+    assert(tie(4).board.nInARow(xPiece) == false)
+    assert(tie(5).board.nInARow(xPiece) == false)
+    assert(tie(6).board.nInARow(xPiece) == false)
+    assert(tie(7).board.nInARow(xPiece) == false)
+    assert(tie(8).board.nInARow(xPiece) == false)
+    assert(tie(9).board.nInARow(xPiece) == false)
 
-    assert(tie(0).board.nInARow(3, oPiece).size == 0)
-    assert(tie(1).board.nInARow(3, oPiece).size == 0)
-    assert(tie(2).board.nInARow(3, oPiece).size == 0)
-    assert(tie(3).board.nInARow(3, oPiece).size == 0)
-    assert(tie(4).board.nInARow(3, oPiece).size == 0)
-    assert(tie(5).board.nInARow(3, oPiece).size == 0)
-    assert(tie(6).board.nInARow(3, oPiece).size == 0)
-    assert(tie(7).board.nInARow(3, oPiece).size == 0)
-    assert(tie(8).board.nInARow(3, oPiece).size == 0)
-    assert(tie(9).board.nInARow(3, oPiece).size == 0)
+    assert(tie(0).board.nInARow(oPiece) == false)
+    assert(tie(1).board.nInARow(oPiece) == false)
+    assert(tie(2).board.nInARow(oPiece) == false)
+    assert(tie(3).board.nInARow(oPiece) == false)
+    assert(tie(4).board.nInARow(oPiece) == false)
+    assert(tie(5).board.nInARow(oPiece) == false)
+    assert(tie(6).board.nInARow(oPiece) == false)
+    assert(tie(7).board.nInARow(oPiece) == false)
+    assert(tie(8).board.nInARow(oPiece) == false)
+    assert(tie(9).board.nInARow(oPiece))
 
     assert(tie(0).gameResult.get.result == Pending)
     assert(tie(1).gameResult.get.result == Pending)

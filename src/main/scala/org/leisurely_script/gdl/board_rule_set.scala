@@ -1,20 +1,22 @@
-package org.leisurelyscript.gdl
+package org.leisurely_script.gdl
 
 import scala.util.{Try, Success, Failure}
 import scala.util.control.Breaks._
+
+import org.leisurely_script.implementation.Board
 
 import Direction._
 import NeighborType._
 import Shape._
 
-case class Board(size:List[Int],
-  boardShape:Shape,
-  neighborType:NeighborType,
-  nodeShape:Shape,
-  graph:Graph = new Graph()) {
-
-  def this(other:Board) = {
-    this(other.size, other.boardShape, other.neighborType, other.nodeShape, new Graph(other.graph))
+case class BoardRuleSet(val size:List[Int],
+                        val boardShape:Shape,
+                        val neighborType:NeighborType,
+                        val nodeShape:Shape,
+                        val pieces:List[PieceRule],
+                        val graph:Graph = new Graph()) {
+  def this(other:BoardRuleSet) = {
+    this(other.size, other.boardShape, other.neighborType, other.nodeShape, other.pieces, new Graph(other.graph))
   }
   def nodes() = {
     graph.nodesByCoord
@@ -113,11 +115,11 @@ case class Board(size:List[Int],
       }
     }).reduce(_+_)
   }
-  def push(thing:Equipment, coord:Coordinate):Try[Board] = {
-    Try(new Board(size, boardShape, neighborType, nodeShape, graph.push(thing, coord).get))
+  def push(thing:Equipment, coord:Coordinate):Try[BoardRuleSet] = {
+    Try(new BoardRuleSet(size, boardShape, neighborType, nodeShape, pieces, graph.push(thing, coord).get))
   }
-  def pop(coord:Coordinate):Try[Board] = {
-    Try(new Board(size, boardShape, neighborType, nodeShape, graph.pop(coord).get))
+  def pop(coord:Coordinate):Try[BoardRuleSet] = {
+    Try(new BoardRuleSet(size, boardShape, neighborType, nodeShape, pieces, graph.pop(coord).get))
   }
   def nInARow(n:Int, piece:PhysicalPiece, neighborType:NeighborType=null):Set[ConcretelyKnownPlayer] = {
     def recursiveWalk(x:Int, n:Int, thisNode:BoardNode, piece:PhysicalPiece, direction:Direction=null):Boolean = {
@@ -161,12 +163,33 @@ case class Board(size:List[Int],
       throw new IllegalBoardException("The board must have nodes, no nodes found.")
     }
   }
+  def getPlayableBoard(nInARow:Int=0):Try[Board] = {
+    //TODO: Add error checking
+    var nInARowFunc:Option[(Array[Array[Int]])=>Boolean] = None
+    if (nInARow > 0) {
+      val possibleRows = graph.setOfNLengthRows(nInARow)
+      nInARowFunc = Some((matrix) => {
+        var retVal:Boolean = false
+        possibleRows.takeWhile(row => !{
+          val boolFunc: (Coordinate)=>Boolean = (coord:Coordinate) => {
+            coord match {
+              case Coordinate(x: Int, y: Int) => matrix(x)(y) > 0
+            }
+          }
+          retVal = row.map(boolFunc).reduce(_ && _)
+          retVal
+        })
+        retVal
+      })
+    }
+    Success(new Board(this, nInARowFunc))
+  }
 }
 
 
-object Board {
-  def apply(size:List[Int], boardShape:Shape, neighborType:NeighborType, nodeShape:Shape):Board = {
-    val board = new Board(size, boardShape, neighborType, nodeShape)
+object BoardRuleSet {
+  def apply(size:List[Int], boardShape:Shape, neighborType:NeighborType, nodeShape:Shape, pieces:List[PieceRule]):BoardRuleSet = {
+    val board = new BoardRuleSet(size, boardShape, neighborType, nodeShape, pieces)
     board.generateGraph()
     board
   }

@@ -1,13 +1,13 @@
-package org.leisurelyscript.gdl
+package org.leisurely_script.gdl
 
 import MoveAction._
+import org.leisurely_script.implementation.Game
 
 
-class LegalMove(
-  val owner:PlayerValidator,
-  val precondition:(Game, Move)=>Boolean=(game:Game, move:Move)=>true,
-  val action:MoveAction,
-  val postcondition:(Game, Move)=>Boolean=null) {
+class LegalMove(val owner:PlayerValidator,
+                val precondition:(Game, Move)=>Boolean= (game:Game, move:Move)=>true,
+                val action:MoveAction,
+                val postcondition:(Game, Move)=>Boolean=null) {
 
   def legal(game:Game, move:Move):Boolean = {
     if (!owner.playersValid(game, move.player)) {
