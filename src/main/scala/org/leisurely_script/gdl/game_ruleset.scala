@@ -2,9 +2,7 @@ package org.leisurely_script.gdl
 
 import scala.util.{Try, Success, Failure}
 
-import GameStatus._
 import GameResultState._
-import MoveAction._
 
 import org.leisurely_script.implementation.Game
 
@@ -94,5 +92,5 @@ object GameRuleSet {
             board:BoardRuleSet = null,
             pieces:List[PieceRule] = List[PieceRule](),
             endConditions:List[EndCondition] = List[EndCondition]()
-        ):GameRuleSet = new GameRuleSet(name, players, board, pieces, endConditions)
+           ):GameRuleSet = new GameRuleSet(name, players, board, pieces, endConditions)
 }

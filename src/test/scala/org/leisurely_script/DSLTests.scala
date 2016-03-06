@@ -155,4 +155,26 @@ class DLSTests extends FunSuite {
     }
     assert(iffExpression3.build.evaluate.get == 3)
   }
+  test("test type conversion") {
+    import org.leisurely_script.gdl.ImplicitDefs.Views.TypeConversions._
+    def convertMe[V <: AnyVal, T <: AnyValExpression[V]](expr:T):Boolean = {
+      expr match {
+        case de:T => true
+        case _ => fail
+      }
+    }
+
+    val byte:Byte = 1
+    val long:Long = 1
+    val short:Short = 1
+
+    assert(convertMe[Boolean, BooleanExpression](true))
+    assert(convertMe[Byte, ByteExpression](byte))
+    assert(convertMe[Char, CharExpression]('a'))
+    assert(convertMe[Double, DoubleExpression](1.0))
+    assert(convertMe[Float, FloatExpression](1.0F))
+    assert(convertMe[Int, IntExpression](1))
+    assert(convertMe[Long, LongExpression](long))
+    assert(convertMe[Short, ShortExpression](short))
+  }
 }

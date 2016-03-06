@@ -366,8 +366,6 @@ x iff
 nInARow
 full
 empty
-and
-not
 
 previous
 player
@@ -408,11 +406,14 @@ implicit def ShortExpressionToIntExpression(shortExpr:ShortExpression) = IntExpr
 
 GameRule methods such as nInARow, full, empty, etc. must return GameExpressions. These game expressions will later be used to create the conditions for the playable game.
 
-##### empty, full, nInARow, etc.
+##### Function/Method Call Expression
 
-iff(boardRuleSet.nInARow(3, <piece_rule>)) {
-    // Do something
+object nInARow[Boolean] extends GameExpression[Boolean] {
+    apply():FunctionCallExpression[T <: GameExpression] = {
+
+    }
 }
+
 
 
 
