@@ -408,12 +408,14 @@ GameRule methods such as nInARow, full, empty, etc. must return GameExpressions.
 
 ##### Function/Method Call Expression
 
-object nInARow[Boolean] extends GameExpression[Boolean] {
+FunctionObj {
     apply():FunctionCallExpression[T <: GameExpression] = {
 
     }
 }
 
+object nInARow[PieceRule, Boolean] extends GameExpression[Boolean] implements BoardExpression {
+    apply():FunctionCallExpression[Boolean] = {
 
-
-
+    }
+}

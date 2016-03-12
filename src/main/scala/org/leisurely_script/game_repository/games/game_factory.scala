@@ -1,5 +1,6 @@
 package org.leisurely_script.repository
 
+import org.leisurely_script.gdl.types.NInARowExpression
 import org.leisurely_script.implementation.Game
 
 import scala.util.{Try, Success, Failure}
@@ -41,10 +42,10 @@ object GameFactory {
     val board = BoardRuleSet(List(3, 3), Square, Indirect, Square, List(piece))
     val endConditions = List(
       EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
-        game.ruleSet.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size > 0
+        board.nInARow(3, game.pieces(0), player)
       }),
       EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
-        game.ruleSet.board.nInARow(3, game.pieces(0).getPhysicalPiece(player)).size == 0 && game.board.full
+        board.nInARow(3, game.pieces(0), player) && game.board.full
       })
     )
     GameRuleSet()

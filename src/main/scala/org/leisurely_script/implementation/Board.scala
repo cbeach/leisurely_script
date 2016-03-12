@@ -1,6 +1,6 @@
 package org.leisurely_script.implementation
 
-import scala.collection.mutable.{Stack, ArrayBuffer};
+import scala.collection.mutable.{Stack, ArrayBuffer, HashMap};
 
 import org.leisurely_script.gdl._
 
@@ -9,14 +9,14 @@ import scala.util.{Try, Success, Failure}
 /**
   * Created by mcsmash on 1/13/16.
   */
-class Board(rS:BoardRuleSet, nInARowFunc:Option[(Array[Array[Int]])=>Boolean]) {
+class Board(rS:BoardRuleSet) {
   val boardRuleSet = rS
-  val nInARowFunction = nInARowFunc
-  var occupancyMatrices:Map[PieceRule, Array[Array[Int]]] = {
+  private val nodeRows:HashMap[Int, Set[List[Coordinate]]] = HashMap.empty()
+  private val occupancyMatrices:Map[PieceRule, Array[Array[Int]]] = {
     for (piece <- boardRuleSet.pieces)
       yield (piece -> Array.ofDim[Int](boardRuleSet.size(0), boardRuleSet.size(1)))
   }.toMap
-  var occupancyStacks:ArrayBuffer[ArrayBuffer[Stack[Equipment]]] = {
+  private val occupancyStacks:ArrayBuffer[ArrayBuffer[Stack[Equipment]]] = {
     val returnArray:ArrayBuffer[ArrayBuffer[Stack[Equipment]]]
       = new ArrayBuffer[ArrayBuffer[Stack[Equipment]]](boardRuleSet.size(0))
     for (i <- 0 until boardRuleSet.size(0)) {
@@ -27,11 +27,22 @@ class Board(rS:BoardRuleSet, nInARowFunc:Option[(Array[Array[Int]])=>Boolean]) {
     }
     returnArray
   }
-  def nInARow(piece:PhysicalPiece):Boolean = {
-    nInARowFunction match {
-      case Some(func) => func(occupancyMatrices(piece.rule))
-      case None => throw new IllegalExecutionException("No rule requires nInARow. nInARow is unavailable.")
+  def addRowSet(n:Int, rows:Set[List[Coordinate]]) = {
+    nodeRows(n) = rows
+  }
+  def nInARow(n:Int, piece:PhysicalPiece):Boolean = {
+    val possibleRows = nodeRows(n)
+    val matrix = occupancyMatrices(piece.rule)
+    var retVal = false
+    if (n > 0) {
+      possibleRows.takeWhile(row => !{
+        retVal = row.map(_ match {
+          case Coordinate(x: Int, y: Int) => matrix(x)(y) > 0
+        }).reduce(_ && _)
+        retVal
+      })
     }
+    retVal
   }
   protected def findInOccupancyMatrices(truthFunction:(Int)=>Boolean):Option[(PieceRule, Coordinate)] = {
     for (pair <- occupancyMatrices) {

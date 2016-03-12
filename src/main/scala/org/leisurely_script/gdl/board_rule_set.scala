@@ -1,5 +1,7 @@
 package org.leisurely_script.gdl
 
+import org.leisurely_script.gdl.types.NInARowExpression
+
 import scala.util.{Try, Success, Failure}
 import scala.util.control.Breaks._
 
@@ -15,6 +17,7 @@ case class BoardRuleSet(val size:List[Int],
                         val nodeShape:Shape,
                         val pieces:List[PieceRule],
                         val graph:Graph = new Graph()) {
+  var playableBoard:Option[Board] = None
   def this(other:BoardRuleSet) = {
     this(other.size, other.boardShape, other.neighborType, other.nodeShape, other.pieces, new Graph(other.graph))
   }
@@ -121,68 +124,24 @@ case class BoardRuleSet(val size:List[Int],
   def pop(coord:Coordinate):Try[BoardRuleSet] = {
     Try(new BoardRuleSet(size, boardShape, neighborType, nodeShape, pieces, graph.pop(coord).get))
   }
-  def nInARow(n:Int, piece:PhysicalPiece, neighborType:NeighborType=null):Set[ConcretelyKnownPlayer] = {
-    def recursiveWalk(x:Int, n:Int, thisNode:BoardNode, piece:PhysicalPiece, direction:Direction=null):Boolean = {
-      val matchingPieces = thisNode.equipment.filter(eq => {
-        eq match {
-          case p:PhysicalPiece => piece.name == p.name && piece.owner.getPlayers == p.owner.getPlayers
-          case _ => false
-        }
-      })
-
-      val edges = direction match {
-        case null => graph.outEdges(thisNode.coord)
-        case _ => graph.outEdges(thisNode.coord).filter(edge => direction == edge.direction)
-      }
-
-      if (matchingPieces.length == 0
-      || (x != n - 1 && edges.length == 0)) {
-        false
-      } else if (x != n - 1) {
-        (for (e <- edges) yield recursiveWalk(x + 1, n, e.nodes._2, piece, e.direction)).exists(x => x == true)
-      } else if (x == n - 1 && matchingPieces.length > 0) {
-        true
-      } else {
-        false
-      }
-    }
-
-    var players:Set[ConcretelyKnownPlayer] = Set()
-    for ((coord, node) <- graph.nodesByCoord) {
-      if (recursiveWalk(0, n, node, piece)) {
-        piece.owner match {
-          case tempPlayers:ConcretelyKnownPlayer => players = players ++ tempPlayers.getPlayers
-          case _ => throw new IllegalPlayerException("Equipment that has been placed on the board must be owned by ConcretelyKnownPlayers.")
-        }
-      }
-    }
-    return players
+  def nInARow(n:Int, piece:PieceRule, player:Player, neighborType:NeighborType=null):NInARowExpression = {
+    NInARowExpression(n, piece, this, player, neighborType)
   }
   def wellFormed:Unit = {
     if (graph.nodesByCoord.size == 0) {
       throw new IllegalBoardException("The board must have nodes, no nodes found.")
     }
   }
-  def getPlayableBoard(nInARow:Int=0):Try[Board] = {
+  def getPlayableBoard:Try[Board] = {
     //TODO: Add error checking
-    var nInARowFunc:Option[(Array[Array[Int]])=>Boolean] = None
-    if (nInARow > 0) {
-      val possibleRows = graph.setOfNLengthRows(nInARow)
-      nInARowFunc = Some((matrix) => {
-        var retVal:Boolean = false
-        possibleRows.takeWhile(row => !{
-          val boolFunc: (Coordinate)=>Boolean = (coord:Coordinate) => {
-            coord match {
-              case Coordinate(x: Int, y: Int) => matrix(x)(y) > 0
-            }
-          }
-          retVal = row.map(boolFunc).reduce(_ && _)
-          retVal
-        })
-        retVal
-      })
+    playableBoard match {
+      case Some(pBoard: Board) => {
+        Success(pBoard)
+      }
+      case None => {
+        Success(new Board(this))
+      }
     }
-    Success(new Board(this, nInARowFunc))
   }
 }
 

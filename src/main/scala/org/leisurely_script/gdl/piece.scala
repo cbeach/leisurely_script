@@ -7,6 +7,7 @@ case class PhysicalPiece(val name:String, val owner:ConcretelyKnownPlayer, overr
   override def copy:Equipment = {
     PhysicalPiece(name, owner, rule)
   }
+  def is(pieceRule:PieceRule):Boolean = pieceRule == rule
 }
 
 case class PieceRule(val name:String, val owner:PlayerValidator, val legalMoves:List[LegalMove]) {
