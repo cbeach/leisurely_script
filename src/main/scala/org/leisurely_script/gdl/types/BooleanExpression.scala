@@ -3,7 +3,15 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class BooleanExpression(value:Boolean) extends AnyValExpression[Boolean] {
+class BooleanExpression extends AnyValExpression[Boolean] {
+  var value:Boolean = _
+  def this(value:Boolean) = {
+    this
+    this.setValue(value)
+  }
+  def setValue(v:Boolean) = {
+    value = v
+  }
   override def evaluate:Option[Boolean] = Some(value)
   def !=(other: BooleanExpression): BooleanExpression = {
     BooleanExpression(value != other.value)
@@ -47,4 +55,9 @@ case class BooleanExpression(value:Boolean) extends AnyValExpression[Boolean] {
   def compareTo(other: BooleanExpression): IntExpression = {
 		IntExpression(value.compareTo(other.value))
 	}
+}
+
+object BooleanExpression {
+  def apply() = new BooleanExpression()
+  def apply(value:Boolean) = new BooleanExpression(value)
 }

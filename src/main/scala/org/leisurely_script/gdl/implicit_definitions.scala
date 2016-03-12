@@ -5,6 +5,7 @@ import org.apache.commons.codec.binary.Base64
 import org.leisurely_script.gdl.PieceRule
 import org.leisurely_script.gdl.{Player => PlayerClass, EndCondition, PlayerListWrapper,
   PieceRuleListWrapper, EndConditionListWrapper}
+import org.leisurely_script.gdl.expressions._
 import spray.json._
 
 
@@ -308,6 +309,8 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
 }
 package Views {
 
+import org.leisurely_script.gdl.SpecificPlayer
+import org.leisurely_script.gdl.expressions.WellFormedConditionalExpressionBuilder
 import org.leisurely_script.gdl.types._
 
 object Game {
@@ -317,6 +320,7 @@ object Game {
       pieces:List[PieceRule]):PieceRuleListWrapper = PieceRuleListWrapper(pieces)
     implicit def endConditionListToEndConditionListWrapper(
       endConditions:List[EndCondition]):EndConditionListWrapper = EndConditionListWrapper(endConditions)
+    implicit def playerToSpecificPlayer(player:PlayerClass):SpecificPlayer = SpecificPlayer(player)
   }
   object Player {
     implicit def playerToPlayerSet(player:PlayerClass):Set[PlayerClass] = Set(player)
@@ -339,5 +343,12 @@ object Game {
     implicit def IntExpressionToInt(expr:IntExpression):Int = expr.value
     implicit def LongExpressionToLong(expr:LongExpression):Long = expr.value
     implicit def ShortExpressionToShort(expr:ShortExpression):Short = expr.value
+
+    implicit def WellFormedConditionalBuilderToConditional[T]
+      (cBuilder:WellFormedConditionalExpressionBuilder[TRUE, TRUE, T]):ConditionalExpression[T] =
+      cBuilder.build
+    implicit def FinalizedConditionalBuilderToConditional[T]
+      (cBuilder:FinalizedConditionalExpressionBuilder[TRUE, TRUE, T]):ConditionalExpression[T] =
+      cBuilder.build
   }
 }

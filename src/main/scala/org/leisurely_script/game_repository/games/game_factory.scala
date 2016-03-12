@@ -1,12 +1,13 @@
 package org.leisurely_script.repository
 
-import org.leisurely_script.gdl.types.NInARowExpression
+import org.leisurely_script.gdl.expressions.{NInARowExpression, iff}
 import org.leisurely_script.implementation.Game
 
 import scala.util.{Try, Success, Failure}
 
 import org.leisurely_script.gdl._
 import org.leisurely_script.gdl.ImplicitDefs.Views.Game._
+import org.leisurely_script.gdl.ImplicitDefs.Views.TypeConversions._
 
 import GameResultState._
 import MoveAction._
@@ -40,12 +41,13 @@ object GameFactory {
     }, Push)
     val piece = new PieceRule("token", AnyPlayer, List[LegalMove](legalMove))
     val board = BoardRuleSet(List(3, 3), Square, Indirect, Square, List(piece))
+
     val endConditions = List(
-      EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
-        board.nInARow(3, game.pieces(0), player)
+      EndCondition(iff(board.nInARow(3, piece, PreviousPlayer)) {
+        PreviousPlayer.wins
       }),
-      EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
-        board.nInARow(3, game.pieces(0), player) && game.board.full
+      EndCondition(iff(!board.nInARow(3, piece, AnyPlayer) && board.full) {
+        AllPlayers.ties
       })
     )
     GameRuleSet()

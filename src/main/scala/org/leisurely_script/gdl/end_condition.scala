@@ -1,10 +1,7 @@
 package org.leisurely_script.gdl
 
+import org.leisurely_script.gdl.types.{GameExpression, GameResultExpression}
 import org.leisurely_script.implementation.Game
 
 
-case class EndCondition(result:GameResultState.Value, affectedPlayer:PlayerValidator, private val condition:(Game, Player) => Boolean) {
-  def conditionMet(game:Game, player:Player):Boolean = {
-    condition(game, player)
-  }
-}
+case class EndCondition(result:GameExpression[SGameResult]) {}

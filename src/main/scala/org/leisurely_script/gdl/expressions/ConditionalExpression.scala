@@ -31,7 +31,8 @@ private[leisurely_script] class IncompleteConditionalExpressionContainer[HasCond
 }
 
 private[leisurely_script] class WellFormedConditionalExpressionBuilder[HasCond, HasExpr, T]
-    (conditionExpr:Option[BooleanExpression], thenExpr:Option[GameExpression[T]], otherwiseExpr:Option[GameExpression[T]]) {
+    (conditionExpr:Option[BooleanExpression], thenExpr:Option[GameExpression[T]],
+     otherwiseExpr:Option[GameExpression[T]]) {
   var otherwiseBuilder:Option[WellFormedConditionalExpressionBuilder[TRUE, TRUE, T]] = None
   def otherwise(expr:WellFormedConditionalExpressionBuilder[TRUE, TRUE, T]):WellFormedConditionalExpressionBuilder[HasCond, HasExpr, T] = {
     otherwiseExpr match {

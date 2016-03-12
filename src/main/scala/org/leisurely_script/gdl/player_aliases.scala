@@ -1,14 +1,19 @@
 package org.leisurely_script.gdl
 
+import org.leisurely_script.gdl.types.GameResultExpression
 import org.leisurely_script.implementation.Game
+import org.leisurely_script.gdl.GameResultState._
 
 
-trait PlayerValidator {
+trait PlayerValidator extends {
   def playersValid(game:Game, players:Set[Player]):Boolean
   def playersValid(game:Game, players:ConcretelyKnownPlayer):Boolean = {
     playersValid(game, players.getPlayers)
   }
   def getPlayers(game:Game):Set[Player]
+  def wins = GameResultExpression(Some(this), Win)
+  def loses = GameResultExpression(Some(this), Lose)
+  def ties = GameResultExpression(Some(this), Tie)
 }
 
 trait ConcretelyKnownPlayer {
@@ -155,3 +160,18 @@ case object AnyPlayer extends PlayerValidator {
   }
 }
 
+case class SpecificPlayer(player:Player) extends PlayerValidator {
+  override def playersValid(game:Game, players:Set[Player]):Boolean = {
+    if (players.size != 1) {
+      false
+    } else {
+      players.contains(player)
+    }
+  }
+  override def playersValid(game:Game, players:ConcretelyKnownPlayer):Boolean = {
+    playersValid(game, players.getPlayers)
+  }
+  def getPlayers(game:Game):Set[Player] = {
+    Set(player)
+  }
+}

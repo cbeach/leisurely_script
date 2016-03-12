@@ -1,6 +1,6 @@
 package org.leisurely_script.gdl
 
-import org.leisurely_script.gdl.types.NInARowExpression
+import org.leisurely_script.gdl.expressions.{BoardFullExpression, BoardEmptyExpression, NInARowExpression}
 
 import scala.util.{Try, Success, Failure}
 import scala.util.control.Breaks._
@@ -89,26 +89,16 @@ case class BoardRuleSet(val size:List[Int],
    *
    * @return Boolean  true if there are no pieces on the board, false if there are
    */
-  def empty(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
-    for (node <- graph.nodesByCoord) {
-      if (node._2.empty(truthFunction) == false) {
-        return false
-      }
-    }
-    true
+  def empty:BoardEmptyExpression = {
+    BoardEmptyExpression(this)
   }
   /**
    * Is the board full?
    *
    * @return Boolean  true if there are no more empty nodes on the board, false if there are
    */
-  def full(truthFunction:(BoardNode)=>Boolean=null):Boolean = {
-    for (node <- graph.nodesByCoord) {
-      if (node._2.empty(truthFunction) == true) {
-        return false
-      }
-    }
-    true
+  def full:BoardFullExpression = {
+    BoardFullExpression(this)
   }
   def numberOfPieces(pieceCounter:(BoardNode)=>Int=null):Int = {
     graph.nodesByCoord.map(node => {
@@ -116,7 +106,7 @@ case class BoardRuleSet(val size:List[Int],
         case func:((BoardNode)=>Int) => func(node._2)
         case _ => node._2.equipment.size
       }
-    }).reduce(_+_)
+    }).sum
   }
   def push(thing:Equipment, coord:Coordinate):Try[BoardRuleSet] = {
     Try(new BoardRuleSet(size, boardShape, neighborType, nodeShape, pieces, graph.push(thing, coord).get))
@@ -124,7 +114,7 @@ case class BoardRuleSet(val size:List[Int],
   def pop(coord:Coordinate):Try[BoardRuleSet] = {
     Try(new BoardRuleSet(size, boardShape, neighborType, nodeShape, pieces, graph.pop(coord).get))
   }
-  def nInARow(n:Int, piece:PieceRule, player:Player, neighborType:NeighborType=null):NInARowExpression = {
+  def nInARow(n:Int, piece:PieceRule, player:PlayerValidator, neighborType:NeighborType=null):NInARowExpression = {
     NInARowExpression(n, piece, this, player, neighborType)
   }
   def wellFormed:Unit = {
