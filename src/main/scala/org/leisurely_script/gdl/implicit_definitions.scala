@@ -183,26 +183,59 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
       def read(json:JsValue):GameResultState.Value =
         GameResultState.withName(json.convertTo[String])
     }
-    private case class EndConditionFunctionWrapper(func:(Game, PlayerClass)=>Boolean) {}
-    implicit object EndConditionFunctionFormatter extends RootJsonFormat[(Game, PlayerClass)=>Boolean] {
-      def write(func:(Game, PlayerClass)=>Boolean):JsValue = {
-        val byteStream = new ByteArrayOutputStream()
-        new ObjectOutputStream(byteStream).writeObject(EndConditionFunctionWrapper(func))
-        val base64String:String = Base64.encodeBase64String(byteStream.toByteArray)
-        JsObject(("condition", JsString(base64String)))
+    implicit object NInARowExpressionFormatter extends JsonFormat[NInARowExpression] {
+      def write(expr:NInARowExpression):JsValue = {
+        //pieceRule:PieceRule, boardRuleSet:BoardRuleSet, player:PlayerValidator, neighborType:NeighborType=null
+        JsObject(
+          ("n", expr.n.toJson),
+          ("pieceRule", expr.pieceRule.toJson),
+          ("boardRuleSet", expr.boardRuleSet.toJson),
+          ("player", expr.player.toJson),
+          ("neighborType", expr.neighborType.toJson)
+        )
       }
-      def read(json:JsValue):(Game, PlayerClass)=>Boolean = json match {
-        case JsObject(fields) if fields.isDefinedAt("condition") =>
-          val byteArray = Base64.decodeBase64(fields("condition").convertTo[String])
-          val inputStream = new ByteArrayInputStream(byteArray)
-          new ObjectInputStream(inputStream).readObject() match {
-            case condition:EndConditionFunctionWrapper => condition.func
-            case thing => deserializationError(s"got $thing, expected (Game, Player) => Boolean")
-          }
-        case thing => deserializationError(s"got $thing, expected (Game, Player) => Boolean")
+      def read(json:JsValue):NInARowExpression = {
+        json match {
+          case JsObject(fields) => NInARowExpression(
+            fields("n").convertTo[Int],
+            fields("pieceRule").convertTo[PieceRule],
+            fields("boardRuleSet").convertTo[BoardRuleSet],
+            fields("player").convertTo[PlayerValidator],
+            fields("neighborType").convertTo[NeighborType.Value]
+          )
+        }
       }
     }
-    implicit val EndConditionFormatter = jsonFormat(EndCondition, "result", "affectedPlayer", "condition")
+    implicit object BoardFullExpressionFormatter extends JsonFormat[BoardFullExpression] {
+      def write(boardFull:BoardFullExpression):JsValue = {
+        JsObject(("boardRuleSet", boardFull.boardRuleSet.toJson))
+      }
+      def read(json:JsValue):BoardFullExpression = {
+        json match {
+          case JsObject(fields) => BoardFullExpression(fields("boardRuleSet").convertTo[BoardRuleSet])
+        }
+      }
+    }
+    implicit object BoardEmptyExpressionFormatter extends JsonFormat[BoardEmptyExpression] {
+      def write(boardEmpty:BoardEmptyExpression):JsValue = {
+        JsObject(("boardRuleSet", boardEmpty.boardRuleSet.toJson))
+      }
+      def read(json:JsValue):BoardEmptyExpression = {
+        json match {
+          case JsObject(fields) => BoardEmptyExpression(fields("boardRuleSet").convertTo[BoardRuleSet])
+        }
+      }
+    }
+    //implicit object EndConditionFormatter extends JsonFormat[EndCondition] {
+    //  def write(endCondition: EndCondition):JsValue = {
+    //    JsObject()
+    //  }
+    //  def read(json: JsValue):EndCondition = {
+    //    json match {
+    //      case JsObject(fields) => EndCondition
+    //    }
+    //  }
+    //}
 
     private case class LegalMoveConditionWrapper(func:(Game, Move)=>Boolean) {}
     implicit val moveActionFormatter = new JsonFormat[MoveAction.Value] {
