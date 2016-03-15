@@ -12,7 +12,10 @@ import spray.json._
 package TypeClasses {
 import java.io.{ObjectInputStream, ByteArrayInputStream, ObjectOutputStream, ByteArrayOutputStream}
 import org.leisurely_script.gdl._
+import org.leisurely_script.gdl.types._
 import org.leisurely_script.implementation.Game
+
+import scala.collection.mutable
 
 object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     implicit object PlayerFormatter extends RootJsonFormat[PlayerClass] {
@@ -226,16 +229,37 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
         }
       }
     }
-    //implicit object EndConditionFormatter extends JsonFormat[EndCondition] {
-    //  def write(endCondition: EndCondition):JsValue = {
-    //    JsObject()
-    //  }
-    //  def read(json: JsValue):EndCondition = {
-    //    json match {
-    //      case JsObject(fields) => EndCondition
-    //    }
-    //  }
-    //}
+    implicit val AnyValExpressionFormatter = new JsonFormat[AnyValExpression] {
+      def write[T](v:AnyValExpression[T]):JsValue = {
+        var fields:mutable.HashMap[String, JsValue] = mutable.HashMap(("value", v.value.toJson))
+        v match {
+          case BooleanExpression => fields("type") = "Boolean".toJson
+          case ByteExpression =>fields("type") = "Byte".toJson
+          case CharExpression =>fields("type") = "Char".toJson
+          case DoubleExpression =>fields("type") = "Double".toJson
+          case FloatExpression =>fields("type") = "Float".toJson
+          case IntExpression =>fields("type") = "Int".toJson
+          case LongExpression =>fields("type") = "Long".toJson
+          case ShortExpression =>fields("type") = "Short".toJson
+        }
+        new JsObject(fields.toMap)
+      }
+      def read[T](json:JsValue):AnyValExpression[T] = {
+        json match {
+          case JsObject(fields) =>
+        }
+      }
+    }
+    implicit object EndConditionFormatter extends JsonFormat[EndCondition] {
+      def write(endCondition: EndCondition):JsValue = {
+        JsObject()
+      }
+      def read(json: JsValue):EndCondition = {
+        json match {
+          case JsObject(fields) => EndCondition
+        }
+      }
+    }
 
     private case class LegalMoveConditionWrapper(func:(Game, Move)=>Boolean) {}
     implicit val moveActionFormatter = new JsonFormat[MoveAction.Value] {
