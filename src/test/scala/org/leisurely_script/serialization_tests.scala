@@ -10,6 +10,7 @@ import spray.json._
 
 import org.leisurely_script.gdl._
 import org.leisurely_script.gdl.ImplicitDefs.TypeClasses.LeisurelyScriptJSONProtocol._
+import org.leisurely_script.gdl.ImplicitDefs.Views.Game._
 import org.leisurely_script.gdl.Shape._
 import org.leisurely_script.gdl.NeighborType._
 import org.leisurely_script.gdl.GameResultState._

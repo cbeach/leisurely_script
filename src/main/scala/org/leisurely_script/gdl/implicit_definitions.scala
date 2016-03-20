@@ -229,38 +229,131 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
         }
       }
     }
-    implicit val AnyValExpressionFormatter = new JsonFormat[AnyValExpression] {
-      def write[T](v:AnyValExpression[T]):JsValue = {
-        var fields:mutable.HashMap[String, JsValue] = mutable.HashMap(("value", v.value.toJson))
-        v match {
-          case BooleanExpression => fields("type") = "Boolean".toJson
-          case ByteExpression =>fields("type") = "Byte".toJson
-          case CharExpression =>fields("type") = "Char".toJson
-          case DoubleExpression =>fields("type") = "Double".toJson
-          case FloatExpression =>fields("type") = "Float".toJson
-          case IntExpression =>fields("type") = "Int".toJson
-          case LongExpression =>fields("type") = "Long".toJson
-          case ShortExpression =>fields("type") = "Short".toJson
-        }
-        new JsObject(fields.toMap)
+    implicit object BooleanExpressionFormatter extends JsonFormat[BooleanExpression] {
+      def write(expr:BooleanExpression):JsValue = {
+        JsObject(("value", expr.toJson))
       }
-      def read[T](json:JsValue):AnyValExpression[T] = {
+      def read(json:JsValue):BooleanExpression = {
         json match {
-          case JsObject(fields) =>
+          case JsObject(fields) => BooleanExpression(fields("value").convertTo[Boolean])
         }
       }
     }
-    implicit object EndConditionFormatter extends JsonFormat[EndCondition] {
+    implicit object ByteExpressionFormatter extends JsonFormat[ByteExpression] {
+      def write(expr:ByteExpression):JsValue = {
+        JsObject(("value", expr.toJson))
+      }
+      def read(json:JsValue):ByteExpression = {
+        json match {
+          case JsObject(fields) => ByteExpression(fields("value").convertTo[Byte])
+        }
+      }
+    }
+    implicit object CharExpressionFormatter extends JsonFormat[CharExpression] {
+      def write(expr:CharExpression):JsValue = {
+        JsObject(("value", expr.toJson))
+      }
+      def read(json:JsValue):CharExpression = {
+        json match {
+          case JsObject(fields) => CharExpression(fields("value").convertTo[Char])
+        }
+      }
+    }
+    implicit object DoubleExpressionFormatter extends JsonFormat[DoubleExpression] {
+      def write(expr:DoubleExpression):JsValue = {
+        JsObject(("value", expr.toJson))
+      }
+      def read(json:JsValue):DoubleExpression = {
+        json match {
+          case JsObject(fields) => DoubleExpression(fields("value").convertTo[Double])
+        }
+      }
+    }
+    implicit object FloatExpressionFormatter extends JsonFormat[FloatExpression] {
+      def write(expr:FloatExpression):JsValue = {
+        JsObject(("value", expr.toJson))
+      }
+      def read(json:JsValue):FloatExpression = {
+        json match {
+          case JsObject(fields) => FloatExpression(fields("value").convertTo[Float])
+        }
+      }
+    }
+    implicit object IntExpressionFormatter extends JsonFormat[IntExpression] {
+      def write(expr:IntExpression):JsValue = {
+        JsObject(("value", expr.toJson))
+      }
+      def read(json:JsValue):IntExpression = {
+        json match {
+          case JsObject(fields) => IntExpression(fields("value").convertTo[Int])
+        }
+      }
+    }
+    implicit object LongExpressionFormatter extends JsonFormat[LongExpression] {
+      def write(expr:LongExpression):JsValue = {
+        JsObject(("value", expr.toJson))
+      }
+      def read(json:JsValue):LongExpression = {
+        json match {
+          case JsObject(fields) => LongExpression(fields("value").convertTo[Long])
+        }
+      }
+    }
+    implicit object ShortExpressionFormatter extends JsonFormat[ShortExpression] {
+      def write(expr:ShortExpression):JsValue = {
+        JsObject(("value", expr.toJson))
+      }
+      def read(json:JsValue):ShortExpression = {
+        json match {
+          case JsObject(fields) => ShortExpression(fields("value").convertTo[Short])
+        }
+      }
+    }
+    implicit object conditionalFormatter extends JsonFormat[ConditionalExpression] {
+      def write(value:ConditionalExpression):JsValue = {
+        JsObject(
+          ("condition", value.conditionExpr.toJson),
+          ("then", value.thenExpr.toJson),
+          ("otherwise", value.otherwise.toJson)
+        )
+      }
+      def read(json:JsValue):ConditionalExpression = {
+        json match {
+          case JsObject(fields) => {
+            new ConditionalExpression(
+              fields("condition").convertTo[BooleanExpression],
+              fields("then").convertTo[GameExpression],
+              fields("otherwise").convertTo[Option[GameExpression]]
+            )
+          }
+        }
+
+      }
+    }
+    implicit object endConditionFormatter extends JsonFormat[EndCondition] {
       def write(endCondition: EndCondition):JsValue = {
-        JsObject()
+        JsObject(("expr", endCondition.result.toJson))
       }
       def read(json: JsValue):EndCondition = {
         json match {
-          case JsObject(fields) => EndCondition
+          case JsObject(fields) => EndCondition(fields("expr").convertTo[GameExpression[SGameResult]])
         }
       }
     }
-
+    implicit val SGameResultFormatter = new JsonFormat[SGameResult] {
+      def write(value:SGameResult):JsValue = {
+        JsObject(
+          ("players", value.players.toJson),
+          ("result", value.result.toJson))
+      }
+      def read(json:JsValue):SGameResult = {
+        json match {
+          case JsObject(fields) => SGameResult(
+            fields("players").convertTo[Set[Player]],
+            fields("result").convertTo[GameResultState.Value])
+        }
+      }
+    }
     private case class LegalMoveConditionWrapper(func:(Game, Move)=>Boolean) {}
     implicit val moveActionFormatter = new JsonFormat[MoveAction.Value] {
       def write(action:MoveAction.Value):JsValue = JsString(action.toString)
@@ -338,7 +431,7 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
       def write(status:GameStatus.Value):JsValue = JsString(status.toString)
       def read(json:JsValue):GameStatus.Value = GameStatus.withName(json.convertTo[String])
     }
-    implicit val gameResultFormatter = jsonFormat3(GameResult)
+    implicit val gameResultFormatter = jsonFormat2(SGameResult)
     implicit object GameFormatter extends RootJsonFormat[GameRuleSet] {
       def write(game:GameRuleSet):JsValue = {
         JsObject(
@@ -370,7 +463,7 @@ import org.leisurely_script.gdl.SpecificPlayer
 import org.leisurely_script.gdl.expressions.WellFormedConditionalExpressionBuilder
 import org.leisurely_script.gdl.types._
 
-object Game {
+  object Game {
     implicit def playerListToPlayerListWrapper(
       players:List[PlayerClass]):PlayerListWrapper = PlayerListWrapper(players)
     implicit def pieceRuleListToPieceRuleListWrapper(

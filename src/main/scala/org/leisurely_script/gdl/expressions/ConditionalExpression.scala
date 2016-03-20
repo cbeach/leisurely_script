@@ -5,9 +5,9 @@ import org.leisurely_script.gdl.types._
 /**
   * Created by mcsmash on 1/27/16.
   */
-class ConditionalExpression[T](conditionExpr:BooleanExpression,
-                               thenExpr:GameExpression[T],
-                               otherwise:Option[GameExpression[T]] = None) extends GameExpression[T] {
+class ConditionalExpression[T](val conditionExpr:BooleanExpression,
+                               val thenExpr:GameExpression[T],
+                               val otherwise:Option[GameExpression[T]] = None) extends GameExpression[T] {
   override def evaluate:Option[T] = {
     if (conditionExpr.evaluate.get) {
       thenExpr.evaluate

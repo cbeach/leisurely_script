@@ -3,10 +3,13 @@ package org.leisurely_script
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
+import spray.json._
 
 import org.leisurely_script.gdl.types._
 import org.leisurely_script.gdl.expressions.iff
 import org.leisurely_script.gdl._
+import org.leisurely_script.gdl.ImplicitDefs.TypeClasses.LeisurelyScriptJSONProtocol._
+import org.leisurely_script.gdl.ImplicitDefs.Views.TypeConversions._
 
 
 class DLSTests extends FunSuite {
@@ -157,7 +160,7 @@ class DLSTests extends FunSuite {
   }
   test("test type conversion") {
     import org.leisurely_script.gdl.ImplicitDefs.Views.TypeConversions._
-    def convertMe[V <: AnyVal, T <: AnyValExpression[V]](expr:T):Boolean = {
+    def convertMe[V <: AnyVal, T <: AnyValExpression](expr:T):Boolean = {
       expr match {
         case de:T => true
         case _ => fail
@@ -176,5 +179,27 @@ class DLSTests extends FunSuite {
     assert(convertMe[Int, IntExpression](1))
     assert(convertMe[Long, LongExpression](long))
     assert(convertMe[Short, ShortExpression](short))
+  }
+  test("spray.json expression formatters") {
+    val byte:Byte = 1
+    val long:Long = 1
+    val short:Short = 1
+
+    var formatted = BooleanExpression(true).toJson
+    assert(formatted.convertTo[BooleanExpression] == BooleanExpression(true))
+    formatted = ByteExpression(byte).toJson
+    assert(formatted.convertTo[ByteExpression] == ByteExpression(byte))
+    formatted = CharExpression('a').toJson
+    assert(formatted.convertTo[CharExpression] == CharExpression('a'))
+    formatted = DoubleExpression(2.0).toJson
+    assert(formatted.convertTo[DoubleExpression] == DoubleExpression(2.0))
+    formatted = FloatExpression(2.0F).toJson
+    assert(formatted.convertTo[FloatExpression] == FloatExpression(2.0f))
+    formatted = IntExpression(2).toJson
+    assert(formatted.convertTo[IntExpression] == IntExpression(1))
+    formatted = LongExpression(long).toJson
+    assert(formatted.convertTo[LongExpression] == LongExpression(1L))
+    formatted = ShortExpression(short).toJson
+    assert(formatted.convertTo[ShortExpression] == ShortExpression(short))
   }
 }
