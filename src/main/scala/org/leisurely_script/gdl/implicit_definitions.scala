@@ -1,5 +1,6 @@
 package org.leisurely_script.gdl.ImplicitDefs
 
+import scala.reflect.runtime.universe._
 import org.apache.commons.codec.binary.Base64
 
 import org.leisurely_script.gdl.PieceRule
@@ -229,9 +230,40 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
         }
       }
     }
+    implicit object GameExpressionFormatter extends JsonFormat[GameExpression] {
+      def write(expr:GameExpression):JsValue = {
+        expr match {
+          case e:BooleanExpression => e.toJson
+          case e:ByteExpression => e.toJson
+          case e:CharExpression => e.toJson
+          case e:DoubleExpression => e.toJson
+          case e:FloatExpression => e.toJson
+          case e:IntExpression => e.toJson
+          case e:LongExpression => e.toJson
+          case e:ShortExpression => e.toJson
+        }
+      }
+      def read(json:JsValue): GameExpression = {
+        json match {
+          case JsObject(fields) => fields("type").convertTo[String] match {
+            case "Boolean" => BooleanExpression(fields("value").convertTo[Boolean])
+            case "Byte" => ByteExpression(fields("value").convertTo[Byte])
+            case "Char" => CharExpression(fields("value").convertTo[Char])
+            case "Double" => DoubleExpression(fields("value").convertTo[Double])
+            case "Float" => FloatExpression(fields("value").convertTo[Float])
+            case "Int" => IntExpression(fields("value").convertTo[Int])
+            case "Long" => LongExpression(fields("value").convertTo[Long])
+            case "Short" => ShortExpression(fields("value").convertTo[Short])
+          }
+        }
+      }
+    }
     implicit object BooleanExpressionFormatter extends JsonFormat[BooleanExpression] {
       def write(expr:BooleanExpression):JsValue = {
-        JsObject(("value", expr.toJson))
+        JsObject(
+          ("type", "Boolean".toJson),
+          ("value", expr.toJson)
+        )
       }
       def read(json:JsValue):BooleanExpression = {
         json match {
@@ -241,7 +273,10 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     }
     implicit object ByteExpressionFormatter extends JsonFormat[ByteExpression] {
       def write(expr:ByteExpression):JsValue = {
-        JsObject(("value", expr.toJson))
+        JsObject(
+          ("type", "Byte".toJson),
+          ("value", expr.toJson)
+        )
       }
       def read(json:JsValue):ByteExpression = {
         json match {
@@ -251,7 +286,10 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     }
     implicit object CharExpressionFormatter extends JsonFormat[CharExpression] {
       def write(expr:CharExpression):JsValue = {
-        JsObject(("value", expr.toJson))
+        JsObject(
+          ("type", "Char".toJson),
+          ("value", expr.toJson)
+        )
       }
       def read(json:JsValue):CharExpression = {
         json match {
@@ -261,7 +299,10 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     }
     implicit object DoubleExpressionFormatter extends JsonFormat[DoubleExpression] {
       def write(expr:DoubleExpression):JsValue = {
-        JsObject(("value", expr.toJson))
+        JsObject(
+          ("type", "Double".toJson),
+          ("value", expr.toJson)
+        )
       }
       def read(json:JsValue):DoubleExpression = {
         json match {
@@ -271,7 +312,10 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     }
     implicit object FloatExpressionFormatter extends JsonFormat[FloatExpression] {
       def write(expr:FloatExpression):JsValue = {
-        JsObject(("value", expr.toJson))
+        JsObject(
+          ("type", "Float".toJson),
+          ("value", expr.toJson)
+        )
       }
       def read(json:JsValue):FloatExpression = {
         json match {
@@ -281,7 +325,10 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     }
     implicit object IntExpressionFormatter extends JsonFormat[IntExpression] {
       def write(expr:IntExpression):JsValue = {
-        JsObject(("value", expr.toJson))
+        JsObject(
+          ("type", "Int".toJson),
+          ("value", expr.toJson)
+        )
       }
       def read(json:JsValue):IntExpression = {
         json match {
@@ -291,7 +338,10 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     }
     implicit object LongExpressionFormatter extends JsonFormat[LongExpression] {
       def write(expr:LongExpression):JsValue = {
-        JsObject(("value", expr.toJson))
+        JsObject(
+          ("type", "Long".toJson),
+          ("value", expr.toJson)
+        )
       }
       def read(json:JsValue):LongExpression = {
         json match {
@@ -301,7 +351,10 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
     }
     implicit object ShortExpressionFormatter extends JsonFormat[ShortExpression] {
       def write(expr:ShortExpression):JsValue = {
-        JsObject(("value", expr.toJson))
+        JsObject(
+          ("type", "Short".toJson),
+          ("value", expr.toJson)
+        )
       }
       def read(json:JsValue):ShortExpression = {
         json match {
@@ -320,9 +373,10 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
       def read(json:JsValue):ConditionalExpression = {
         json match {
           case JsObject(fields) => {
+            val thenExpr:GameExpression = fields("then").convertTo[GameExpression]
             new ConditionalExpression(
               fields("condition").convertTo[BooleanExpression],
-              fields("then").convertTo[GameExpression],
+              thenExpr,
               fields("otherwise").convertTo[Option[GameExpression]]
             )
           }
@@ -375,6 +429,24 @@ object LeisurelyScriptJSONProtocol extends DefaultJsonProtocol {
             case thing => deserializationError(s"got $thing, expected (Game, Move) => Boolean")
           }
         case thing => deserializationError(s"got $thing, expected (Game, Move) => Boolean")
+      }
+    }
+    implicit object TypeTagFormatter extends JsonFormat[TypeTag] {
+      def write(value:TypeTag):JsValue = {
+        val byteStream = new ByteArrayOutputStream()
+        new ObjectOutputStream(byteStream).writeObject(value)
+        val base64String:String = Base64.encodeBase64String(byteStream.toByteArray)
+        JsObject(("type", JsString(base64String)))
+      }
+      def read(json:JsValue):TypeTag = json match {
+        case JsObject(fields) if fields.isDefinedAt("type") =>
+          val byteArray = Base64.decodeBase64(fields("type").convertTo[String])
+          val inputStream = new ByteArrayInputStream(byteArray)
+          new ObjectInputStream(inputStream).readObject() match {
+            case tt:TypeTag => tt
+            case thing => deserializationError(s"got $thing, a TypeTag")
+          }
+        case thing => deserializationError(s"got $thing, a TypeTag")
       }
     }
     implicit object LegalMoveFormatter extends RootJsonFormat[LegalMove] {
