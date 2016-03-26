@@ -10,13 +10,16 @@ import scala.util.{Failure, Success}
 /**
   * Created by mcsmash on 3/12/16.
   */
-case class NInARowExpression(n:Int, pieceRule:PieceRule, boardRuleSet:BoardRuleSet, player:PlayerValidator,
+case class NInARowExpression(n:Int, pieceRule:PieceRule, boardRuleSet:BoardRuleSet, players:PlayerValidator,
                              neighborType:NeighborType=null)
   extends BooleanExpression {
+  def gameCreationHook(gameRuleSet:GameRuleSet):Unit = {
+    boardRuleSet.addNInARowSet(n, pieceRule, players)
+  }
   override def evaluate:Option[Boolean] = {
     Some(boardRuleSet.getPlayableBoard match {
       case Success(board:Board) => {
-        val concretePlayers = SomePlayers(player.getPlayers(game.get))
+        val concretePlayers = SomePlayers(players.getPlayers(game.get))
         board.nInARow(n, pieceRule.getPhysicalPiece(concretePlayers))
       }
       case Failure(ex) => throw ex

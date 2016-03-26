@@ -85,7 +85,6 @@ class GameRuleSet(val name:String,
   }
 }
 
-
 object GameRuleSet {
   def apply(name:String = java.util.UUID.randomUUID.toString,
             players:Players = new Players(List[Player]()),

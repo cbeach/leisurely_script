@@ -34,16 +34,16 @@ class TicTacToeTests extends FunSuite {
       case Success(tTT) => tTT.startGame()
       case Failure(ex) => fail
     }
-    val legalMoves:List[Move] = ticTacToe.legalMoves(ticTacToe.players.current)
-    assert(ticTacToe.players.current == ticTacToe.players.all(0))
-    val playerX = ticTacToe.players.all(0)
-    val playerO = ticTacToe.players.all(1)
-    val pieceRule = ticTacToe.pieces(0)
+    val legalMoves:List[Move] = ticTacToe.legalMoves(ticTacToe.current.player)
+    assert(ticTacToe.current.player == ticTacToe.player(0))
+    val playerX = ticTacToe.player(0)
+    val playerO = ticTacToe.player(1)
+    val pieceRule = ticTacToe.piece(0)
     val xPiece = pieceRule.getPhysicalPiece(playerX)
     val oPiece = pieceRule.getPhysicalPiece(playerO)
 
-    val firstMove = ticTacToe.applyMove(Move(xPiece, ticTacToe.players.current, Push, ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
-    assert(firstMove.players.current == ticTacToe.players.all(1))
+    val firstMove = ticTacToe.applyMove(Move(xPiece, ticTacToe.current.player, Push, ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
+    assert(firstMove.current.player == ticTacToe.player(1))
   }
 
   test("A user should be able to get a valid list of legal moves.") {
@@ -51,23 +51,23 @@ class TicTacToeTests extends FunSuite {
       case Success(tTT) => tTT.startGame()
       case Failure(ex) => fail
     }
-    val legalMoves:List[Move] = ticTacToe.legalMoves(ticTacToe.players.current)
+    val legalMoves:List[Move] = ticTacToe.legalMoves(ticTacToe.current.player)
     assert(legalMoves.size == 9)
     legalMoves.foreach(move => {
-      assert(move.player == ticTacToe.players.current)
+      assert(move.player == ticTacToe.current.player)
     })
     assert(legalMoves.map(move => move.player.getPlayers.size == 1 && move.player.getPlayers.head.name == "X").reduce(_&&_))
-    val playerX = ticTacToe.players.all(0)
-    val playerO = ticTacToe.players.all(1)
-    val pieceRule = ticTacToe.pieces(0)
+    val playerX = ticTacToe.player(0)
+    val playerO = ticTacToe.player(1)
+    val pieceRule = ticTacToe.piece(0)
     val xPiece = pieceRule.getPhysicalPiece(playerX)
     val oPiece = pieceRule.getPhysicalPiece(playerO)
-    val firstMove = ticTacToe.applyMove(Move(xPiece, ticTacToe.players.current, Push, ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
-    val legalMovesForTurn2:List[Move] = firstMove.legalMoves(firstMove.players.current)
+    val firstMove = ticTacToe.applyMove(Move(xPiece, ticTacToe.current.player, Push, ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
+    val legalMovesForTurn2:List[Move] = firstMove.legalMoves(firstMove.current.player)
 
     assert(legalMovesForTurn2.size == 8)
     legalMovesForTurn2.foreach(move => {
-      assert(move.player == firstMove.players.current)
+      assert(move.player == firstMove.current.player)
     })
     assert(legalMovesForTurn2.map(move => move.player.getPlayers.size == 1 && move.player.getPlayers.head.name == "O").reduce(_&&_))
   }
@@ -77,26 +77,21 @@ class TicTacToeTests extends FunSuite {
       case Success(tTT) => tTT.startGame()
       case Failure(ex) => fail
     }
-    val playerX = ticTacToe.players.all(0)
-    val playerO = ticTacToe.players.all(1)
-    val pieceRule = ticTacToe.pieces(0)
+    val playerX = ticTacToe.player(0)
+    val playerO = ticTacToe.player(1)
+    val pieceRule = ticTacToe.piece(0)
     val xPiece = pieceRule.getPhysicalPiece(playerX)
     val oPiece = pieceRule.getPhysicalPiece(playerO)
 
-    val move1 = ticTacToe.applyMove(Move(xPiece, ticTacToe.players.current, Push, ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
-    val move2 = move1.applyMove(Move(oPiece, move1.players.current, Push, move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 0)))).get
-    val move3 = move2.applyMove(Move(xPiece, move2.players.current, Push, move2.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 1)))).get
-    val move4 = move3.applyMove(Move(oPiece, move3.players.current, Push, move3.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
-    val move5 = move4.applyMove(Move(xPiece, move4.players.current, Push, move4.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 2)))).get
+    val move1 = ticTacToe.applyMove(Move(xPiece, ticTacToe.current.player, Push, ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
+    val move2 = move1.applyMove(Move(oPiece, move1.current.player, Push, move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 0)))).get
+    val move3 = move2.applyMove(Move(xPiece, move2.current.player, Push, move2.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 1)))).get
+    val move4 = move3.applyMove(Move(oPiece, move3.current.player, Push, move3.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
+    val move5 = move4.applyMove(Move(xPiece, move4.current.player, Push, move4.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 2)))).get
 
     intercept[IllegalGameStateException] {
-      move5.applyMove(Move(oPiece, move5.players.current, Push, move5.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 2)))).get
+      move5.applyMove(Move(oPiece, move5.current.player, Push, move5.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 2)))).get
     }
-
-    val move5Ranking = move5.gameResult.get.ranking.get
-
-    assert(move5.gameResult.get.result == Win)
-    assert(move5Ranking(0)(0) == move5.players.all(0))
   }
 
   test("No more moves are possible after a player has won.") {
@@ -104,21 +99,21 @@ class TicTacToeTests extends FunSuite {
       case Success(tTT) => tTT.startGame()
       case Failure(ex) => fail
     }
-    val playerX = ticTacToe.players.all(0)
-    val playerO = ticTacToe.players.all(1)
+    val playerX = ticTacToe.player(0)
+    val playerO = ticTacToe.player(1)
 
-    val pieceRule = ticTacToe.pieces(0)
+    val pieceRule = ticTacToe.piece(0)
 
     val xPiece = pieceRule.getPhysicalPiece(playerX)
     val oPiece = pieceRule.getPhysicalPiece(playerO)
 
-    val move1 = ticTacToe.applyMove(Move(xPiece, ticTacToe.players.current, Push, ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
-    val move2 = move1.applyMove(Move(oPiece, move1.players.current, Push, move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 0)))).get
-    val move3 = move2.applyMove(Move(xPiece, move2.players.current, Push, move2.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 1)))).get
-    val move4 = move3.applyMove(Move(oPiece, move3.players.current, Push, move3.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
-    val move5 = move4.applyMove(Move(xPiece, move4.players.current, Push, move4.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 2)))).get
+    val move1 = ticTacToe.applyMove(Move(xPiece, ticTacToe.current.player, Push, ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
+    val move2 = move1.applyMove(Move(oPiece, move1.current.player, Push, move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 0)))).get
+    val move3 = move2.applyMove(Move(xPiece, move2.current.player, Push, move2.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 1)))).get
+    val move4 = move3.applyMove(Move(oPiece, move3.current.player, Push, move3.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
+    val move5 = move4.applyMove(Move(xPiece, move4.current.player, Push, move4.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 2)))).get
     intercept[IllegalGameStateException] {
-      val failingMove = move5.applyMove(Move(oPiece, move5.players.current, Push, move5.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 2)))).get
+      val failingMove = move5.applyMove(Move(oPiece, move5.current.player, Push, move5.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 2)))).get
     }
   }
 
@@ -127,17 +122,17 @@ class TicTacToeTests extends FunSuite {
       case Success(tTT) => tTT.startGame()
       case Failure(ex) => fail
     }
-    val pieceRule = move0.pieces(0)
-    val playerX = move0.players.all(0)
-    val playerO = move0.players.all(1)
+    val pieceRule = move0.piece(0)
+    val playerX = move0.player(0)
+    val playerO = move0.player(1)
     val xPiece = pieceRule.getPhysicalPiece(playerX)
     val oPiece = pieceRule.getPhysicalPiece(playerO)
 
-    val move1 = move0.applyMove(Move(xPiece, move0.players.current, Push, move0.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
-    val move2 = move1.applyMove(Move(oPiece, move1.players.current, Push, move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 0)))).get
-    val move3 = move2.applyMove(Move(xPiece, move2.players.current, Push, move2.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
-    val move4 = move3.applyMove(Move(oPiece, move3.players.current, Push, move3.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 1)))).get
-    val move5 = move4.applyMove(Move(xPiece, move4.players.current, Push, move4.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 2)))).get
+    val move1 = move0.applyMove(Move(xPiece, move0.current.player, Push, move0.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
+    val move2 = move1.applyMove(Move(oPiece, move1.current.player, Push, move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 0)))).get
+    val move3 = move2.applyMove(Move(xPiece, move2.current.player, Push, move2.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
+    val move4 = move3.applyMove(Move(oPiece, move3.current.player, Push, move3.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 1)))).get
+    val move5 = move4.applyMove(Move(xPiece, move4.current.player, Push, move4.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 2)))).get
 
     assert(move0.history.size == 0)
     assert(move1.history.size == 1)
@@ -157,18 +152,18 @@ class TicTacToeTests extends FunSuite {
       case Success(tTT) => tTT.startGame()
       case Failure(ex) => fail
     }
-    val playerX = ticTacToe.players.all(0)
-    val playerO = ticTacToe.players.all(1)
+    val playerX = ticTacToe.player(0)
+    val playerO = ticTacToe.player(1)
 
-    val pieceRule = ticTacToe.pieces(0)
+    val pieceRule = ticTacToe.piece(0)
 
     val xPiece = pieceRule.getPhysicalPiece(playerX)
     val oPiece = pieceRule.getPhysicalPiece(playerO)
 
-    val move1 = ticTacToe.applyMove(Move(xPiece, ticTacToe.players.all(0), Push,
+    val move1 = ticTacToe.applyMove(Move(xPiece, ticTacToe.player(0), Push,
       ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
     intercept[IllegalMoveException] {
-      val move2:Game = move1.applyMove(Move(oPiece, ticTacToe.players.all(0), Push,
+      val move2:Game = move1.applyMove(Move(oPiece, ticTacToe.player(0), Push,
         move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 1)))).get
     }
   }
@@ -178,15 +173,15 @@ class TicTacToeTests extends FunSuite {
       case Success(tTT) => tTT.startGame()
       case Failure(ex) => fail
     }
-    val playerX = ticTacToe.players.all(0)
-    val playerO = ticTacToe.players.all(1)
-    val pieceRule = ticTacToe.pieces(0)
+    val playerX = ticTacToe.player(0)
+    val playerO = ticTacToe.player(1)
+    val pieceRule = ticTacToe.piece(0)
     val xPiece = pieceRule.getPhysicalPiece(playerX)
     val oPiece = pieceRule.getPhysicalPiece(playerO)
 
-    val move1 = ticTacToe.applyMove(new Move(xPiece, ticTacToe.players.current, Push, ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
-    val move2 = move1.applyMove(new Move(oPiece, move1.players.current, Push, move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 1)))).get
-    val move3 = move2.applyMove(new Move(xPiece, move2.players.current, Push, move2.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 2)))).get
+    val move1 = ticTacToe.applyMove(new Move(xPiece, ticTacToe.current.player, Push, ticTacToe.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
+    val move2 = move1.applyMove(new Move(oPiece, move1.current.player, Push, move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 1)))).get
+    val move3 = move2.applyMove(new Move(xPiece, move2.current.player, Push, move2.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 2)))).get
     assert(move3.status == InProgress)
   }
 
@@ -195,27 +190,22 @@ class TicTacToeTests extends FunSuite {
       case Success(tTT) => tTT.startGame()
       case Failure(ex) => fail
     }
-    val playerX = move0.players.all(0)
-    val playerO = move0.players.all(1)
-    val pieceRule = move0.pieces(0)
+    val playerX = move0.player(0)
+    val playerO = move0.player(1)
+    val pieceRule = move0.piece(0)
     val xPiece = pieceRule.getPhysicalPiece(playerX)
     val oPiece = pieceRule.getPhysicalPiece(playerO)
 
-    val move1 = move0.applyMove(Move(xPiece, move0.players.current, Push, move0.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
-    val move2 = move1.applyMove(Move(oPiece, move1.players.current, Push, move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
-    val move3 = move2.applyMove(Move(xPiece, move2.players.current, Push, move2.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 1)))).get
-    val move4 = move3.applyMove(Move(oPiece, move3.players.current, Push, move3.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 1)))).get
-    val move5 = move4.applyMove(Move(xPiece, move4.players.current, Push, move4.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 0)))).get
-    val move6 = move5.applyMove(Move(oPiece, move5.players.current, Push, move5.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 2)))).get
-    val move7 = move6.applyMove(Move(xPiece, move6.players.current, Push, move6.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 2)))).get
-    val move8 = move7.applyMove(Move(oPiece, move7.players.current, Push, move7.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 0)))).get
-    val move9 = move8.applyMove(Move(xPiece, move8.players.current, Push, move8.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 2)))).get
+    val move1 = move0.applyMove(Move(xPiece, move0.current.player, Push, move0.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 1)))).get
+    val move2 = move1.applyMove(Move(oPiece, move1.current.player, Push, move1.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 0)))).get
+    val move3 = move2.applyMove(Move(xPiece, move2.current.player, Push, move2.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 1)))).get
+    val move4 = move3.applyMove(Move(oPiece, move3.current.player, Push, move3.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 1)))).get
+    val move5 = move4.applyMove(Move(xPiece, move4.current.player, Push, move4.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 0)))).get
+    val move6 = move5.applyMove(Move(oPiece, move5.current.player, Push, move5.board.boardRuleSet.graph.nodesByCoord(Coordinate(1, 2)))).get
+    val move7 = move6.applyMove(Move(xPiece, move6.current.player, Push, move6.board.boardRuleSet.graph.nodesByCoord(Coordinate(0, 2)))).get
+    val move8 = move7.applyMove(Move(oPiece, move7.current.player, Push, move7.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 0)))).get
+    val move9 = move8.applyMove(Move(xPiece, move8.current.player, Push, move8.board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 2)))).get
 
-    move9.gameResult match {
-      case Some(gameResult:GameResult) => {
-        assert(gameResult.result == Tie)
-      }
-      case None => fail
-    }
+    assert(move9.gameResult.result == Tie)
   }
 }

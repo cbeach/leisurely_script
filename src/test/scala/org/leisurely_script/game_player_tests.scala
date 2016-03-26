@@ -23,14 +23,14 @@ class GamePlayerTests extends FunSuite {
     var counter = 0
     while(entryQueue.nonEmpty) {
       val head = entryQueue.dequeue()
-      val legalMoves = head.legalMoves(head.players.current)
+      val legalMoves = head.legalMoves(head.current.player)
       if (head.status != Finished) {
         legalMoves.foreach(move => {
           entryQueue += {
             head.applyMove(move) match {
               case Success(nS) => nS
               case Failure(_) => {
-                info(s"An illegal move was provided by Game.legalMoves. Move: ${move}\n Current player: ${head.players.current}\n Board: ${boardToString(head.board)}.")
+                info(s"An illegal move was provided by Game.legalMoves. Move: ${move}\n Current player: ${head.current.player}\n Board: ${boardToString(head.board)}.")
                 fail
               }
             }

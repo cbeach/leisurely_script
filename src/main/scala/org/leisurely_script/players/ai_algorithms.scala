@@ -16,7 +16,7 @@ class BreadthFirstPlayer extends GamePlayer {
 class RandomPlayer extends GamePlayer {
   val rand = new Random()
   override def playTurn(game:Game):Move = {
-    val legalMoves = game.legalMoves(game.players.current)
+    val legalMoves = game.legalMoves(game.current.player)
     legalMoves(rand.nextInt(legalMoves.size))
   }
 }

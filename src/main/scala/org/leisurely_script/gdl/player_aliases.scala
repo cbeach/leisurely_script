@@ -22,13 +22,13 @@ trait ConcretelyKnownPlayer {
 
 case object AllPlayers extends PlayerValidator {
   override def playersValid(game:Game, players:Set[Player]):Boolean = {
-    game.players.all.toSet == players
+    game.all.players.toSet == players
   }
   override def toString:String = {
     "Player(All)"
   }
   override def getPlayers(game:Game):Set[Player] = {
-    game.players.all.toSet
+    game.all.players.toSet
   }
 }
 
@@ -41,7 +41,7 @@ case object PreviousPlayer extends PlayerValidator {
         throw new IllegalPlayerException("No player was provided for validation.")
       }
     }
-    players.head == game.players.previous
+    players.head == game.previous.player
   }
   def playerValid(game:Game, player:Player):Boolean = {
     playersValid(game, Set(player))
@@ -50,7 +50,7 @@ case object PreviousPlayer extends PlayerValidator {
     "Player(Previous)"
   }
   override def getPlayers(game:Game):Set[Player] = {
-    Set[Player](game.players.previous)
+    Set[Player](game.previous.player)
   }
 }
 
@@ -63,7 +63,7 @@ case object CurrentPlayer extends PlayerValidator {
         throw new IllegalPlayerException("No player was provided for validation.")
       }
     }
-    players.head == game.players.current
+    players.head == game.current.player
   }
   def playerValid(game:Game, player:Player):Boolean = {
     playersValid(game, Set(player))
@@ -72,7 +72,7 @@ case object CurrentPlayer extends PlayerValidator {
     "Player(Current)"
   }
   override def getPlayers(game:Game):Set[Player] = {
-    Set[Player](game.players.current)
+    Set[Player](game.current.player)
   }
 }
 
@@ -85,7 +85,7 @@ case object NextPlayer extends PlayerValidator {
         throw new IllegalPlayerException("No player was provided for validation.")
       }
     }
-    players.head == game.players.next
+    players.head == game.next.player
   }
   def playerValid(game:Game, player:Player):Boolean = {
     playersValid(game, Set(player))
@@ -94,13 +94,13 @@ case object NextPlayer extends PlayerValidator {
     "Player(Next)"
   }
   override def getPlayers(game:Game):Set[Player] = {
-    Set[Player](game.players.next)
+    Set[Player](game.next.player)
   }
 }
 
 case class SomePlayers(validPlayers:Set[Player]) extends PlayerValidator with ConcretelyKnownPlayer {
   override def playersValid(game:Game, players:Set[Player]):Boolean = {
-    players.subsetOf(validPlayers.toSet) && players.subsetOf(game.players.all.toSet)
+    players.subsetOf(validPlayers.toSet) && players.subsetOf(game.all.players.toSet)
   }
   override def toString:String = {
     s"[${validPlayers map(player => player toString) mkString ", "}]"
@@ -113,7 +113,7 @@ case class SomePlayers(validPlayers:Set[Player]) extends PlayerValidator with Co
 
 case class SubsetOfPlayers(validPlayers:Set[Player]) extends PlayerValidator with ConcretelyKnownPlayer {
   override def playersValid(game:Game, player:Set[Player]):Boolean = {
-    validPlayers.subsetOf(game.players.all.toSet)
+    validPlayers.subsetOf(game.all.players.toSet)
   }
   override def toString:String = {
     s"[${validPlayers map(player => player toString) mkString ", "}]"
@@ -145,7 +145,7 @@ case object AnyPlayer extends PlayerValidator {
       false
     } else {
       players.map(player => {
-        game.players.all.contains(player)
+        game.all.players.contains(player)
       }).reduce(_ || _)
     }
   }
@@ -156,7 +156,7 @@ case object AnyPlayer extends PlayerValidator {
     "Player(Any)"
   }
   override def getPlayers(game:Game):Set[Player] = {
-    game.players.all.toSet
+    game.all.players.toSet
   }
 }
 

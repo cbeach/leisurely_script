@@ -132,7 +132,7 @@ case class Graph(val nodes:mutable.ListBuffer[BoardNode]=mutable.ListBuffer(),
     })
     string
   }
-  def setOfNLengthRows(n:Int): Set[List[Coordinate]] = {
+  def setOfNLengthRows(n:Int): Set[Set[Coordinate]] = {
     @tailrec
     def takeUntilN(accum:mutable.Queue[BoardEdge]):Option[List[Coordinate]] = {
       if (accum.size == n - 1) {
@@ -151,12 +151,11 @@ case class Graph(val nodes:mutable.ListBuffer[BoardNode]=mutable.ListBuffer(),
       }
       takeUntilN(accum)
     }
-    var rowSet = Set[List[Coordinate]]()
+    var rowSet = Set[Set[Coordinate]]()
     for (node <- nodes) {
-      for (edge <- outEdges.getOrElse(node.coord,
-          mutable.ListBuffer[BoardEdge]()).toList) {
+      for (edge <- outEdges.getOrElse(node.coord, mutable.ListBuffer[BoardEdge]()).toSet[BoardEdge]) {
         takeUntilN(mutable.Queue(edge)).foreach(list => {
-          rowSet = rowSet + list
+          rowSet = rowSet + list.toSet
         })
       }
     }

@@ -2,6 +2,7 @@ package org.leisurely_script.gdl
 
 import org.leisurely_script.gdl.expressions.{BoardFullExpression, BoardEmptyExpression, NInARowExpression}
 
+import scala.collection.mutable
 import scala.util.{Try, Success, Failure}
 import scala.util.control.Breaks._
 
@@ -11,12 +12,14 @@ import Direction._
 import NeighborType._
 import Shape._
 
-case class BoardRuleSet(val size:List[Int],
-                        val boardShape:Shape,
-                        val neighborType:NeighborType,
-                        val nodeShape:Shape,
-                        val pieces:List[PieceRule],
-                        val graph:Graph = new Graph()) {
+case class BoardRuleSet(size:List[Int],
+                        boardShape:Shape,
+                        neighborType:NeighborType,
+                        nodeShape:Shape,
+                        pieces:List[PieceRule],
+                        graph:Graph = new Graph()) {
+
+  val nodeRows = mutable.HashMap[(Int, PieceRule, PlayerValidator), Set[Set[Coordinate]]]()
   var playableBoard:Option[Board] = None
   def this(other:BoardRuleSet) = {
     this(other.size, other.boardShape, other.neighborType, other.nodeShape, other.pieces, new Graph(other.graph))
@@ -111,7 +114,10 @@ case class BoardRuleSet(val size:List[Int],
   def nInARow(n:Int, piece:PieceRule, player:PlayerValidator, neighborType:NeighborType=null):NInARowExpression = {
     NInARowExpression(n, piece, this, player, neighborType)
   }
-  def wellFormed:Unit = {
+  def addNInARowSet(n:Int, piece:PieceRule, players:PlayerValidator) = {
+    nodeRows((n, piece, players)) = graph.setOfNLengthRows(n)
+  }
+  def wellFormed():Unit = {
     if (graph.nodesByCoord.size == 0) {
       throw new IllegalBoardException("The board must have nodes, no nodes found.")
     }

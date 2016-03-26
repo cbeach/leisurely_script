@@ -1,6 +1,7 @@
 package org.leisurely_script.implementation
 
-import scala.collection.mutable.{Stack, ArrayBuffer, HashMap};
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 import org.leisurely_script.gdl._
 
@@ -11,27 +12,27 @@ import scala.util.{Try, Success, Failure}
   */
 class Board(rS:BoardRuleSet) {
   val boardRuleSet = rS
-  private val nodeRows:HashMap[Int, Set[List[Coordinate]]] = HashMap.empty
+  private val nodeRows:mutable.HashMap[
+    (Int, PieceRule, PlayerValidator),
+    Set[Set[Coordinate]]
+  ] = rS.nodeRows
   private val _occupancyMatrices:Map[PieceRule, Array[Array[Int]]] = {
     for (piece <- boardRuleSet.pieces)
       yield piece -> Array.ofDim[Int](boardRuleSet.size(0), boardRuleSet.size(1))
   }.toMap
-  private val _occupancyStacks:ArrayBuffer[ArrayBuffer[Stack[Equipment]]] = {
-    val returnArray:ArrayBuffer[ArrayBuffer[Stack[Equipment]]]
-      = new ArrayBuffer[ArrayBuffer[Stack[Equipment]]](boardRuleSet.size(0))
+  private val _occupancyStacks:ArrayBuffer[ArrayBuffer[mutable.Stack[Equipment]]] = {
+    val returnArray:ArrayBuffer[ArrayBuffer[mutable.Stack[Equipment]]]
+      = new ArrayBuffer[ArrayBuffer[mutable.Stack[Equipment]]](boardRuleSet.size(0))
     for (i <- 0 until boardRuleSet.size(0)) {
       returnArray += {
         for (j <- 0 until boardRuleSet.size(1))
-          yield new Stack[Equipment]()
+          yield new mutable.Stack[Equipment]()
       }.to[ArrayBuffer]
     }
     returnArray
   }
-  def addRowSet(n:Int, rows:Set[List[Coordinate]]) = {
-    nodeRows(n) = rows
-  }
   def nInARow(n:Int, piece:PhysicalPiece):Boolean = {
-    val possibleRows = nodeRows(n)
+    val possibleRows = nodeRows((n, piece.rule, SomePlayers(piece.owner.getPlayers)))
     val matrix = _occupancyMatrices(piece.rule)
     var retVal = false
     if (n > 0) {
@@ -99,10 +100,10 @@ class Board(rS:BoardRuleSet) {
   def nodes:List[BoardNode] = boardRuleSet.graph.nodes.toList
   def numberOfPieces:Int = {
     var accum = 0
-    _occupancyStacks.foreach((a:ArrayBuffer[Stack[Equipment]]) => {
+    _occupancyStacks.foreach((a:ArrayBuffer[mutable.Stack[Equipment]]) => {
       a match {
-        case arrayBuffer: ArrayBuffer[Stack[Equipment]] => arrayBuffer.foreach({
-          case stack:Stack[Equipment] => accum += stack.size
+        case arrayBuffer: ArrayBuffer[mutable.Stack[Equipment]] => arrayBuffer.foreach({
+          case stack:mutable.Stack[Equipment] => accum += stack.size
         })
       }
     })
