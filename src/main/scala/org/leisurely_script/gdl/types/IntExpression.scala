@@ -3,7 +3,11 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class IntExpression(value:Int) extends AnyValExpression[Int] {
+class IntExpression extends AnyValExpression[Int] {
+  def this(value:Int) = {
+    this
+    this.value = value
+  }
   override def evaluate:Option[Int] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -129,4 +133,8 @@ case class IntExpression(value:Int) extends AnyValExpression[Int] {
   def toBinaryStringExpression: StringExpression = StringExpression(value.toBinaryString)
   def toHexStringExpression: StringExpression = StringExpression(value.toHexString)
   def toOctalStringExpression: StringExpression = StringExpression(value.toOctalString)
+}
+object IntExpression {
+  def apply() = new IntExpression()
+  def apply(value:Int) = new IntExpression(value)
 }

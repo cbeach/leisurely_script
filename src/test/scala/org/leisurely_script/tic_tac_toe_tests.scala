@@ -23,25 +23,10 @@ import Shape._
 
 class TicTacToeTests extends FunSuite {
   test("Create a TicTacToe game object") {
-    val board = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
-    val players = new Players(List(Player("X"), Player("O")))
-    val legalMove = new LegalMove(CurrentPlayer, (game:Game, move:Move) => {
-      game.board.boardRuleSet.graph.nodesByCoord(move.node.coord).empty()
-    }, Push)
-    val piece = new PieceRule("token", CurrentPlayer, List[LegalMove](legalMove))
-    val endConditions = List(
-      EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
-        game.board.nInARow(piece.getPhysicalPiece(player))
-      }),
-      EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
-        !game.board.nInARow(piece.getPhysicalPiece(player)) && game.board.full
-      })
-    )
-    val first = GameRuleSet()
-    val second = first.add(players)
-    val third = second.add(board)
-    val fourth = third.add(List(piece))
-    val fifth = fourth.add(endConditions)
+    val first:GameRuleSet = LocalStaticRepository.load("TicTacToe") match {
+      case Success(tTT) => tTT
+      case Failure(ex) => fail
+    }
   }
 
   test("The game should advance to the next player after applyMove is called") {

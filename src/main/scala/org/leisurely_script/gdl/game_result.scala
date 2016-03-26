@@ -7,4 +7,4 @@ case class GameResult(
   ranking:Option[List[List[Player]]],
   conditionThatWasMet:Option[EndCondition]=None) {}
 
-case class SGameResult(players:Set[Player]=Set(), result:GameResultState.Value=Pending) {}
+case class SGameResult(players:PlayerValidator, result:GameResultState.Value=Pending) {}

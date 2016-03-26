@@ -108,12 +108,6 @@ case class BoardRuleSet(val size:List[Int],
       }
     }).sum
   }
-  def push(thing:Equipment, coord:Coordinate):Try[BoardRuleSet] = {
-    Try(new BoardRuleSet(size, boardShape, neighborType, nodeShape, pieces, graph.push(thing, coord).get))
-  }
-  def pop(coord:Coordinate):Try[BoardRuleSet] = {
-    Try(new BoardRuleSet(size, boardShape, neighborType, nodeShape, pieces, graph.pop(coord).get))
-  }
   def nInARow(n:Int, piece:PieceRule, player:PlayerValidator, neighborType:NeighborType=null):NInARowExpression = {
     NInARowExpression(n, piece, this, player, neighborType)
   }

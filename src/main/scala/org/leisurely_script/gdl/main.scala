@@ -3,8 +3,6 @@ package org.leisurely_script.gdl
 import java.io.PrintWriter
 import com.ning.http.client.RequestBuilder
 
-import spray.json._
-import org.leisurely_script.gdl.ImplicitDefs.TypeClasses.LeisurelyScriptJSONProtocol._
 import dispatch._, Defaults._
 
 import org.leisurely_script.implementation.Game
@@ -21,7 +19,7 @@ object Main {
     val request:Req = gameRepositoryService("TicTacToe")
       .PUT
       .setContentType("application/json", "UTF-8")
-      .setBody(ticTacToe.toJson.toString)
+      //.setBody(ticTacToe.toJson.toString)
     Http(request OK as.String)
   }
 }

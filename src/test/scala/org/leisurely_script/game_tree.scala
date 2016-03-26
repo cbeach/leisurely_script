@@ -1,14 +1,15 @@
 package org.leisurely_script.test.suites
 
+import org.leisurely_script.gdl.expressions.iff
 import org.leisurely_script.implementation.Game
 
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
 
-
 import org.leisurely_script.gdl._
 import org.leisurely_script.gdl.ImplicitDefs.Views.Game._
+import org.leisurely_script.gdl.ImplicitDefs.Views.TypeConversions._
 import org.leisurely_script.test.util.GameUtilities.TicTacToeUtilities._
 import org.leisurely_script.repository.LocalStaticRepository
 
@@ -100,37 +101,40 @@ class GameTreeTests extends FunSuite {
 
   test("A new board should be empty") {
     val board = BoardRuleSet(List(4, 4), Square, Direct, Square, List[PieceRule]())
-    assert(board.empty())
+    assert(board.empty)
   }
 
   test("The user can push a piece into a node in the board") {
     val board = BoardRuleSet(List(3, 3), Square, Direct, Square, List[PieceRule]())
+      .getPlayableBoard.get
     val player1 = Player("1")
     val piece = new PieceRule("token", player1, List[LegalMove]())
     val newBoard = board.push(piece.getPhysicalPiece(player1), Coordinate(0, 0)).get
 
-    assert(!newBoard.empty() && !newBoard.full())
+    assert(!newBoard.empty && !newBoard.full)
   }
 
   test("The user can pop a piece out of a node in the board") {
     val board = BoardRuleSet(List(3, 3), Square, Direct, Square, List[PieceRule]())
+      .getPlayableBoard.get
     val player1 = Player("1")
     val piece = new PieceRule("token", player1, List[LegalMove]())
     val firstNewBoard = board.push(piece.getPhysicalPiece(player1), Coordinate(0, 0)).get
     val secondNewBoard = firstNewBoard.pop(Coordinate(0, 0)).get
 
-    assert(secondNewBoard.empty())
+    assert(secondNewBoard.empty)
     assert(!(firstNewBoard eq secondNewBoard))
   }
 
   test("Board.full should return true when called on a full board") {
     var board = BoardRuleSet(List(3, 3), Square, Direct, Square, List[PieceRule]())
+      .getPlayableBoard.get
     val player1 = Player("1")
     val pieceRule = new PieceRule("token", player1, List[LegalMove]())
-    for (node <- board.graph.nodesByCoord) {
+    for (node <- board.boardRuleSet.graph.nodesByCoord) {
       board = board.push(PhysicalPiece("token", player1, pieceRule), node._1).get
     }
-    assert(board.full())
+    assert(board.full)
   }
 
   test("Board.nInARow should detect rows that are 3 long") {
@@ -138,36 +142,42 @@ class GameTreeTests extends FunSuite {
     val pieceRule1 = new PieceRule("token", player1, List[LegalMove]())
     val piece1 = new PhysicalPiece("token", player1, pieceRule1)
     val horizontalBoard = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
+      .getPlayableBoard.get
       .push(piece1, Coordinate(0, 0))
       .flatMap(b => b.push(piece1, Coordinate(0, 1)))
       .flatMap(b => b.push(piece1, Coordinate(0, 2))) getOrElse fail
     val verticalBoard = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
+      .getPlayableBoard.get
       .push(piece1, Coordinate(0, 0))
       .flatMap(b => b.push(piece1, Coordinate(1, 0)))
       .flatMap(b => b.push(piece1, Coordinate(2, 0))) getOrElse fail
     val diagonalBoard = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
+      .getPlayableBoard.get
       .push(piece1, Coordinate(0, 0))
       .flatMap(b => b.push(piece1, Coordinate(1, 1)))
       .flatMap(b => b.push(piece1, Coordinate(2, 2))) getOrElse fail
     val cornerBoard = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
+      .getPlayableBoard.get
       .push(piece1, Coordinate(0, 0))
       .flatMap(b => b.push(piece1, Coordinate(2, 2))) getOrElse fail
     val emptyBoard = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
+      .getPlayableBoard.get
 
     val player2 = Player("2")
     val pieceRule2 = new PieceRule("token", player2, List[LegalMove]())
     val piece2 = new PhysicalPiece("token", player2, pieceRule2)
     val diagonalBoardAlternatingPlayers = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
+      .getPlayableBoard.get
       .push(piece1, Coordinate(0, 0))
       .flatMap(b => b.push(piece2, Coordinate(1, 1)))
       .flatMap(b => b.push(piece1, Coordinate(2, 2))) getOrElse fail
 
-    assert(horizontalBoard.nInARow(3, piece1).size > 0 )
-    assert(verticalBoard.nInARow(3, piece1).size > 0 )
-    assert(diagonalBoard.nInARow(3, piece1).size > 0 )
-    assert(cornerBoard.nInARow(3, piece1).size == 0 )
-    assert(emptyBoard.nInARow(3, piece1).size == 0)
-    assert(diagonalBoardAlternatingPlayers.nInARow(3, piece1).size == 0)
+    assert(horizontalBoard.nInARow(3, piece1))
+    assert(verticalBoard.nInARow(3, piece1))
+    assert(diagonalBoard.nInARow(3, piece1))
+    assert(cornerBoard.nInARow(3, piece1))
+    assert(emptyBoard.nInARow(3, piece1))
+    assert(diagonalBoardAlternatingPlayers.nInARow(3, piece1))
   }
 
   test("A user should be able to get the number of pieces that occupy a board") {
@@ -175,10 +185,11 @@ class GameTreeTests extends FunSuite {
     val pieceRule = new PieceRule("token", player, List[LegalMove]())
     val piece = new PhysicalPiece("token", player, pieceRule)
     val board = BoardRuleSet(List(3, 3), Square, Indirect, Square, List[PieceRule]())
+      .getPlayableBoard.get
       .push(piece, Coordinate(0, 0))
       .flatMap(b => b.push(piece, Coordinate(0, 1)))
       .flatMap(b => b.push(piece, Coordinate(0, 2))) getOrElse fail
-    assert(board.numberOfPieces() == 3)
+    assert(board.numberOfPieces == 3)
   }
 
   test("Performing a push move should return a new game with a board that has 1 piece in it") {
@@ -235,9 +246,9 @@ class GameTreeTests extends FunSuite {
     val legalMove = new LegalMove(player, precondition, Push)
     val piece = new PieceRule("token", player, List[LegalMove](legalMove))
     val move = new Move(piece.getPhysicalPiece(player), player, Push, board.graph.nodesByCoord(Coordinate(0, 0)))
-    val endCondition = new EndCondition(Win, player, (game:Game, player:Player) => {
-      false
-    })
+    val endCondition = EndCondition(iff(board.nInARow(3, piece, PreviousPlayer)) {
+        PreviousPlayer.wins
+      })
 
     val game = GameRuleSet()
       .add(board)
@@ -293,9 +304,10 @@ class GameTreeTests extends FunSuite {
     val player = players(0)
     val legalMove = new LegalMove(player, precondition, Push)
     val piece = new PieceRule("token", player, List[LegalMove](legalMove))
-    val endCondition = EndCondition(Win, player, (game, player) => {
-      game.board.nInARow(piece.getPhysicalPiece(player))
-    })
+    val endCondition = EndCondition(iff(board.nInARow(3, piece, PreviousPlayer)) {
+        PreviousPlayer.wins
+      })
+
     val game = GameRuleSet().add(board).add(List(piece)).add(List(endCondition)).add(players).startGame()
 
     val aFewPlayers = Set(players(1), players(2), players(3))
@@ -325,11 +337,11 @@ class GameTreeTests extends FunSuite {
     }, Push)
     val piece = new PieceRule("token", AnyPlayer, List[LegalMove](legalMove))
     val endConditions = List(
-      EndCondition(Win, PreviousPlayer, (game:Game, player:Player) => {
-        game.board.nInARow(piece.getPhysicalPiece(player))
+      EndCondition(iff(board.nInARow(3, piece, PreviousPlayer)) {
+        PreviousPlayer.wins
       }),
-      EndCondition(Tie, AllPlayers, (game:Game, player:Player) => {
-        !game.board.nInARow(piece.getPhysicalPiece(player)) && game.board.full
+      EndCondition(iff(!board.nInARow(3, piece, AnyPlayer) && board.full) {
+        AllPlayers.ties
       })
     )
 
@@ -363,27 +375,27 @@ class GameTreeTests extends FunSuite {
     val move9 = tie(8).applyMove(Move(tie(8).pieces(0).getPhysicalPiece(tie(8).players.current),
       tie(8).players.current, Push, tie(8).board.boardRuleSet.graph.nodesByCoord(Coordinate(2, 2)))).get
 
-    assert(tie(0).board.nInARow(xPiece) == false)
-    assert(tie(1).board.nInARow(xPiece) == false)
-    assert(tie(2).board.nInARow(xPiece) == false)
-    assert(tie(3).board.nInARow(xPiece) == false)
-    assert(tie(4).board.nInARow(xPiece) == false)
-    assert(tie(5).board.nInARow(xPiece) == false)
-    assert(tie(6).board.nInARow(xPiece) == false)
-    assert(tie(7).board.nInARow(xPiece) == false)
-    assert(tie(8).board.nInARow(xPiece) == false)
-    assert(tie(9).board.nInARow(xPiece) == false)
+    assert(tie(0).board.nInARow(3, xPiece) == false)
+    assert(tie(1).board.nInARow(3, xPiece) == false)
+    assert(tie(2).board.nInARow(3, xPiece) == false)
+    assert(tie(3).board.nInARow(3, xPiece) == false)
+    assert(tie(4).board.nInARow(3, xPiece) == false)
+    assert(tie(5).board.nInARow(3, xPiece) == false)
+    assert(tie(6).board.nInARow(3, xPiece) == false)
+    assert(tie(7).board.nInARow(3, xPiece) == false)
+    assert(tie(8).board.nInARow(3, xPiece) == false)
+    assert(tie(9).board.nInARow(3, xPiece) == false)
 
-    assert(tie(0).board.nInARow(oPiece) == false)
-    assert(tie(1).board.nInARow(oPiece) == false)
-    assert(tie(2).board.nInARow(oPiece) == false)
-    assert(tie(3).board.nInARow(oPiece) == false)
-    assert(tie(4).board.nInARow(oPiece) == false)
-    assert(tie(5).board.nInARow(oPiece) == false)
-    assert(tie(6).board.nInARow(oPiece) == false)
-    assert(tie(7).board.nInARow(oPiece) == false)
-    assert(tie(8).board.nInARow(oPiece) == false)
-    assert(tie(9).board.nInARow(oPiece))
+    assert(tie(0).board.nInARow(3, oPiece) == false)
+    assert(tie(1).board.nInARow(3, oPiece) == false)
+    assert(tie(2).board.nInARow(3, oPiece) == false)
+    assert(tie(3).board.nInARow(3, oPiece) == false)
+    assert(tie(4).board.nInARow(3, oPiece) == false)
+    assert(tie(5).board.nInARow(3, oPiece) == false)
+    assert(tie(6).board.nInARow(3, oPiece) == false)
+    assert(tie(7).board.nInARow(3, oPiece) == false)
+    assert(tie(8).board.nInARow(3, oPiece) == false)
+    assert(tie(9).board.nInARow(3, oPiece))
 
     assert(tie(0).gameResult.get.result == Pending)
     assert(tie(1).gameResult.get.result == Pending)

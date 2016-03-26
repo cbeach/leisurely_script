@@ -11,12 +11,12 @@ import scala.util.{Try, Success, Failure}
   */
 class Board(rS:BoardRuleSet) {
   val boardRuleSet = rS
-  private val nodeRows:HashMap[Int, Set[List[Coordinate]]] = HashMap.empty()
-  private val occupancyMatrices:Map[PieceRule, Array[Array[Int]]] = {
+  private val nodeRows:HashMap[Int, Set[List[Coordinate]]] = HashMap.empty
+  private val _occupancyMatrices:Map[PieceRule, Array[Array[Int]]] = {
     for (piece <- boardRuleSet.pieces)
-      yield (piece -> Array.ofDim[Int](boardRuleSet.size(0), boardRuleSet.size(1)))
+      yield piece -> Array.ofDim[Int](boardRuleSet.size(0), boardRuleSet.size(1))
   }.toMap
-  private val occupancyStacks:ArrayBuffer[ArrayBuffer[Stack[Equipment]]] = {
+  private val _occupancyStacks:ArrayBuffer[ArrayBuffer[Stack[Equipment]]] = {
     val returnArray:ArrayBuffer[ArrayBuffer[Stack[Equipment]]]
       = new ArrayBuffer[ArrayBuffer[Stack[Equipment]]](boardRuleSet.size(0))
     for (i <- 0 until boardRuleSet.size(0)) {
@@ -32,7 +32,7 @@ class Board(rS:BoardRuleSet) {
   }
   def nInARow(n:Int, piece:PhysicalPiece):Boolean = {
     val possibleRows = nodeRows(n)
-    val matrix = occupancyMatrices(piece.rule)
+    val matrix = _occupancyMatrices(piece.rule)
     var retVal = false
     if (n > 0) {
       possibleRows.takeWhile(row => !{
@@ -45,7 +45,7 @@ class Board(rS:BoardRuleSet) {
     retVal
   }
   protected def findInOccupancyMatrices(truthFunction:(Int)=>Boolean):Option[(PieceRule, Coordinate)] = {
-    for (pair <- occupancyMatrices) {
+    for (pair <- _occupancyMatrices) {
       pair match {
         case (key:PieceRule, matrix:Array[Array[Int]]) => {
           findInMatrix(matrix, truthFunction) match {
@@ -83,7 +83,7 @@ class Board(rS:BoardRuleSet) {
   protected[leisurely_script] def push(thing:Equipment, coord:Coordinate):Try[Board] = {
     coord match {
       case Coordinate(x:Int, y:Int) => {
-        occupancyStacks(x)(y).push(thing)
+        _occupancyStacks(x)(y).push(thing)
         Success(this)
       }
     }
@@ -91,7 +91,7 @@ class Board(rS:BoardRuleSet) {
   protected[leisurely_script] def pop(coord:Coordinate):Try[Board] = {
     coord match {
       case Coordinate(x: Int, y: Int) => {
-        occupancyStacks(x)(y).pop()
+        _occupancyStacks(x)(y).pop()
         Success(this)
       }
     }
@@ -99,7 +99,7 @@ class Board(rS:BoardRuleSet) {
   def nodes:List[BoardNode] = boardRuleSet.graph.nodes.toList
   def numberOfPieces:Int = {
     var accum = 0
-    occupancyStacks.foreach((a:ArrayBuffer[Stack[Equipment]]) => {
+    _occupancyStacks.foreach((a:ArrayBuffer[Stack[Equipment]]) => {
       a match {
         case arrayBuffer: ArrayBuffer[Stack[Equipment]] => arrayBuffer.foreach({
           case stack:Stack[Equipment] => accum += stack.size
@@ -108,4 +108,14 @@ class Board(rS:BoardRuleSet) {
     })
     accum
   }
+  def getNumberOfOccupancyMatrices:Int = _occupancyMatrices.size
+  def getOccupancyMatricesDimensions(p:PieceRule):Tuple3[Option[Int], Option[Int], Option[Int]] = {
+    boardRuleSet.size.size match {
+      case 1 => (Some(_occupancyMatrices(p).length), None, None)
+      case 2 => (Some(_occupancyMatrices(p).length),
+                 Some(_occupancyMatrices(p)(0).length), None)
+    }
+  }
+  def occupancyMatrices(p:PieceRule)(x:Int)(y:Int):Int = _occupancyMatrices(p)(x)(y)
+  def occupancyStacks(x:Int)(y:Int) = _occupancyStacks(x)(y)
 }

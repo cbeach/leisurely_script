@@ -1,19 +1,19 @@
 package org.leisurely_script.gdl.types
 
 import org.leisurely_script.gdl.ImplicitDefs.Views.TypeConversions._
-import org.leisurely_script.gdl.{PlayerValidator, SGameResult, Player, GameResultState}
+import org.leisurely_script.gdl._
 
 /**
   * Created by mcsmash on 3/12/16.
   */
-case class GameResultExpression(player:Option[PlayerValidator], result:GameResultState.Value)
+case class GameResultExpression(players:Option[PlayerValidator], result:GameResultState.Value)
   extends GameExpression[SGameResult] {
   def this(result: SGameResult) = {
-    this(result.player, result.result)
+    this(Some(result.players), result.result)
   }
   def evaluate:Option[SGameResult] = {
-    player match {
-      case Some(p:Player) => Some(SGameResult(p.getPlayers(game.get), result))
+    players match {
+      case Some(p:Set[Player]) => Some(SGameResult(SomePlayers(p), result))
     }
   }
 }

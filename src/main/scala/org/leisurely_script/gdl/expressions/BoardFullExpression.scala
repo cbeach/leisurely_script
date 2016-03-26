@@ -11,15 +11,13 @@ import scala.util.{Failure, Success}
   * Created by mcsmash on 3/12/16.
   */
 case class BoardFullExpression(boardRuleSet:BoardRuleSet) extends BooleanExpression {
-  override def evaluate:BooleanExpression = {
-    BooleanExpression(
-      boardRuleSet.getPlayableBoard match {
-        case Success(board:Board) => {
-          board.full
-        }
-        case Failure(ex) => throw ex
+  override def evaluate:Option[Boolean] = {
+    Some(boardRuleSet.getPlayableBoard match {
+      case Success(board:Board) => {
+        board.full
       }
-    )
+      case Failure(ex) => throw ex
+    })
   }
 }
 

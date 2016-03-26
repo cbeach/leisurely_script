@@ -3,7 +3,11 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class LongExpression(value:Long) extends AnyValExpression[Long] {
+class LongExpression extends AnyValExpression[Long] {
+  def this(value:Long) = {
+    this
+    this.value = value
+  }
   override def evaluate:Option[Long] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -129,4 +133,8 @@ case class LongExpression(value:Long) extends AnyValExpression[Long] {
   def toBinaryString: StringExpression = StringExpression(value.toBinaryString)
   def toHexString: StringExpression = StringExpression(value.toHexString)
   def toOctalString: StringExpression = StringExpression(value.toOctalString)
+}
+object LongExpression {
+  def apply() = new LongExpression()
+  def apply(value:Long) = new LongExpression(value)
 }

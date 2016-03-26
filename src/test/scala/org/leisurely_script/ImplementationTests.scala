@@ -26,7 +26,7 @@ class ImplementationTests extends FunSuite {
       case Success(tTT: GameRuleSet) => tTT
       case Failure(ex) => throw ex
     }
-    assert(ticTacToe.board.getPlayableBoard() match {
+    assert(ticTacToe.board.getPlayableBoard match {
       case Success(_) => true
       case Failure(_) => false
     })
@@ -36,8 +36,8 @@ class ImplementationTests extends FunSuite {
       case Success(tTT: GameRuleSet) => tTT
       case Failure(ex) => throw ex
     }
-    ticTacToe.board.getPlayableBoard() match {
-      case Success(playableBoard: Board) => assert(playableBoard.occupancyMatrices.size == 1)
+    ticTacToe.board.getPlayableBoard match {
+      case Success(playableBoard: Board) => assert(playableBoard.getNumberOfOccupancyMatrices == 1)
       case Failure(ex) => throw ex
     }
   }
@@ -47,10 +47,21 @@ class ImplementationTests extends FunSuite {
       case Failure(ex) => throw ex
     }
     val token = ticTacToe.pieces(0)
-    ticTacToe.board.getPlayableBoard() match {
+    ticTacToe.board.getPlayableBoard match {
       case Success(playableBoard: Board) => {
-        assert(playableBoard.occupancyMatrices(token).size == 3)
-        assert(playableBoard.occupancyMatrices(token)(0).size == 3)
+        val dimensions = playableBoard.getOccupancyMatricesDimensions(token)
+        dimensions._1 match {
+          case Some(x:Int) => assert(x == 3)
+          case None => fail("x dimension is not present in tic tac toe board")
+        }
+        dimensions._2 match {
+          case Some(y:Int) => assert(y == 3)
+          case None => fail("y dimension is not present in tic tac toe board")
+        }
+        dimensions._3 match {
+          case Some(z:Int) => fail("there is a z dimension in a 2D board")
+          case None => {}
+        }
       }
       case Failure(ex) => throw ex
     }
@@ -60,7 +71,7 @@ class ImplementationTests extends FunSuite {
       case Success(tTT: GameRuleSet) => tTT
       case Failure(ex) => throw ex
     }
-    ticTacToe.board.getPlayableBoard() match {
+    ticTacToe.board.getPlayableBoard match {
       case Success(playableBoard: Board) => assert(playableBoard.empty)
       case Failure(ex) => throw ex
     }
@@ -78,7 +89,7 @@ class ImplementationTests extends FunSuite {
     val pieceX = pieceRule.getPhysicalPiece(playerX)
     val pieceO = pieceRule.getPhysicalPiece(playerO)
 
-    ticTacToe.board.getPlayableBoard() match {
+    ticTacToe.board.getPlayableBoard match {
       case Success(playableBoard: Board) => {
         playableBoard.push(pieceX, Coordinate(0, 0))
         assert(playableBoard.occupancyMatrices(pieceRule)(0)(0) == 1)
@@ -108,7 +119,7 @@ class ImplementationTests extends FunSuite {
     val pieceX = pieceRule.getPhysicalPiece(playerX)
     val pieceO = pieceRule.getPhysicalPiece(playerO)
 
-    ticTacToe.board.getPlayableBoard() match {
+    ticTacToe.board.getPlayableBoard match {
       case Success(playableBoard: Board) => {
         playableBoard.push(pieceX, Coordinate(0, 0))
         playableBoard.pop(Coordinate(0, 0))
@@ -146,12 +157,12 @@ class ImplementationTests extends FunSuite {
     val pieceX = pieceRule.getPhysicalPiece(playerX)
     val pieceO = pieceRule.getPhysicalPiece(playerO)
 
-    ticTacToe.board.getPlayableBoard(nInARow = 3) match {
+    ticTacToe.board.getPlayableBoard match {
       case Success(playableBoard: Board) => {
         playableBoard.push(pieceX, Coordinate(0, 0))
         playableBoard.push(pieceX, Coordinate(0, 1))
         playableBoard.push(pieceX, Coordinate(0, 2))
-        assert(playableBoard.nInARow(pieceX))
+        assert(playableBoard.nInARow(3, pieceX))
       }
       case Failure(ex) => throw ex
     }

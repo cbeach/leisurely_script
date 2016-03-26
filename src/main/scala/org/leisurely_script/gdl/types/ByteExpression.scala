@@ -2,7 +2,11 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class ByteExpression(value:Byte) extends AnyValExpression[Byte] {
+class ByteExpression extends AnyValExpression[Byte] {
+  def this(value:Byte) = {
+    this
+    this.value = value
+  }
   override def evaluate:Option[Byte] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -125,3 +129,9 @@ case class ByteExpression(value:Byte) extends AnyValExpression[Byte] {
   def min(other: ByteExpression): ByteExpression = ByteExpression(value min other.value)
   def signum: IntExpression = IntExpression(value.signum)
 }
+
+object ByteExpression {
+  def apply() = new ByteExpression()
+  def apply(value:Byte) = new ByteExpression(value)
+}
+

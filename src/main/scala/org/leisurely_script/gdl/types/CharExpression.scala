@@ -3,7 +3,11 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class CharExpression(value:Char) extends AnyValExpression[Char] {
+class CharExpression extends AnyValExpression[Char] {
+  def this(value:Char) = {
+    this
+    this.value = value
+  }
   override def evaluate:Option[Char] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -147,4 +151,9 @@ case class CharExpression(value:Char) extends AnyValExpression[Char] {
   def unary_+: = IntExpression(+value)
   def unary_-: = IntExpression(-value)
   def unary_~: = IntExpression(~value)
+}
+
+object CharExpression {
+  def apply() = new CharExpression()
+  def apply(value:Char) = new CharExpression(value)
 }

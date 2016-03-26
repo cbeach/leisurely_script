@@ -20,46 +20,46 @@ class Game(val ruleSet:GameRuleSet,
            var gameResult:Option[GameResult]=None,
            var status:GameStatus.Value=InProgress,
            var playerScoringFunction:Option[(Player, GameResultState.Value, Option[Player])=>Double]=None) {
-  val board = boardRuleSet.getPlayableBoard() match {
+  val board = boardRuleSet.getPlayableBoard match {
     case Success(board:Board) => board
     case Failure(ex) => throw ex
   }
 
-  gameResult = Some({
-    val conditionValues:List[Boolean] = endConditions.map(endCondition => {
-      val affectedPlayerSet = endCondition.affectedPlayer.getPlayers(this)
-      endCondition.conditionMet(this, affectedPlayerSet.head)
-    })
+//  gameResult = Some({
+//    val conditionValues:List[Boolean] = endConditions.map(endCondition => {
+//      val affectedPlayerSet = endCondition.affectedPlayers.getPlayers(this)
+//      endCondition.conditionMet(this, affectedPlayerSet.head)
+//    })
 
-    if (history.isEmpty) {
-      GameResult(Pending, None)
-    } else {
-      history(0).gameResult.get.result match {
-        case Pending =>
-          if (conditionValues.nonEmpty && conditionValues.reduce(_ || _)) {
-            val conditionThatWasMetIndex = conditionValues.indexOf(true)
-            val conditionThatWasMet = endConditions(conditionValues.indexOf(true))
-            val endResult = conditionThatWasMet.result
-            val winner:Option[Player] = endResult match {
-              case Win => {
-                players.all.find(p => {
-                  if (conditionThatWasMet.affectedPlayer.getPlayers(this).size != 1) {
-                    throw new IllegalPlayerException("Only one winning player is currently supported")
-                  }
-                  p == conditionThatWasMet.affectedPlayer.getPlayers(this).head
-                })
-              }
-              case _ => None
-            }
-            // What if two conditions are met at the same time?
-            GameResult(endResult, Some(rankPlayers(endResult, winner)), Some(conditionThatWasMet))
-          } else {
-            GameResult(Pending, None)
-          }
-        case _ => history(0).gameResult.get
-      }
-    }
-  })
+//    if (history.isEmpty) {
+//      GameResult(Pending, None)
+//    } else {
+//      history(0).gameResult.get.result match {
+//        case Pending =>
+//          if (conditionValues.nonEmpty && conditionValues.reduce(_ || _)) {
+//            val conditionThatWasMetIndex = conditionValues.indexOf(true)
+//            val conditionThatWasMet = endConditions(conditionValues.indexOf(true))
+//            val endResult = conditionThatWasMet.result
+//            val winner:Option[Player] = endResult match {
+//              case Win => {
+//                players.all.find(p => {
+//                  if (conditionThatWasMet.affectedPlayer.getPlayers(this).size != 1) {
+//                    throw new IllegalPlayerException("Only one winning player is currently supported")
+//                  }
+//                  p == conditionThatWasMet.affectedPlayer.getPlayers(this).head
+//                })
+//              }
+//              case _ => None
+//            }
+//            // What if two conditions are met at the same time?
+//            GameResult(endResult, Some(rankPlayers(endResult, winner)), Some(conditionThatWasMet))
+//          } else {
+//            GameResult(Pending, None)
+//          }
+//        case _ => history(0).gameResult.get
+//      }
+//    }
+//  })
   status = {
     gameResult.get.result match {
       case Pending => status

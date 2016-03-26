@@ -4,6 +4,10 @@ package org.leisurely_script.gdl.types
   * Created by mcsmash on 1/25/16.
   */
 class BooleanExpression extends AnyValExpression[Boolean] {
+  def this(value:Boolean) = {
+    this
+    this.value = value
+  }
   override def evaluate:Option[Boolean] = Some(value)
   def !=(other: BooleanExpression): BooleanExpression = {
     BooleanExpression(value != other.value)

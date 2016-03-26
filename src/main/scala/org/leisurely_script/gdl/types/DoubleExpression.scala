@@ -1,7 +1,11 @@
 package org.leisurely_script.gdl.types
 
 
-case class DoubleExpression(value:Double) extends AnyValExpression[Double] {
+class DoubleExpression extends AnyValExpression[Double] {
+	def this(value:Double) = {
+		this
+		this.value = value
+	}
 	override def evaluate:Option[Double] = Some(value)
 	def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
 	def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -111,4 +115,8 @@ case class DoubleExpression(value:Double) extends AnyValExpression[Double] {
 	def signum: IntExpression = IntExpression(value.signum)
 	def toDegrees: DoubleExpression = DoubleExpression(value.toDegrees)
 	def toRadians: DoubleExpression = DoubleExpression(value.toRadians)
+}
+object DoubleExpression {
+	def apply() = new DoubleExpression()
+	def apply(value:Double) = new DoubleExpression(value)
 }

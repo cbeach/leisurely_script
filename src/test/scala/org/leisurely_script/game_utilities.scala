@@ -48,23 +48,7 @@ package GameUtilities {
       s"\n ${strList.slice(0, 3).mkString("")} \n ${strList.slice(3, 6).mkString("")} \n ${strList.slice(6, 9).mkString("")}"
     }
     def boardToString(board:Board):String = {
-      val strList = for (i <- 0 until 3; j <- 0 until 3) yield {
-        val equipment = board.occupancyStacks(i)(j)
-        if (equipment.size == 0) {
-          "-"
-        } else {
-          equipment(0) match {
-            case piece:PhysicalPiece => {
-              if (piece.owner.getPlayers.size != 1) {
-                throw new IllegalPlayerException("Only one player can own a piece in TicTacToe")
-              } else {
-                piece.owner.getPlayers.head.name
-              }
-            }
-          }
-        }
-      }
-      s"\n ${strList.slice(0, 3).mkString("")} \n ${strList.slice(3, 6).mkString("")} \n ${strList.slice(6, 9).mkString("")}"
+      "This doesn't make much sense at the moment"
     }
     def boardToInt(board:BoardRuleSet):Int = {
       val intList = for (i <- 0 until 3; j <- 0 until 3) yield {

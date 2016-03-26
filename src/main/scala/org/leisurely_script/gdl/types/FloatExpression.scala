@@ -3,7 +3,11 @@ package org.leisurely_script.gdl.types
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class FloatExpression(value:Float) extends AnyValExpression[Float] {
+class FloatExpression extends AnyValExpression[Float] {
+  def this(value:Float) = {
+    this
+    this.value = value
+  }
   override def evaluate:Option[Float] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -113,4 +117,8 @@ case class FloatExpression(value:Float) extends AnyValExpression[Float] {
   def isWhole(): BooleanExpression = BooleanExpression(value isWhole)
   def max(other: FloatExpression): FloatExpression = FloatExpression(value max other.value)
   def min(other: FloatExpression): FloatExpression = FloatExpression(value min other.value)
-} 
+}
+object FloatExpression {
+  def apply() = new FloatExpression()
+  def apply(value:Float) = new FloatExpression(value)
+}
