@@ -1,8 +1,14 @@
 package org.leisurely_script.gdl.types
+
+import scala.reflect.runtime.universe._
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class ByteExpression(value:Byte) extends AnyValExpression[Byte] {
+class ByteExpression extends AnyValExpression[Byte] {
+  def this(v:Byte) = {
+    this
+    value = v
+  }
   override def evaluate:Option[Byte] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -124,4 +130,10 @@ case class ByteExpression(value:Byte) extends AnyValExpression[Byte] {
   def max(other: ByteExpression): ByteExpression = ByteExpression(value max other.value)
   def min(other: ByteExpression): ByteExpression = ByteExpression(value min other.value)
   def signum: IntExpression = IntExpression(value.signum)
+}
+
+object ByteExpression {
+  def apply(v:Byte) = {
+    new ByteExpression(v)
+  }
 }

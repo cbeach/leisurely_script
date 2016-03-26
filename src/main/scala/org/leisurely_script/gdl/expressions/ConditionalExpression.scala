@@ -1,5 +1,7 @@
 package org.leisurely_script.gdl.expressions
 
+import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
 import org.leisurely_script.gdl.types._
 
 /**

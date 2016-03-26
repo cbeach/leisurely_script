@@ -1,8 +1,15 @@
 package org.leisurely_script.gdl.types
+
+import scala.reflect.runtime.universe._
+
 /**
   * Created by mcsmash on 1/25/16.
   */
-case class ShortExpression(value:Short) extends AnyValExpression[Short] {
+class ShortExpression extends AnyValExpression[Short] {
+  def this(v:Short) = {
+    this
+    value = v
+  }
   override def evaluate:Option[Short] = Some(value)
   def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
   def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
@@ -124,4 +131,10 @@ case class ShortExpression(value:Short) extends AnyValExpression[Short] {
   def max(other: ShortExpression): ShortExpression = ShortExpression(value max other.value)
   def min(other: ShortExpression): ShortExpression = ShortExpression(value min other.value)
   def signum: IntExpression = IntExpression(value.signum)
+}
+
+object ShortExpression {
+  def apply(v:Short) = {
+    new ShortExpression(v)
+  }
 }
