@@ -11,9 +11,9 @@ trait PlayerValidator extends {
     playersValid(game, players.getPlayers)
   }
   def getPlayers(game:Game):Set[Player]
-  def wins = GameResultExpression(Some(this), Win)
-  def loses = GameResultExpression(Some(this), Lose)
-  def ties = GameResultExpression(Some(this), Tie)
+  def wins = GameResultExpression(this, Win)
+  def loses = GameResultExpression(this, Lose)
+  def ties = GameResultExpression(this, Tie)
 }
 
 trait ConcretelyKnownPlayer {
@@ -160,7 +160,7 @@ case object AnyPlayer extends PlayerValidator {
   }
 }
 
-case class SpecificPlayer(player:Player) extends PlayerValidator {
+case class SpecificPlayer(player:Player) extends PlayerValidator with ConcretelyKnownPlayer {
   override def playersValid(game:Game, players:Set[Player]):Boolean = {
     if (players.size != 1) {
       false
@@ -171,7 +171,6 @@ case class SpecificPlayer(player:Player) extends PlayerValidator {
   override def playersValid(game:Game, players:ConcretelyKnownPlayer):Boolean = {
     playersValid(game, players.getPlayers)
   }
-  def getPlayers(game:Game):Set[Player] = {
-    Set(player)
-  }
+  def getPlayers(game:Game):Set[Player] = Set(player)
+  def getPlayers:Set[Player] = Set(player)
 }

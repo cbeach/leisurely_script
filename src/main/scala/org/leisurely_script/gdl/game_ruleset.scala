@@ -1,5 +1,7 @@
 package org.leisurely_script.gdl
 
+import org.leisurely_script.gdl.types.GameExpression
+
 import scala.util.{Try, Success, Failure}
 
 import GameResultState._
@@ -52,10 +54,25 @@ class GameRuleSet(val name:String,
   def startGame():Game = {
     Try(wellFormed) match {
       case Success(_) => {
+        processAST()
         new Game(this)
       }
       case Failure(exception) => {
         throw exception
+      }
+    }
+  }
+  private def processAST():Unit = {
+    endConditions.foreach(eC => {
+      processNode(eC.result)
+    })
+  }
+  def processNode(node:GameExpression[_]):Unit = {
+    val children = node.getChildExpressions
+    children.foreach {
+      (childNode: GameExpression[Any]) => {
+        childNode.gameCreationHook(this)
+        processNode(childNode)
       }
     }
   }

@@ -13,7 +13,7 @@ import scala.util.{Failure, Success}
 case class NInARowExpression(n:Int, pieceRule:PieceRule, boardRuleSet:BoardRuleSet, players:PlayerValidator,
                              neighborType:NeighborType=null)
   extends BooleanExpression {
-  def gameCreationHook(gameRuleSet:GameRuleSet):Unit = {
+  override def gameCreationHook(gameRuleSet:GameRuleSet):Unit = {
     boardRuleSet.addNInARowSet(n, pieceRule, players)
   }
   override def evaluate:Option[Boolean] = {

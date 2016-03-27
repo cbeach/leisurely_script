@@ -1,5 +1,7 @@
 package org.leisurely_script
 
+import org.leisurely_script.gdl.{Player, SpecificPlayer, SGameResult, EndCondition}
+
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
@@ -7,6 +9,7 @@ import org.scalatest.FunSuite
 import org.leisurely_script.gdl.types._
 import org.leisurely_script.gdl.expressions.iff
 import org.leisurely_script.gdl._
+import org.leisurely_script.gdl.GameResultState._
 import org.leisurely_script.gdl.ImplicitDefs.Views.TypeConversions._
 
 
@@ -177,5 +180,21 @@ class DLSTests extends FunSuite {
     assert(convertMe[Int, IntExpression](1))
     assert(convertMe[Long, LongExpression](long))
     assert(convertMe[Short, ShortExpression](short))
+  }
+  test("Does an EndCondition evaluate properly?") {
+    val player1:SpecificPlayer = SpecificPlayer(Player("1"))
+    val endCondition = EndCondition(iff(true) {
+      player1.wins
+    })
+    endCondition.result.evaluate match {
+      case Some(sGR:SGameResult) => {
+        assert(sGR.result == Win)
+        sGR.players match {
+          case p:ConcretelyKnownPlayer => assert(player1.getPlayers == p.getPlayers)
+          case _ => fail("the player was not correct")
+        }
+      }
+      case None => fail(s"endCondition.evaluate returned None")
+    }
   }
 }

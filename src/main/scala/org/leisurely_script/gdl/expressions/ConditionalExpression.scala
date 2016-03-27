@@ -8,6 +8,17 @@ import org.leisurely_script.gdl.types._
 class ConditionalExpression[T](val conditionExpr:BooleanExpression,
                                val thenExpr:GameExpression[T],
                                val otherwise:Option[GameExpression[T]] = None) extends GameExpression[T] {
+  override def getChildExpressions:List[GameExpression[Any]] = {
+    val conditionAsAny:GameExpression[Any] = conditionExpr.asInstanceOf[GameExpression[Any]]
+    val thenExprAsAny:GameExpression[Any] = thenExpr.asInstanceOf[GameExpression[Any]]
+    otherwise match {
+      case Some(expr:GameExpression[T]) => {
+        val otherwiseAsAny:GameExpression[Any] = expr.asInstanceOf[GameExpression[Any]]
+        List[GameExpression[Any]](conditionAsAny, thenExprAsAny, otherwiseAsAny)
+      }
+      case None => List(conditionAsAny, thenExprAsAny)
+    }
+  }
   override def evaluate:Option[T] = {
     if (conditionExpr.evaluate.get) {
       thenExpr.evaluate
