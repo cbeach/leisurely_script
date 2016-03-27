@@ -1,5 +1,7 @@
 package org.leisurely_script.gdl.types
 
+import org.leisurely_script.gdl.expressions.OperatorASTNodes.BooleanOperators._
+
 /**
   * Created by mcsmash on 1/25/16.
   */
@@ -9,50 +11,43 @@ class BooleanExpression extends AnyValExpression[Boolean] {
     this.value = value
   }
   override def evaluate:Option[Boolean] = Some(value)
-  def !=(other: BooleanExpression): BooleanExpression = {
-    BooleanExpression(value != other.value)
+  def !=(other: BooleanExpression):  Operator_!= = {
+    Operator_!=(this, other)
 	}
-  def &(other: BooleanExpression): BooleanExpression = {
-    BooleanExpression(value & other.value)
+  def &(other: BooleanExpression):  Operator_& = {
+    Operator_&(this, other)
 	}
-  def &&(other: BooleanExpression): BooleanExpression = {
-    BooleanExpression(value && other.value)
+  def &&(other: BooleanExpression):  Operator_&& = {
+    Operator_&&(this, other)
 	}
-  def ==(other: BooleanExpression): BooleanExpression = {
-    BooleanExpression(value == other.value)
+  def ==(other: BooleanExpression):  Operator_== = {
+    Operator_==(this, other)
 	}
-  def ^(other: BooleanExpression): BooleanExpression = {
-    BooleanExpression(value ^ other.value)
+  def ^(other: BooleanExpression):  Operator_^ = {
+    Operator_^(this, other)
 	}
-  def unary_! = {
-    BooleanExpression(!value)
+  def unary_!(): Operator_! = {
+    Operator_!(this)
 	}
-  def |(other: BooleanExpression): BooleanExpression = {
-    BooleanExpression(value || other.value)
+  def |(other: BooleanExpression):  Operator_| = {
+    Operator_|(this, other)
 	}
-  def ||(other: BooleanExpression): BooleanExpression = {
-    BooleanExpression(value || other.value)
+  def ||(other: BooleanExpression):  Operator_|| = {
+    Operator_||(this, other)
 	}
-  def <(other: BooleanExpression): BooleanExpression = {
-		BooleanExpression(value < other.value)
+  def <(other: BooleanExpression):  Operator_< = {
+		Operator_<(this, other)
 	}
-  def <=(other: BooleanExpression): BooleanExpression = {
-		BooleanExpression(value <= other.value)
+  def <=(other: BooleanExpression):  Operator_<= = {
+		Operator_<=(this, other)
 	}
-  def >(other: BooleanExpression): BooleanExpression = {
-		BooleanExpression(value > other.value)
+  def >(other: BooleanExpression):  Operator_> = {
+		Operator_>(this, other)
 	}
-  def >=(other: BooleanExpression): BooleanExpression = {
-		BooleanExpression(value >= other.value)
-	}
-  def compare(other: BooleanExpression): IntExpression = {
-		IntExpression(value.compare(other.value))
-	}
-  def compareTo(other: BooleanExpression): IntExpression = {
-		IntExpression(value.compareTo(other.value))
+  def >=(other: BooleanExpression):  Operator_>= = {
+		Operator_>=(this, other)
 	}
 }
-
 object BooleanExpression {
   def apply() = new BooleanExpression()
   def apply(value:Boolean) = new BooleanExpression(value)

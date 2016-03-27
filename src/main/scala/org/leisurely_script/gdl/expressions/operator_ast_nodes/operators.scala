@@ -1,0 +1,122 @@
+package org.leisurely_script.gdl.expressions
+
+import org.leisurely_script.gdl.types.{GameExpression, BooleanExpression}
+
+private[gdl] object OperatorASTNodes {
+  private[expressions] trait BaseUnaryOperator
+  [S <: AnyVal, GS <: GameExpression[S]]
+  extends Method0CallExpression[S, GS, S, GS] {
+    val operator: (S) => S
+    val self:GS
+    override def evaluate: Option[S] = {
+      val left: S = self.evaluate match {
+        case Some(value: S) => value
+        case None => return None
+      }
+      Some(operator(left))
+    }
+  }
+
+  private[expressions] trait BaseBinaryOperator[
+  S <: AnyVal, GS <: GameExpression[S],
+  R <: AnyVal, GR <: GameExpression[R],
+  A <: AnyVal, GA <: GameExpression[A]
+  ] extends Method1CallExpression[
+      S, GS,
+      R, GR,
+      A, GA] {
+    val operator: (S, A) => R
+    val self:GS
+    val other:GA
+    override def evaluate: Option[R] = {
+      val left: S = self.evaluate match {
+        case Some(value: S) => value
+        case None => return None
+      }
+      val right: A = other.evaluate match {
+        case Some(value: A) => value
+        case None => return None
+      }
+      Some(operator(left, right))
+    }
+  }
+
+  object BooleanOperators {
+    abstract class BooleanUnaryOperator(self: BooleanExpression)
+    extends BooleanExpression with BaseUnaryOperator[Boolean, BooleanExpression] {}
+    abstract class BooleanBinaryOperator(self: BooleanExpression, other: BooleanExpression)
+    extends BooleanExpression with BaseBinaryOperator[
+    Boolean, BooleanExpression,
+    Boolean, BooleanExpression,
+    Boolean, BooleanExpression] {}
+
+    case class Operator_!=(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left != right
+    }
+
+    case class Operator_&(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left & right
+    }
+
+    case class Operator_&&(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left && right
+    }
+
+    case class Operator_==(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left == right
+    }
+
+    case class Operator_^(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left ^ right
+    }
+
+    case class Operator_!(self: BooleanExpression) extends BooleanUnaryOperator(self) {
+      val operator = (value: Boolean) => !value
+    }
+
+    case class Operator_|(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left | right
+    }
+
+    case class Operator_||(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left || right
+    }
+
+    case class Operator_<(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left < right
+    }
+
+    case class Operator_<=(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left <= right
+    }
+
+    case class Operator_>(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left > right
+    }
+
+    case class Operator_>=(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+      val operator = (left: Boolean, right: Boolean) => left >= right
+    }
+  }
+  object ByteOperators {
+
+  }
+  object CharOperators {
+
+  }
+  object DoubleOperators {
+
+  }
+  object FloatOperators {
+
+  }
+  object IntOperators {
+
+  }
+  object LongOperators {
+
+  }
+  object ShortOperators {
+
+  }
+}

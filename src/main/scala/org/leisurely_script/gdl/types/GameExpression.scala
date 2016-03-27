@@ -4,7 +4,7 @@ import org.leisurely_script.gdl.GameRuleSet
 import org.leisurely_script.implementation.Game
 
 
-trait GameExpression[T] {
+trait GameExpression[+T] {
   protected var game:Option[Game] = None
   def setGame(g:Game) = {
     game = Some(g)

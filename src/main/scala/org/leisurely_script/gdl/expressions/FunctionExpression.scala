@@ -1,23 +1,38 @@
 package org.leisurely_script.gdl.expressions
 
-import org.leisurely_script.gdl.types.GameExpression
+import org.leisurely_script.gdl.types.{BooleanExpression, GameExpression}
 
 /**
   * Created by mcsmash on 3/12/16.
   */
-//case class Function0CallExpression[+R](func:() => R) extends GameExpression[R] {
-//  def evaluate:Option[R] = {
-//    Some(func())
-//  }
-//}
+trait FunctionCall[+R, +GR <: GameExpression[R]] extends GameExpression[R] {
+  override def getChildExpressions:List[GameExpression[Any]]
+  override def evaluate:Option[R]
+}
+trait Function0CallExpression[
+R, +GR <: GameExpression[R]] extends FunctionCall[R, GR] {}
 
-//abstract class Function1CallExpression[-T1, +R](arg1:T1)
-//  extends GameExpression[R] {}
-//abstract class Function2CallExpression[-T1, -T2, +R](arg1:T1, arg2:T2)
-//  extends GameExpression[R] {}
-//abstract class Function3CallExpression[-T1, -T2, -T3, +R](arg1:T1, arg2:T2, arg3:T3)
-//  extends GameExpression[R] {}
-//abstract class Function4CallExpression[-T1, -T2, -T3, -T4, +R]
-//  (arg1:T1, arg2:T2, arg3:T3, arg4:T4) extends GameExpression[R] {}
-//abstract class Function5CallExpression[-T1, -T2, -T3, -T4, -T5, +R]
-//  (arg1:T1, arg2:T2, arg3:T3, arg4:T4, arg5:T5) extends GameExpression[R] {}
+trait Function1CallExpression[
+R, +GR <: GameExpression[R],
+T1, -GT1 <: GameExpression[T1]]
+extends FunctionCall[R, GR] {}
+
+trait Function2CallExpression[
+R, T1, T2, -GT1 <: GameExpression[T1], -GT2 <: GameExpression[T2], +GR <: GameExpression[R]]
+extends FunctionCall[R, GR] {}
+
+trait Method0CallExpression[S, +GS <: GameExpression[S], +R, +GR <: GameExpression[R]]
+extends FunctionCall[R, GR] {}
+
+trait Method1CallExpression[
+S, +GS <: GameExpression[S],
++R, +GR <: GameExpression[R],
+T1, -GT1 <: GameExpression[T1]]
+extends FunctionCall[R, GR] {}
+
+trait Method2CallExpression[
+S, +GS <: GameExpression[S],
++R, +GR <: GameExpression[R],
+T1, -GT1 <: GameExpression[T1],
+T2, -GT2 <: GameExpression[T2]]
+extends FunctionCall[R, GR] {}
