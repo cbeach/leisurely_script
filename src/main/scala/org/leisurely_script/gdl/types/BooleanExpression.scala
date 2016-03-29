@@ -11,9 +11,6 @@ class BooleanExpression extends AnyValExpression[Boolean] {
     this.value = value
   }
   override def evaluate:Option[Boolean] = Some(value)
-  def !=(other: BooleanExpression):  Operator_!= = {
-    Operator_!=(this, other)
-	}
   def &(other: BooleanExpression):  Operator_& = {
     Operator_&(this, other)
 	}
