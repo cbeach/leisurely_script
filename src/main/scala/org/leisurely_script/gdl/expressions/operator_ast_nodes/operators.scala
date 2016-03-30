@@ -44,9 +44,9 @@ private[gdl] object OperatorASTNodes {
         Some(operator(left, right))
       }
     }
-    trait BaseComparisonOperator[
-    S <: AnyVal, GS <: GameExpression[S],
-    O <: AnyVal, GO <: GameExpression[O]]
+    trait BaseEquivalenceOperator[
+    S <: Any, GS <: GameExpression[S],
+    O <: Any, GO <: GameExpression[O]]
       extends BooleanExpression with BaseBinaryOperator[
         S, GS,
         Boolean, BooleanExpression,
@@ -67,15 +67,27 @@ private[gdl] object OperatorASTNodes {
         R, GR,
         O, GO] {}
   }
-  case class Operator_!=[S <: AnyVal, GS <: GameExpression[S], O <: AnyVal, GO <: GameExpression[O]]
+  case class Operator_!=[S <: Any, GS <: GameExpression[S], O <: Any, GO <: GameExpression[O]]
   (self: GS, other: GO)
-    extends BaseComparisonOperator[S, GS, O, GO] {
+    extends BaseEquivalenceOperator[S, GS, O, GO] {
     val operator = (left: S, right: O) => left != right
   }
-  case class Operator_==[S <: AnyVal, GS <: GameExpression[S], O <: AnyVal, GO <: GameExpression[O]]
+  case class Operator_==[S <: Any, GS <: GameExpression[S], O <: Any, GO <: GameExpression[O]]
   (self: GS, other: GO)
-    extends BaseComparisonOperator[S, GS, O, GO] {
+    extends BaseEquivalenceOperator[S, GS, O, GO] {
     val operator = (left: S, right: O) => left == right
+  }
+  trait Equivalence extends GameExpression[Any] {
+    def ==(other: GameExpression[Any]):
+    Operator_==[Any, GameExpression[Any], Any, GameExpression[Any]] = {
+      val gS:GameExpression[Any] = this
+      Operator_==(gS, other)
+    }
+    def !=(other: GameExpression[Any]):
+    Operator_!=[Any, GameExpression[Any], Any, GameExpression[Any]] = {
+      val gS:GameExpression[Any] = this
+      Operator_!=(gS, other)
+    }
   }
   case class Operator_<[S <: Ordered[O], GS <: GameExpression[S], O <: Ordered[S], GO <: GameExpression[O]]
   (self: GS, other: GO)
@@ -106,20 +118,12 @@ private[gdl] object OperatorASTNodes {
     Boolean, BooleanExpression,
     Boolean, BooleanExpression] {}
 
-    case class Operator_!=(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
-      val operator = (left: Boolean, right: Boolean) => left != right
-    }
-
     case class Operator_&(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
       val operator = (left: Boolean, right: Boolean) => left & right
     }
 
     case class Operator_&&(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
       val operator = (left: Boolean, right: Boolean) => left && right
-    }
-
-    case class Operator_==(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
-      val operator = (left: Boolean, right: Boolean) => left == right
     }
 
     case class Operator_^(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {

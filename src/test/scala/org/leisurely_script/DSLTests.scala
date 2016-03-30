@@ -1,5 +1,7 @@
 package org.leisurely_script.gdl
 
+import org.leisurely_script.gdl.expressions.OperatorASTNodes.{Operator_==, Equivalence, Operator_!=}
+
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
@@ -1028,6 +1030,14 @@ class DLSTests extends FunSuite {
     assert((trueExpression != falseExpression).evaluate.get)
     assert((falseExpression != trueExpression).evaluate.get)
     assert((!(falseExpression != falseExpression).evaluate.get))
+    (falseExpression != falseExpression) match {
+      case _:Operator_!=[_, _, _, _] => ()
+      case _ => fail
+    }
+    (falseExpression == falseExpression) match {
+      case _:Operator_==[_, _, _, _] => ()
+      case _ => fail
+    }
 
     assert((trueExpression & trueExpression).evaluate.get)
     assert((!(trueExpression & falseExpression).evaluate.get))
