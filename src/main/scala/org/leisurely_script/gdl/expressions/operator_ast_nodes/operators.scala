@@ -1,7 +1,5 @@
 package org.leisurely_script.gdl.expressions
 
-import scala.math.Numeric
-
 import org.leisurely_script.gdl.expressions.OperatorASTNodes.BaseOperators._
 import org.leisurely_script.gdl.types.{AnyValExpression, GameExpression, BooleanExpression}
 
@@ -21,9 +19,9 @@ private[gdl] object OperatorASTNodes {
       }
     }
     trait BaseBinaryOperator[
-    S <: Any, GS <: GameExpression[S],
-    R <: Any, GR <: GameExpression[R],
-    A <: Any, GA <: GameExpression[A]
+    S, GS <: GameExpression[S],
+    R, GR <: GameExpression[R],
+    A, GA <: GameExpression[A]
     ] extends Method1CallExpression[
       S, GS,
       R, GR,
@@ -51,21 +49,6 @@ private[gdl] object OperatorASTNodes {
         S, GS,
         Boolean, BooleanExpression,
         O, GO] {}
-    trait BaseOrderingOperator[
-    S <: Ordered[O], GS <: GameExpression[S],
-    O <: Ordered[S], GO <: GameExpression[O]]
-      extends BooleanExpression with BaseBinaryOperator[
-        S, GS,
-        Boolean, BooleanExpression,
-        O, GO] {}
-    trait BaseArithmeticOperator[
-    S <: AnyVal, GS <: AnyValExpression[S],
-    R <: AnyVal, GR <: AnyValExpression[R],
-    O <: AnyVal, GO <: AnyValExpression[O]]
-      extends AnyValExpression[R] with BaseBinaryOperator[
-        S, GS,
-        R, GR,
-        O, GO] {}
   }
   case class Operator_!=[S <: Any, GS <: GameExpression[S], O <: Any, GO <: GameExpression[O]]
   (self: GS, other: GO)
@@ -77,7 +60,7 @@ private[gdl] object OperatorASTNodes {
     extends BaseEquivalenceOperator[S, GS, O, GO] {
     val operator = (left: S, right: O) => left == right
   }
-  trait Equivalence extends GameExpression[Any] {
+  trait EquivalenceExpression extends GameExpression[Any] {
     def ==(other: GameExpression[Any]):
     Operator_==[Any, GameExpression[Any], Any, GameExpression[Any]] = {
       val gS:GameExpression[Any] = this
@@ -88,26 +71,6 @@ private[gdl] object OperatorASTNodes {
       val gS:GameExpression[Any] = this
       Operator_!=(gS, other)
     }
-  }
-  case class Operator_<[S <: Ordered[O], GS <: GameExpression[S], O <: Ordered[S], GO <: GameExpression[O]]
-  (self: GS, other: GO)
-    extends BaseOrderingOperator[S, GS, O, GO] {
-    val operator = (left: S, right: O) => left < right
-  }
-  case class Operator_<=[S <: Ordered[O], GS <: GameExpression[S], O <: Ordered[S], GO <: GameExpression[O]]
-  (self: GS, other: GO)
-    extends BaseOrderingOperator[S, GS, O, GO] {
-    val operator = (left: S, right: O) => left <= right
-  }
-  case class Operator_>[S <: Ordered[O], GS <: GameExpression[S], O <: Ordered[S], GO <: GameExpression[O]]
-  (self: GS, other: GO)
-    extends BaseOrderingOperator[S, GS, O, GO] {
-    val operator = (left: S, right: O) => left > right
-  }
-  case class Operator_>=[S <: Ordered[O], GS <: GameExpression[S], O <: Ordered[S], GO <: GameExpression[O]]
-  (self: GS, other: GO)
-    extends BaseOrderingOperator[S, GS, O, GO] {
-    val operator = (left: S, right: O) => left >= right
   }
   object BooleanOperators {
     abstract class BooleanUnaryOperator(self: BooleanExpression)

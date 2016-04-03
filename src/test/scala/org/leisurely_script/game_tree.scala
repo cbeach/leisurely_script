@@ -14,7 +14,6 @@ import org.leisurely_script.test.util.GameUtilities.TicTacToeUtilities._
 import org.leisurely_script.repository.LocalStaticRepository
 
 import Direction._
-import GameStatus._
 import GameResultState._
 import MoveAction._
 import NeighborType._
