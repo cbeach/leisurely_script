@@ -60,18 +60,6 @@ private[gdl] object OperatorASTNodes {
     extends BaseEquivalenceOperator[S, GS, O, GO] {
     val operator = (left: S, right: O) => left == right
   }
-  trait EquivalenceExpression extends GameExpression[Any] {
-    def ==(other: GameExpression[Any]):
-    Operator_==[Any, GameExpression[Any], Any, GameExpression[Any]] = {
-      val gS:GameExpression[Any] = this
-      Operator_==(gS, other)
-    }
-    def !=(other: GameExpression[Any]):
-    Operator_!=[Any, GameExpression[Any], Any, GameExpression[Any]] = {
-      val gS:GameExpression[Any] = this
-      Operator_!=(gS, other)
-    }
-  }
   object BooleanOperators {
     abstract class BooleanUnaryOperator(self: BooleanExpression)
     extends BooleanExpression with BaseUnaryOperator[Boolean, BooleanExpression] {}
@@ -105,21 +93,21 @@ private[gdl] object OperatorASTNodes {
       val operator = (left: Boolean, right: Boolean) => left || right
     }
 
-    case class Operator_<(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
-      val operator = (left: Boolean, right: Boolean) => left < right
-    }
+    //case class Operator_<(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+    //  val operator = (left: Boolean, right: Boolean) => left < right
+    //}
 
-    case class Operator_<=(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
-      val operator = (left: Boolean, right: Boolean) => left <= right
-    }
+    //case class Operator_<=(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+    //  val operator = (left: Boolean, right: Boolean) => left <= right
+    //}
 
-    case class Operator_>(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
-      val operator = (left: Boolean, right: Boolean) => left > right
-    }
+    //case class Operator_>(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+    //  val operator = (left: Boolean, right: Boolean) => left > right
+    //}
 
-    case class Operator_>=(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
-      val operator = (left: Boolean, right: Boolean) => left >= right
-    }
+    //case class Operator_>=(self: BooleanExpression, other: BooleanExpression) extends BooleanBinaryOperator(self, other) {
+    //  val operator = (left: Boolean, right: Boolean) => left >= right
+    //}
   }
   object ByteOperators {
 

@@ -1,13 +1,12 @@
 package org.leisurely_script.gdl.types
 
 import org.leisurely_script.gdl.expressions.OperatorASTNodes.BooleanOperators._
-import org.leisurely_script.gdl.expressions.OperatorASTNodes.EquivalenceExpression
-import org.leisurely_script.gdl.expressions.operator_ast_nodes.ComparisonOperators.OrderedExpression
+import org.leisurely_script.gdl.expressions.operator_ast_nodes.ComparisonOperators.Operator_<
 
 /**
   * Created by mcsmash on 1/25/16.
   */
-class BooleanExpression extends AnyValExpression[Boolean] with EquivalenceExpression with OrderedExpression {
+class BooleanExpression extends AnyValExpression[Boolean] {
   def this(value:Boolean) = {
     this
     this.value = value
@@ -31,6 +30,12 @@ class BooleanExpression extends AnyValExpression[Boolean] with EquivalenceExpres
   def ||(other: BooleanExpression):  Operator_|| = {
     Operator_||(this, other)
 	}
+  def <(other: BooleanExpression): Operator_<[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
+    Operator_<[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
+  }
+  def <=(other: BooleanExpression): Operator_<[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
+    Operator_<[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
+  }
 }
 object BooleanExpression {
   def apply() = new BooleanExpression()

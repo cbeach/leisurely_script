@@ -13,13 +13,21 @@ private[gdl] object ComparisonOperators {
     extends BooleanExpression with BaseBinaryOperator[
       S, GS,
       Boolean, BooleanExpression,
-      O, GO] {}
+      O, GO] {
+  }
   case class Operator_<[
   S <: Ordered[Any], GS <: GameExpression[S],
   O <: Ordered[Any], GO <: GameExpression[O]]
   (self: GS, other: GO)
     extends BaseOrderingOperator[S, GS, O, GO] {
     val operator = (left: S, right: O) => left < right
+    def compare(other: GO): Int = {
+      self.evaluate match {
+        case Some(s: S) => other.evaluate match {
+          case Some(o: O) => s.compare(o)
+        }
+      }
+    }
   }
   case class Operator_<=[
   S <: Ordered[Any], GS <: GameExpression[S],
@@ -42,27 +50,4 @@ private[gdl] object ComparisonOperators {
     extends BaseOrderingOperator[S, GS, O, GO] {
     val operator = (left: S, right: O) => left >= right
   }
-  trait OrderedExpression extends GameExpression[Ordered[Any]] {
-    def <(other: GameExpression[Ordered[Any]]):
-    Operator_<[Ordered[Any], GameExpression[Ordered[Any]], Ordered[Any], GameExpression[Ordered[Any]]] = {
-      val gS:GameExpression[Ordered[Any]] = this
-      Operator_<(gS, other)
-    }
-    def <=(other: GameExpression[Ordered[Any]]):
-    Operator_<=[Ordered[Any], GameExpression[Ordered[Any]], Ordered[Any], GameExpression[Ordered[Any]]] = {
-      val gS:GameExpression[Ordered[Any]] = this
-      Operator_<=(gS, other)
-    }
-    def >(other: GameExpression[Ordered[Any]]):
-    Operator_>[Ordered[Any], GameExpression[Ordered[Any]], Ordered[Any], GameExpression[Ordered[Any]]] = {
-      val gS:GameExpression[Ordered[Any]] = this
-      Operator_>(gS, other)
-    }
-    def >=(other: GameExpression[Ordered[Any]]):
-    Operator_>=[Ordered[Any], GameExpression[Ordered[Any]], Ordered[Any], GameExpression[Ordered[Any]]] = {
-      val gS:GameExpression[Ordered[Any]] = this
-      Operator_>=(gS, other)
-    }
-  }
-
 }

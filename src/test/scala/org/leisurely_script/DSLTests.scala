@@ -1,7 +1,5 @@
 package org.leisurely_script.gdl
 
-import org.leisurely_script.gdl.expressions.OperatorASTNodes.{Operator_==, EquivalenceExpression, Operator_!=}
-
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
