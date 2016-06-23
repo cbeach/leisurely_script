@@ -42,7 +42,7 @@ class LongExpression extends AnyValExpression[Long] {
   def +(other: CharExpression): LongExpression = LongExpression(value + other.value)
   def +(other: ShortExpression): LongExpression = LongExpression(value + other.value)
   def +(other: ByteExpression): LongExpression = LongExpression(value + other.value)
-  def +(other: StringExpression): StringExpression = StringExpression(value + other.value)
+  //def +(other: StringExpression): StringExpression = StringExpression(value + other.value)
   def -(other: DoubleExpression): DoubleExpression = DoubleExpression(value - other.value)
   def -(other: FloatExpression): FloatExpression = FloatExpression(value - other.value)
   def -(other: LongExpression): LongExpression = LongExpression(value - other.value)
@@ -130,9 +130,9 @@ class LongExpression extends AnyValExpression[Long] {
   def max(other: LongExpression): LongExpression = LongExpression(value max other.value)
   def min(other: LongExpression): LongExpression = LongExpression(value min other.value)
   def signum: IntExpression = IntExpression(value.signum)
-  def toBinaryString: StringExpression = StringExpression(value.toBinaryString)
-  def toHexString: StringExpression = StringExpression(value.toHexString)
-  def toOctalString: StringExpression = StringExpression(value.toOctalString)
+  //def toBinaryString: StringExpression = StringExpression(value.toBinaryString)
+  //def toHexString: StringExpression = StringExpression(value.toHexString)
+  //def toOctalString: StringExpression = StringExpression(value.toOctalString)
 }
 object LongExpression {
   def apply() = new LongExpression()

@@ -2,6 +2,7 @@ package org.leisurely_script.gdl.types
 
 
 import org.leisurely_script.gdl.expressions.operator_ast_nodes.EquivalenceOperators._
+import org.leisurely_script.gdl.expressions.operator_ast_nodes.BitwiseOperators._
 import org.leisurely_script.gdl.expressions.operator_ast_nodes.ComparisonOperators._
 import org.leisurely_script.gdl.expressions.operator_ast_nodes.LogicalOperators._
 
@@ -14,12 +15,6 @@ class BooleanExpression extends AnyValExpression[Boolean] {
     this.value = value
   }
   override def evaluate:Option[Boolean] = Some(value)
-  def &(other: BooleanExpression):  Operator_& = {
-    Operator_&(this, other)
-	}
-  def |(other: BooleanExpression):  Operator_| = {
-    Operator_|(this, other)
-	}
   def &&(other: BooleanExpression):  Operator_&& = {
     Operator_&&(this, other)
   }
@@ -32,19 +27,20 @@ class BooleanExpression extends AnyValExpression[Boolean] {
   def unary_!(): Operator_! = {
     Operator_!(this)
   }
-  def <(other: BooleanExpression): Operator_<[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
-    Operator_<[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
-  }
-  def <=(other: BooleanExpression): Operator_<=[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
-    Operator_<=[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
-  }
-  def >(other: BooleanExpression): Operator_>[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
-    Operator_>[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
-  }
-  def >=(other: BooleanExpression): Operator_>=[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
-    Operator_>=[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
-  }
+//  def <(other: BooleanExpression): Operator_<[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
+//    Operator_<[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
+//  }
+//  def <=(other: BooleanExpression): Operator_<=[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
+//    Operator_<=[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
+//  }
+//  def >(other: BooleanExpression): Operator_>[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
+//    Operator_>[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
+//  }
+//  def >=(other: BooleanExpression): Operator_>=[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
+//    Operator_>=[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
+//  }
 }
+
 object BooleanExpression {
   def apply() = new BooleanExpression()
   def apply(value:Boolean) = new BooleanExpression(value)

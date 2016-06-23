@@ -41,7 +41,7 @@ class ShortExpression extends AnyValExpression[Short] {
   def +(other: CharExpression): IntExpression = IntExpression(value + other.value)
   def +(other: ShortExpression): IntExpression = IntExpression(value + other.value)
   def +(other: ByteExpression): IntExpression = IntExpression(value + other.value)
-  def +(other: StringExpression): StringExpression = StringExpression(value + other.value)
+  //def +(other: StringExpression): StringExpression = StringExpression(value + other.value)
   def -(other: DoubleExpression): DoubleExpression = DoubleExpression(value - other.value)
   def -(other: FloatExpression): FloatExpression = FloatExpression(value - other.value)
   def -(other: LongExpression): LongExpression = LongExpression(value - other.value)
