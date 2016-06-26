@@ -6,7 +6,7 @@ import org.scalatest.FunSuite
 
 import org.leisurely_script.gdl.types._
 import org.leisurely_script.gdl.expressions.iff
-import org.leisurely_script.gdl.expressions.OperatorASTNodes.BooleanOperators._
+import org.leisurely_script.gdl.expressions.operator_ast_nodes.ComparisonOperators._
 import org.leisurely_script.gdl.GameResultState._
 import org.leisurely_script.gdl.ImplicitDefs.Views.TypeConversions._
 

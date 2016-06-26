@@ -15,27 +15,25 @@ private[gdl] object LogicalOperators {
       Boolean, BooleanExpression,
       Boolean, BooleanExpression,
       Boolean, BooleanExpression] {}
-  trait BaseUnaryLogicalOperator[
-  S <: Any, GS <: GameExpression[S],
-  O <: Any, GO <: GameExpression[O]]
+  trait BaseUnaryLogicalOperator[S <: Any, GS <: GameExpression[S]]
     extends BooleanExpression with BaseUnaryOperator[
       Boolean, BooleanExpression] {
     val operator = (self: Boolean) => !self
   }
   case class Operator_&&(self: BooleanExpression, other: BooleanExpression)
-    extends BaseLogicalOperator {
+    extends BaseLogicalOperator[Boolean, BooleanExpression, Boolean, BooleanExpression] {
     val operator = (left: Boolean, right: Boolean) => left || right
   }
   case class Operator_||(self: BooleanExpression, other: BooleanExpression)
-    extends BaseLogicalOperator {
+    extends BaseLogicalOperator[Boolean, BooleanExpression, Boolean, BooleanExpression] {
     val operator = (left: Boolean, right: Boolean) => left || right
   }
   case class Operator_^(self: BooleanExpression, other: BooleanExpression)
-    extends BaseLogicalOperator {
+    extends BaseLogicalOperator[Boolean, BooleanExpression, Boolean, BooleanExpression] {
     val operator = (left: Boolean, right: Boolean) => left ^ right
   }
   case class Operator_!(self: BooleanExpression)
-    extends BaseUnaryLogicalOperator {
-    override val operator = (left: Boolean, right: Boolean) => left || right
+    extends BaseUnaryLogicalOperator[Boolean, BooleanExpression] {
+    override val operator = (self: Boolean) => !self
   }
 }

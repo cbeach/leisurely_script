@@ -22,25 +22,4 @@ private[gdl] object ComparisonOperators {
     extends BaseOrderingOperator[S, GS, O, GO] {
     val operator = (left: S, right: O) => left < right
   }
-  case class Operator_<=[
-  S <: Ordered[Any], GS <: GameExpression[S],
-  O <: Ordered[Any], GO <: GameExpression[O]]
-  (self: GS, other: GO)
-    extends BaseOrderingOperator[S, GS, O, GO] {
-    val operator = (left: S, right: O) => left <= right
-  }
-  case class Operator_>[
-  S <: Ordered[Any], GS <: GameExpression[S],
-  O <: Ordered[Any], GO <: GameExpression[O]]
-  (self: GS, other: GO)
-    extends BaseOrderingOperator[S, GS, O, GO] {
-    val operator = (left: S, right: O) => left > right
-  }
-  case class Operator_>=[
-  S <: Ordered[Any], GS <: GameExpression[S],
-  O <: Ordered[Any], GO <: GameExpression[O]]
-  (self: GS, other: GO)
-    extends BaseOrderingOperator[S, GS, O, GO] {
-    val operator = (left: S, right: O) => left >= right
-  }
 }

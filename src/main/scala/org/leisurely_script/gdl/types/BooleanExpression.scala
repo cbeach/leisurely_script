@@ -27,18 +27,9 @@ class BooleanExpression extends AnyValExpression[Boolean] {
   def unary_!(): Operator_! = {
     Operator_!(this)
   }
-//  def <(other: BooleanExpression): Operator_<[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
-//    Operator_<[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
-//  }
-//  def <=(other: BooleanExpression): Operator_<=[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
-//    Operator_<=[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
-//  }
-//  def >(other: BooleanExpression): Operator_>[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
-//    Operator_>[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
-//  }
-//  def >=(other: BooleanExpression): Operator_>=[Boolean, BooleanExpression, Boolean, BooleanExpression] = {
-//    Operator_>=[Boolean, BooleanExpression, Boolean, BooleanExpression](this, other)
-//  }
+  def <(other: BooleanExpression): Operator_<[Ordered[Boolean], BooleanExpression, Ordered[Boolean], BooleanExpression] = {
+    new Operator_<[Ordered[Boolean], BooleanExpression, Ordered[Boolean], BooleanExpression](this, other)
+  }
 }
 
 object BooleanExpression {
