@@ -1,10 +1,6 @@
 import sbt._
 import Keys._
 
-
-// Create a main class (for development purposes only!)
-mainClass in (Compile, run) := Some("org.leisurelyscript.gdl.Main")
-
 lazy val root = (project in file(".")).
   settings(
     name := "leisurely_script",
