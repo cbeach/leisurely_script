@@ -1,55 +1,28 @@
 package org.leisurely_script.gdl.types
+
+import org.leisurely_script.gdl.expressions.operator_ast_nodes.ComparisonOperators.Compare
+
 /**
   * Created by mcsmash on 1/25/16.
   */
-class ByteExpression extends AnyValExpression[Byte] {
+class ByteExpression extends AnyValExpression[Byte] with Compare[Byte] {
+  val ord = Ordering[Byte]
   def this(value:Byte) = {
     this
     this.value = value
   }
+  def compare[B](other: GameExpression[B]) =
+    new IntExpression(other.evaluate match {
+      case Some(o: Byte) => if(evaluate.get < o.toShort) -1 else if(evaluate.get == o) 0 else 1
+      case Some(o: Short) => if(evaluate.get < o) -1 else if(evaluate.get == o) 0 else 1
+      case Some(o: Char) => if(evaluate.get < o) -1 else if(evaluate.get == o) 0 else 1
+      case Some(o: Int) => if(evaluate.get < o) -1 else if(evaluate.get == o) 0 else 1
+      case Some(o: Long) => if(evaluate.get < o) -1 else if(evaluate.get == o) 0 else 1
+      case Some(o: Float) => if(evaluate.get < o) -1 else if(evaluate.get == o) 0 else 1
+      case Some(o: Double) => if(evaluate.get < o) -1 else if(evaluate.get == o) 0 else 1
+    })
+  def compareTo[B](other:GameExpression[B]) = compare(other)
   override def evaluate:Option[Byte] = Some(value)
-  def ==(other: DoubleExpression): BooleanExpression = BooleanExpression(value == other.value)
-  def ==(other: FloatExpression): BooleanExpression = BooleanExpression(value == other.value)
-  def ==(other: LongExpression): BooleanExpression = BooleanExpression(value == other.value)
-  def ==(other: IntExpression): BooleanExpression = BooleanExpression(value == other.value)
-  def ==(other: CharExpression): BooleanExpression = BooleanExpression(value == other.value)
-  def ==(other: ShortExpression): BooleanExpression = BooleanExpression(value == other.value)
-  def ==(other: ByteExpression): BooleanExpression = BooleanExpression(value == other.value)
-  def !=(other: DoubleExpression): BooleanExpression = BooleanExpression(value != other.value)
-  def !=(other: FloatExpression): BooleanExpression = BooleanExpression(value != other.value)
-  def !=(other: LongExpression): BooleanExpression = BooleanExpression(value != other.value)
-  def !=(other: IntExpression): BooleanExpression = BooleanExpression(value != other.value)
-  def !=(other: CharExpression): BooleanExpression = BooleanExpression(value != other.value)
-  def !=(other: ShortExpression): BooleanExpression = BooleanExpression(value != other.value)
-  def !=(other: ByteExpression): BooleanExpression = BooleanExpression(value != other.value)
-  def >(other: DoubleExpression): BooleanExpression = BooleanExpression(value > other.value)
-  def >(other: FloatExpression): BooleanExpression = BooleanExpression(value > other.value)
-  def >(other: LongExpression): BooleanExpression = BooleanExpression(value > other.value)
-  def >(other: IntExpression): BooleanExpression = BooleanExpression(value > other.value)
-  def >(other: CharExpression): BooleanExpression = BooleanExpression(value > other.value)
-  def >(other: ShortExpression): BooleanExpression = BooleanExpression(value > other.value)
-  def >(other: ByteExpression): BooleanExpression = BooleanExpression(value > other.value)
-  def >=(other: DoubleExpression): BooleanExpression = BooleanExpression(value >= other.value)
-  def >=(other: FloatExpression): BooleanExpression = BooleanExpression(value >= other.value)
-  def >=(other: LongExpression): BooleanExpression = BooleanExpression(value >= other.value)
-  def >=(other: IntExpression): BooleanExpression = BooleanExpression(value >= other.value)
-  def >=(other: CharExpression): BooleanExpression = BooleanExpression(value >= other.value)
-  def >=(other: ShortExpression): BooleanExpression = BooleanExpression(value >= other.value)
-  def >=(other: ByteExpression): BooleanExpression = BooleanExpression(value >= other.value)
-  def <(other: DoubleExpression): BooleanExpression = BooleanExpression(value < other.value)
-  def <(other: FloatExpression): BooleanExpression = BooleanExpression(value < other.value)
-  def <(other: LongExpression): BooleanExpression = BooleanExpression(value < other.value)
-  def <(other: IntExpression): BooleanExpression = BooleanExpression(value < other.value)
-  def <(other: CharExpression): BooleanExpression = BooleanExpression(value < other.value)
-  def <(other: ShortExpression): BooleanExpression = BooleanExpression(value < other.value)
-  def <(other: ByteExpression): BooleanExpression = BooleanExpression(value < other.value)
-  def <=(other: DoubleExpression): BooleanExpression = BooleanExpression(value <= other.value)
-  def <=(other: FloatExpression): BooleanExpression = BooleanExpression(value <= other.value)
-  def <=(other: LongExpression): BooleanExpression = BooleanExpression(value <= other.value)
-  def <=(other: IntExpression): BooleanExpression = BooleanExpression(value <= other.value)
-  def <=(other: CharExpression): BooleanExpression = BooleanExpression(value <= other.value)
-  def <=(other: ShortExpression): BooleanExpression = BooleanExpression(value <= other.value)
-  def <=(other: ByteExpression): BooleanExpression = BooleanExpression(value <= other.value)
   def unary_+ = IntExpression(+value)
   def unary_- = IntExpression(-value)
   def unary_~ = IntExpression(~value)
@@ -118,8 +91,6 @@ class ByteExpression extends AnyValExpression[Byte] {
   def toLong: LongExpression = LongExpression(value.toLong)
   def toShort: ShortExpression = ShortExpression(value.toShort)
   def abs: ByteExpression = ByteExpression(value.abs)
-  def compare(other: ByteExpression): IntExpression = IntExpression(value compare other.value)
-  def compareTo(other: ByteExpression): IntExpression = IntExpression(value compareTo other.value)
   def isValidByte: BooleanExpression = BooleanExpression(value.isValidByte)
   def isValidChar: BooleanExpression = BooleanExpression(value.isValidChar)
   def isValidInt: BooleanExpression = BooleanExpression(value.isValidInt)
