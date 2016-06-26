@@ -22,7 +22,7 @@ private[gdl] object LogicalOperators {
   }
   case class Operator_&&(self: BooleanExpression, other: BooleanExpression)
     extends BaseLogicalOperator[Boolean, BooleanExpression, Boolean, BooleanExpression] {
-    val operator = (left: Boolean, right: Boolean) => left || right
+    val operator = (left: Boolean, right: Boolean) => left && right
   }
   case class Operator_||(self: BooleanExpression, other: BooleanExpression)
     extends BaseLogicalOperator[Boolean, BooleanExpression, Boolean, BooleanExpression] {

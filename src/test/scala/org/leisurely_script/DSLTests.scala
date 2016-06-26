@@ -1,5 +1,7 @@
 package org.leisurely_script.gdl
 
+import org.leisurely_script.gdl.expressions.operator_ast_nodes.EquivalenceOperators.{Operator_==, Operator_!=}
+
 import scala.util.{Try, Success, Failure}
 
 import org.scalatest.FunSuite
@@ -1029,11 +1031,11 @@ class DLSTests extends FunSuite {
     assert((falseExpression != trueExpression).evaluate.get)
     assert((!(falseExpression != falseExpression).evaluate.get))
     (falseExpression != falseExpression) match {
-      case _:Operator_!=[_, _, _, _] => ()
+      case _:Operator_!=[_, _] => ()
       case _ => fail
     }
     (falseExpression == falseExpression) match {
-      case _:Operator_==[_, _, _, _] => ()
+      case _:Operator_==[_, _] => ()
       case _ => fail
     }
 
@@ -1212,8 +1214,5 @@ class DLSTests extends FunSuite {
     assert(bE1.isInstanceOf[GameExpression[Boolean]])
     assert(bE1.isInstanceOf[GameExpression[AnyVal]])
     assert(bE1.isInstanceOf[GameExpression[Any]])
-  }
-  test("BooleanExpressions return method call objects") {
-    val bE1:BooleanBinaryOperator = BooleanExpression(true) && BooleanExpression(true)
   }
 }
