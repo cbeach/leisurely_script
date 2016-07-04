@@ -42,7 +42,6 @@ class DoubleExpression extends AnyValExpression[Double] with Compare[Double] {
 	def +(other: CharExpression): DoubleExpression = DoubleExpression(value + other.value)
 	def +(other: ShortExpression): DoubleExpression = DoubleExpression(value + other.value)
 	def +(other: ByteExpression): DoubleExpression = DoubleExpression(value + other.value)
-	//def +(other: StringExpression): StringExpression = StringExpression(value + other.value)
 	def -(other: DoubleExpression): DoubleExpression = DoubleExpression(value - other.value)
 	def -(other: FloatExpression): DoubleExpression = DoubleExpression(value - other.value)
 	def -(other: LongExpression): DoubleExpression = DoubleExpression(value - other.value)

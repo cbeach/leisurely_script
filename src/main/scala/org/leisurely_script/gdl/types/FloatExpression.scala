@@ -44,7 +44,6 @@ class FloatExpression extends AnyValExpression[Float] with Compare[Float] {
   def +(other: CharExpression): FloatExpression = FloatExpression(value + other.value)
   def +(other: ShortExpression): FloatExpression = FloatExpression(value + other.value)
   def +(other: ByteExpression): FloatExpression = FloatExpression(value + other.value)
-  //def +(other: StringExpression): StringExpression = StringExpression(value + other.value)
   def -(other: DoubleExpression): DoubleExpression = DoubleExpression(value - other.value)
   def -(other: FloatExpression): FloatExpression = FloatExpression(value - other.value)
   def -(other: LongExpression): FloatExpression = FloatExpression(value - other.value)
