@@ -14,8 +14,8 @@ class BooleanExpression extends AnyValExpression[Boolean] with Compare[Boolean] 
     this.value = value
   }
   override def evaluate:Option[Boolean] = Some(value)
-  def compare[B](other: GameExpression[B]): IntExpression =
-    new IntExpression(other.evaluate match {
+  def compare[B](other: GameExpression[B]): LongExpression =
+    new LongExpression(other.evaluate match {
       case Some(o) => o match {
         case o: Boolean => if (evaluate.get < o) -1 else if (evaluate.get == o) 0 else 1
       }

@@ -12,7 +12,7 @@ private[gdl] object ComparisonOperators {
   trait Compare[T] {
     outer: GameExpression[T] =>
     val ord: Ordering[T]
-    def compare[B](right: GameExpression[B]): IntExpression
+    def compare[B](right: GameExpression[B]): LongExpression
     def <[B](other: GameExpression[B]): Operator_<[GameExpression[T], GameExpression[B]] =
       Operator_<[GameExpression[T], GameExpression[B]](outer, other, outer.compare(other).evaluate.get < 0)
     def <=[B](other: GameExpression[B]): Operator_<=[GameExpression[T], GameExpression[B]] =
