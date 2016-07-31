@@ -1,8 +1,6 @@
 package org.leisurely_script.gdl.types
 
 
-import org.leisurely_script.gdl.expressions.operator_ast_nodes.EquivalenceOperators._
-import org.leisurely_script.gdl.expressions.operator_ast_nodes.BitwiseOperators._
 import org.leisurely_script.gdl.expressions.operator_ast_nodes.ComparisonOperators._
 import org.leisurely_script.gdl.expressions.operator_ast_nodes.LogicalOperators._
 
