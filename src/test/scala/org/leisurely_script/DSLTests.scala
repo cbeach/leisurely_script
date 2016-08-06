@@ -12,7 +12,7 @@ import org.leisurely_script.gdl.GameResultState._
 import org.leisurely_script.gdl.ImplicitDefs.Views.TypeConversions._
 
 
-class DLSTests extends FunSuite {
+class DSLTests extends FunSuite {
   test("DoubleExpressions evaluate properly.") {
     def eval(b:BooleanExpression): Boolean = {
       b.evaluate.get
@@ -41,9 +41,8 @@ class DLSTests extends FunSuite {
     assert(eval((expr <= doubleExprs(0)) && (expr <= doubleExprs(1))))
     assert(eval((expr <= longExprs(0)) && (expr <= longExprs(1))))
 
-
-    assert(eval((expr / doubleExprs(1)) == DoubleExpression(0.5)))
-    assert(eval((expr / longExprs(1)) == DoubleExpression(0.5)))
+    assert(0.5 == ((expr / doubleExprs(1)).evaluate.get))
+    assert(0.5 == ((expr / longExprs(1)).evaluate.get))
 
     expr = DoubleExpression(3.0)
   }
@@ -75,8 +74,8 @@ class DLSTests extends FunSuite {
     assert(eval((expr <= doubleExprs(0)) && (expr <= doubleExprs(1))))
     assert(eval((expr <= longExprs(0)) && (expr <= longExprs(1))))
 
-    assert(eval((expr / doubleExprs(1)) == DoubleExpression(0.5)))
-    assert(eval((expr / longExprs(1)) == DoubleExpression(0)))
+    assert(0.5 == (expr / doubleExprs(1)).evaluate.get)
+    assert(0 == (expr / longExprs(1)).evaluate.get)
 
   }
   test("BooleanExpressions evaluate properly.") {

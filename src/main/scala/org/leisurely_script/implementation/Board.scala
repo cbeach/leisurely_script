@@ -85,6 +85,7 @@ class Board(rS:BoardRuleSet) {
     coord match {
       case Coordinate(x:Int, y:Int) => {
         _occupancyStacks(x)(y).push(thing)
+        _occupancyMatrices(thing.rule)(x)(y) += 1
         Success(this)
       }
     }
@@ -92,7 +93,8 @@ class Board(rS:BoardRuleSet) {
   protected[leisurely_script] def pop(coord:Coordinate):Try[Board] = {
     coord match {
       case Coordinate(x: Int, y: Int) => {
-        _occupancyStacks(x)(y).pop()
+        val thing = _occupancyStacks(x)(y).pop()
+        _occupancyMatrices(thing.rule)(x)(y) -= 1
         Success(this)
       }
     }
