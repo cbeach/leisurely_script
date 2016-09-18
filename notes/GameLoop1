@@ -1,0 +1,32 @@
+class GameRuleSet {
+    val setupTransformation: (GameState) => GameState
+}
+class GameState {
+    maxNumberOfPlayers = x
+    playerList = [] 
+
+    def morePlayers(): Boolean = 
+        if (stillMorePlayers) {
+            playerList = getPlayer() :: playerList
+            numberOfPlayers++
+            playerList.size() < maxNumberOfPlayers
+        } else {
+            false      
+        } 
+    def waitForInput: GameState
+}
+
+grs = GameRuleSet()
+gs = GameState(grs)
+
+
+// Wait for players to join
+while gs.morePlayers {}
+
+// Perform setup transformations
+grs.setupTransformation(gs)
+
+//Start first turn
+while gs.gameNotEnded
+    gs = gs.waitForInput 
+
