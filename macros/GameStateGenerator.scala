@@ -1,25 +1,44 @@
 package beachc.metaprogrammers
 
+import java.io.ObjectInputStream
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
+
 import scala.annotation.StaticAnnotation
 import scala.meta._
 
-private object StructureRegistry {
-  var structures: List[Defn] = List()
-  def add(defn: Defn) = {
-    structures = defn :: structures
-  }
-}
-
 class GameStateGenerator extends StaticAnnotation {
-  inline def apply(defn: Defn) = meta {
-    println(defn.show[Syntax])
-    defn
+  inline def apply(tree: Tree) = meta {
+    tree match {
+      case q"..$mods val ..$patsnel: $tpeopt = $expr" => {
+        println("definition val")
+        //Unwrap GameRuleSet
+        expr match {
+          case q"$expr(..$aexprssnel)" => {
+            println("  .application")
+            expr match {
+              case q"${name: Term.Name}" => {
+                println("    .name")
+                if (name.value == "GameRuleSet") {
+                  aexprssnel match {
+                    case Seq(name, players, graph, pieces, eConds) => {
+
+                    }
+                  }
+                }
+              }
+            }
+          }
+          case q"_" => {
+            println("wildcard 2")
+          }
+        }
+      }
+      case q"_" => {
+        println("wildcard 1")
+      }
+    }
+    tree
   }
 }
 
-//class RegisterStructure extends StaticAnnotation {
-//  inline def apply(defn: Defn) = meta {
-//    StructureRegistry.add(defn)
-//    defn
-//  }
-//}

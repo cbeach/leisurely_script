@@ -1,6 +1,7 @@
 name := "leisurely_script"
 
 mainClass in (Compile, run) := Some("astTest")
+logLevel in Compile := Level.Error;
 
 
 lazy val commonSettings = Seq(
@@ -15,7 +16,7 @@ lazy val commonSettings = Seq(
   resolvers += Resolver.typesafeRepo("releases"),
   resolvers += Resolver.sonatypeRepo("releases"),
   resolvers += Resolver.sonatypeRepo("snapshots"),
-  addCompilerPlugin("org.scalamacros" % "paradise" % "3.0.0-M4" cross CrossVersion.full),
+  addCompilerPlugin("org.scalamacros" % "paradise" % "3.0.0-M3" cross CrossVersion.full),
   libraryDependencies += "org.scalatest" % "scalatest_2.11" % "3.0.0-RC4",
   libraryDependencies += "org.scalameta" %% "scalameta" % "1.0.0"
 )

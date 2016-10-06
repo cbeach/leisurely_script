@@ -4,9 +4,11 @@ import beachc.ast._
 
 object astTest {
   def main(args: Array[String]): Unit = {
+    //@GameStateGenerator
     val temp: (Int, Int) => List[Int] = (a: Int, b: Int) => {
       List[Int](a, b)
     }
+    //@GameStateGenerator
     val input = CoordinateInput
 
     @GameStateGenerator
@@ -103,6 +105,7 @@ object astTest {
         )
       )
     )
+
     gRS.letsPlayAGame()
   }
 }
