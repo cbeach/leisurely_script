@@ -4,11 +4,6 @@ import beachc.ast._
 
 object astTest {
   def main(args: Array[String]): Unit = {
-    //@GameStateGenerator
-    val temp: (Int, Int) => List[Int] = (a: Int, b: Int) => {
-      List[Int](a, b)
-    }
-    //@GameStateGenerator
     val input = CoordinateInput
 
     @GameStateGenerator
@@ -25,54 +20,54 @@ object astTest {
           Point((0, 2)), Point((1, 2)), Point((2, 2))
         ),
         List(
-          CardinalEdge(Point((0, 0)), Point((0, 1)), East),
-          CardinalEdge(Point((0, 0)), Point((1, 0)), South), 
-          CardinalEdge(Point((0, 0)), Point((1, 1)), SouthEast),
+          BidirectionalEdge(Point((0, 0)), Point((0, 1))),
+          BidirectionalEdge(Point((0, 0)), Point((1, 0))),
+          BidirectionalEdge(Point((0, 0)), Point((1, 1))),
 
-          CardinalEdge(Point((0, 1)), Point((0, 0)), West),
-          CardinalEdge(Point((0, 1)), Point((0, 2)), East),
-          CardinalEdge(Point((0, 1)), Point((1, 0)), SouthWest),
-          CardinalEdge(Point((0, 1)), Point((1, 1)), South),
-          CardinalEdge(Point((0, 1)), Point((1, 2)), SouthEast),
+          BidirectionalEdge(Point((0, 1)), Point((0, 0))),
+          BidirectionalEdge(Point((0, 1)), Point((0, 2))),
+          BidirectionalEdge(Point((0, 1)), Point((1, 0))),
+          BidirectionalEdge(Point((0, 1)), Point((1, 1))),
+          BidirectionalEdge(Point((0, 1)), Point((1, 2))),
 
-          CardinalEdge(Point((0, 2)), Point((0, 1)), West), 
-          CardinalEdge(Point((0, 2)), Point((1, 1)), SouthWest), 
-          CardinalEdge(Point((0, 2)), Point((1, 2)), South), 
+          BidirectionalEdge(Point((0, 2)), Point((0, 1))),
+          BidirectionalEdge(Point((0, 2)), Point((1, 1))),
+          BidirectionalEdge(Point((0, 2)), Point((1, 2))),
 
-          CardinalEdge(Point((1, 0)), Point((0, 0)), North),
-          CardinalEdge(Point((1, 0)), Point((0, 1)), NorthEast),
-          CardinalEdge(Point((1, 0)), Point((1, 1)), East),
-          CardinalEdge(Point((1, 0)), Point((2, 0)), South),
-          CardinalEdge(Point((1, 0)), Point((2, 1)), SouthEast),
+          BidirectionalEdge(Point((1, 0)), Point((0, 0))),
+          BidirectionalEdge(Point((1, 0)), Point((0, 1))),
+          BidirectionalEdge(Point((1, 0)), Point((1, 1))),
+          BidirectionalEdge(Point((1, 0)), Point((2, 0))),
+          BidirectionalEdge(Point((1, 0)), Point((2, 1))),
 
-          CardinalEdge(Point((1, 1)), Point((0, 0)), NorthWest),
-          CardinalEdge(Point((1, 1)), Point((0, 1)), North),
-          CardinalEdge(Point((1, 1)), Point((0, 2)), NorthEast),
-          CardinalEdge(Point((1, 1)), Point((1, 0)), West),
-          CardinalEdge(Point((1, 1)), Point((1, 2)), East),
-          CardinalEdge(Point((1, 1)), Point((2, 0)), SouthWest),
-          CardinalEdge(Point((1, 1)), Point((2, 1)), South),
-          CardinalEdge(Point((1, 1)), Point((2, 2)), SouthEast),
+          BidirectionalEdge(Point((1, 1)), Point((0, 0))),
+          BidirectionalEdge(Point((1, 1)), Point((0, 1))),
+          BidirectionalEdge(Point((1, 1)), Point((0, 2))),
+          BidirectionalEdge(Point((1, 1)), Point((1, 0))),
+          BidirectionalEdge(Point((1, 1)), Point((1, 2))),
+          BidirectionalEdge(Point((1, 1)), Point((2, 0))),
+          BidirectionalEdge(Point((1, 1)), Point((2, 1))),
+          BidirectionalEdge(Point((1, 1)), Point((2, 2))),
 
-          CardinalEdge(Point((1, 2)), Point((0, 1)), NorthWest),
-          CardinalEdge(Point((1, 2)), Point((0, 2)), North),
-          CardinalEdge(Point((1, 2)), Point((1, 1)), West),
-          CardinalEdge(Point((1, 2)), Point((2, 1)), SouthWest),
-          CardinalEdge(Point((1, 2)), Point((2, 2)), South),
+          BidirectionalEdge(Point((1, 2)), Point((0, 1))),
+          BidirectionalEdge(Point((1, 2)), Point((0, 2))),
+          BidirectionalEdge(Point((1, 2)), Point((1, 1))),
+          BidirectionalEdge(Point((1, 2)), Point((2, 1))),
+          BidirectionalEdge(Point((1, 2)), Point((2, 2))),
 
-          CardinalEdge(Point((2, 0)), Point((1, 0)), North),
-          CardinalEdge(Point((2, 0)), Point((1, 1)), NorthEast),
-          CardinalEdge(Point((2, 0)), Point((2, 1)), East),
+          BidirectionalEdge(Point((2, 0)), Point((1, 0))),
+          BidirectionalEdge(Point((2, 0)), Point((1, 1))),
+          BidirectionalEdge(Point((2, 0)), Point((2, 1))),
 
-          CardinalEdge(Point((2, 1)), Point((1, 0)), NorthWest),
-          CardinalEdge(Point((2, 1)), Point((1, 1)), North),
-          CardinalEdge(Point((2, 1)), Point((1, 2)), NorthEast),
-          CardinalEdge(Point((2, 1)), Point((2, 0)), West), 
-          CardinalEdge(Point((2, 1)), Point((2, 2)), East),
+          BidirectionalEdge(Point((2, 1)), Point((1, 0))),
+          BidirectionalEdge(Point((2, 1)), Point((1, 1))),
+          BidirectionalEdge(Point((2, 1)), Point((1, 2))),
+          BidirectionalEdge(Point((2, 1)), Point((2, 0))),
+          BidirectionalEdge(Point((2, 1)), Point((2, 2))),
 
-          CardinalEdge(Point((2, 2)), Point((1, 1)), NorthWest),
-          CardinalEdge(Point((2, 2)), Point((1, 2)), North),
-          CardinalEdge(Point((2, 2)), Point((2, 1)), West)
+          BidirectionalEdge(Point((2, 2)), Point((1, 1))),
+          BidirectionalEdge(Point((2, 2)), Point((1, 2))),
+          BidirectionalEdge(Point((2, 2)), Point((2, 1)))
         )
       ),
       List(Piece("token", AnyPlayer, 

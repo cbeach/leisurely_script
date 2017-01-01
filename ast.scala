@@ -82,7 +82,10 @@ package object ast {
       case None => throw new Exception("Node not found")
     }
   }
+  // Nodes
   case class Point(position: Coordinate) extends Node { }
+
+  // Edges
   abstract class Directed(n1: Node, n2: Node) extends Edge {
     override def traverse(n: Node): Option[Node] = 
       if (n == n1) { Some(n2) } 
@@ -95,6 +98,7 @@ package object ast {
       else if (n == n2) { None } 
       else { None }
   }
+  case class BidirectionalEdge(n1: Node, n2: Node) extends Bidirectional(n1, n2) {}
   case class CardinalEdge(n1: Node, n2: Node, d: CardinalDirection) extends Directed(n1, n2) {}
   trait CardinalDirection
   case object North extends CardinalDirection
