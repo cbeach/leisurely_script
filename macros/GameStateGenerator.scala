@@ -3,6 +3,12 @@ package beachc.metaprogrammers
 import scala.annotation.StaticAnnotation
 import scala.meta._
 
+//class RecursiveGameStateGenerator extends StaticAnnotation {
+//  inline def apply(tree: Any): Any = meta {
+//
+//  }
+//}
+
 class GameStateGenerator extends StaticAnnotation {
   inline def apply(tree: Any): Any = meta {
     tree match {

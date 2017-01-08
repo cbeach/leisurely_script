@@ -1,106 +1,29 @@
 import beachc.metaprogrammers.GameStateGenerator
 import beachc.ast._
+import scala.meta._
 
 
 object astTest {
   def main(args: Array[String]): Unit = {
-    val input = CoordinateInput
-
-    @GameStateGenerator
-    val gRS = GameRuleSet(
-      "Tic-Tac-Toe",
-      List(
-        Person("X", (gs: GameState) => 100),
-        Person("Y", (gs: GameState) => 100)
-      ),
-      Graph(
-        List(
-          Point((0, 0)), Point((1, 0)), Point((2, 0)), 
-          Point((0, 1)), Point((1, 1)), Point((2, 1)), 
-          Point((0, 2)), Point((1, 2)), Point((2, 2))
-        ),
-        List(
-          BidirectionalEdge(Point((0, 0)), Point((0, 1))),
-          BidirectionalEdge(Point((0, 0)), Point((1, 0))),
-          BidirectionalEdge(Point((0, 0)), Point((1, 1))),
-
-          BidirectionalEdge(Point((0, 1)), Point((0, 0))),
-          BidirectionalEdge(Point((0, 1)), Point((0, 2))),
-          BidirectionalEdge(Point((0, 1)), Point((1, 0))),
-          BidirectionalEdge(Point((0, 1)), Point((1, 1))),
-          BidirectionalEdge(Point((0, 1)), Point((1, 2))),
-
-          BidirectionalEdge(Point((0, 2)), Point((0, 1))),
-          BidirectionalEdge(Point((0, 2)), Point((1, 1))),
-          BidirectionalEdge(Point((0, 2)), Point((1, 2))),
-
-          BidirectionalEdge(Point((1, 0)), Point((0, 0))),
-          BidirectionalEdge(Point((1, 0)), Point((0, 1))),
-          BidirectionalEdge(Point((1, 0)), Point((1, 1))),
-          BidirectionalEdge(Point((1, 0)), Point((2, 0))),
-          BidirectionalEdge(Point((1, 0)), Point((2, 1))),
-
-          BidirectionalEdge(Point((1, 1)), Point((0, 0))),
-          BidirectionalEdge(Point((1, 1)), Point((0, 1))),
-          BidirectionalEdge(Point((1, 1)), Point((0, 2))),
-          BidirectionalEdge(Point((1, 1)), Point((1, 0))),
-          BidirectionalEdge(Point((1, 1)), Point((1, 2))),
-          BidirectionalEdge(Point((1, 1)), Point((2, 0))),
-          BidirectionalEdge(Point((1, 1)), Point((2, 1))),
-          BidirectionalEdge(Point((1, 1)), Point((2, 2))),
-
-          BidirectionalEdge(Point((1, 2)), Point((0, 1))),
-          BidirectionalEdge(Point((1, 2)), Point((0, 2))),
-          BidirectionalEdge(Point((1, 2)), Point((1, 1))),
-          BidirectionalEdge(Point((1, 2)), Point((2, 1))),
-          BidirectionalEdge(Point((1, 2)), Point((2, 2))),
-
-          BidirectionalEdge(Point((2, 0)), Point((1, 0))),
-          BidirectionalEdge(Point((2, 0)), Point((1, 1))),
-          BidirectionalEdge(Point((2, 0)), Point((2, 1))),
-
-          BidirectionalEdge(Point((2, 1)), Point((1, 0))),
-          BidirectionalEdge(Point((2, 1)), Point((1, 1))),
-          BidirectionalEdge(Point((2, 1)), Point((1, 2))),
-          BidirectionalEdge(Point((2, 1)), Point((2, 0))),
-          BidirectionalEdge(Point((2, 1)), Point((2, 2))),
-
-          BidirectionalEdge(Point((2, 2)), Point((1, 1))),
-          BidirectionalEdge(Point((2, 2)), Point((1, 2))),
-          BidirectionalEdge(Point((2, 2)), Point((2, 1)))
-        )
-      ),
-      List(Piece("token", AnyPlayer, 
-        LegalMove(
-          AnyPlayer, 
-          (gs: GameState) => {
-            gs.space(0)(input()).isEmpty
-          },
-          Push("token", input())
-        )
-      )),
-      List(
-        EndCondition(
-          CurrentPlayer,
-          (gS: GameState) => if (gS.ThreeInARow(PreviousPlayer, "token")) {
-            Win
-          } else {
-            Pending
-          }
-        ),
-        EndCondition(
-          CurrentPlayer,
-          (gS: GameState) => {
-            if (gS.boardFull && !gS.ThreeInARow(PreviousPlayer, "token")) {
-              Draw
-            } else {
-              Pending
+    val ttt = new java.io.File("./tttImpl.lsrl").parse[Source].get
+    def r(children: Seq[Tree]): Unit = {
+      children.foreach((child) => {
+        child.children match {
+          case h :: t => {
+            r(h.children)
+            r(t)
+            h match {
+              case Term.Name("GameRuleSet") => println("found the gRS")
+              case _ => {}
             }
           }
-        )
-      )
-    )
-
-    gRS.letsPlayAGame()
+          case h :: Nil => {
+            //println(s"leaf: ${h}")
+          }
+          case Nil => { }
+        }
+      })
+    }
+    r(ttt.children)
   }
 }
