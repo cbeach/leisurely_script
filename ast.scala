@@ -11,6 +11,7 @@ package object ast {
   trait NodeInput extends Input[Node] {
     def apply(): Node
   }
+  // Change this to a button?
   case object CoordinateInput extends NodeInput {
     var x: Int = -1
     var y: Int = -1
@@ -23,7 +24,7 @@ package object ast {
 
   // Signal to the meta programmer that an artifact needs access to the implementation's state.
   class GameState(val name:Name) { 
-    val space: List[Graph] = List[Graph]() 
+    val layers: List[Graph] = List[Graph]() 
     def place(owner: Player, piece: Piece, node: Node): GameState = this
     def push(owner: Player, piece: Piece, node: Node): GameState = this
     def pop(owner: Player, piece: Piece, node: Node): GameState = this
@@ -59,6 +60,28 @@ package object ast {
   case object NoPlayer extends Player {}
   case object AnyPlayer extends Player {}
   case class SomePlayers(players: Players) extends Player {}
+
+  /**
+   * Play style
+   **/
+  trait PlayStyle
+  case object Antagonistic extends PlayStyle
+  case object Oportunistic extends PlayStyle
+  case object Cooperative extends PlayStyle
+
+  /**
+   * Turn style
+   **/
+  trait TurnStyle
+  case object Sequential extends TurnStyle
+  case object Simultaneous extends TurnStyle
+  case object Mixed extends TurnStyle
+  case object FixedTime extends TurnStyle
+
+  /**
+   * Turn phase
+   **/
+  trait TurnPhase
 
   /**
    * Graph definitions

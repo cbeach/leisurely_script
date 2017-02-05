@@ -1,6 +1,6 @@
 name := "leisurely_script"
 
-mainClass in (Compile, run) := Some("astTest")
+mainClass in (Compile, run) := Some("beachc.Main")
 logLevel in Compile := Level.Error;
 
 

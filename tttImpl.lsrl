@@ -3,76 +3,90 @@ object Tic_Tac_Toe {
     Person("X", (gs: GameState) => 100),
     Person("Y", (gs: GameState) => 100)
   )
-  val graph = Graph(
-    List(
-      Point((0, 0)), Point((1, 0)), Point((2, 0)), 
-      Point((0, 1)), Point((1, 1)), Point((2, 1)), 
-      Point((0, 2)), Point((1, 2)), Point((2, 2))
-    ),
-    List(
-      BidirectionalEdge(Point((0, 0)), Point((0, 1))),
-      BidirectionalEdge(Point((0, 0)), Point((1, 0))),
-      BidirectionalEdge(Point((0, 0)), Point((1, 1))),
+  val inputs = List(
+      ButtonInput((0, 0)), ButtonInput((1, 0)), ButtonInput((2, 0)), 
+      ButtonInput((0, 1)), ButtonInput((1, 1)), ButtonInput((2, 1)), 
+      ButtonInput((0, 2)), ButtonInput((1, 2)), ButtonInput((2, 2))
+  )
+  val playStyle = Antagonistic
+  val turns = Sequential
+  // Add the "Layer" abstraction on top of the Graph
+  val layers = List(
+    Graph(
+      List(
+        Point((0, 0)), Point((0, 1)), Point((0, 2)), 
+        Point((1, 0)), Point((1, 1)), Point((1, 2)), 
+        Point((2, 0)), Point((2, 1)), Point((2, 2)), 
+      ),
+      List(
+        BidirectionalEdge(Point((0, 0)), Point((0, 1))),
+        BidirectionalEdge(Point((0, 0)), Point((1, 0))),
+        BidirectionalEdge(Point((0, 0)), Point((1, 1))),
 
-      BidirectionalEdge(Point((0, 1)), Point((0, 0))),
-      BidirectionalEdge(Point((0, 1)), Point((0, 2))),
-      BidirectionalEdge(Point((0, 1)), Point((1, 0))),
-      BidirectionalEdge(Point((0, 1)), Point((1, 1))),
-      BidirectionalEdge(Point((0, 1)), Point((1, 2))),
+        BidirectionalEdge(Point((0, 1)), Point((0, 0))),
+        BidirectionalEdge(Point((0, 1)), Point((0, 2))),
+        BidirectionalEdge(Point((0, 1)), Point((1, 0))),
+        BidirectionalEdge(Point((0, 1)), Point((1, 1))),
+        BidirectionalEdge(Point((0, 1)), Point((1, 2))),
 
-      BidirectionalEdge(Point((0, 2)), Point((0, 1))),
-      BidirectionalEdge(Point((0, 2)), Point((1, 1))),
-      BidirectionalEdge(Point((0, 2)), Point((1, 2))),
+        BidirectionalEdge(Point((0, 2)), Point((0, 1))),
+        BidirectionalEdge(Point((0, 2)), Point((1, 1))),
+        BidirectionalEdge(Point((0, 2)), Point((1, 2))),
 
-      BidirectionalEdge(Point((1, 0)), Point((0, 0))),
-      BidirectionalEdge(Point((1, 0)), Point((0, 1))),
-      BidirectionalEdge(Point((1, 0)), Point((1, 1))),
-      BidirectionalEdge(Point((1, 0)), Point((2, 0))),
-      BidirectionalEdge(Point((1, 0)), Point((2, 1))),
+        BidirectionalEdge(Point((1, 0)), Point((0, 0))),
+        BidirectionalEdge(Point((1, 0)), Point((0, 1))),
+        BidirectionalEdge(Point((1, 0)), Point((1, 1))),
+        BidirectionalEdge(Point((1, 0)), Point((2, 0))),
+        BidirectionalEdge(Point((1, 0)), Point((2, 1))),
 
-      BidirectionalEdge(Point((1, 1)), Point((0, 0))),
-      BidirectionalEdge(Point((1, 1)), Point((0, 1))),
-      BidirectionalEdge(Point((1, 1)), Point((0, 2))),
-      BidirectionalEdge(Point((1, 1)), Point((1, 0))),
-      BidirectionalEdge(Point((1, 1)), Point((1, 2))),
-      BidirectionalEdge(Point((1, 1)), Point((2, 0))),
-      BidirectionalEdge(Point((1, 1)), Point((2, 1))),
-      BidirectionalEdge(Point((1, 1)), Point((2, 2))),
+        BidirectionalEdge(Point((1, 1)), Point((0, 0))),
+        BidirectionalEdge(Point((1, 1)), Point((0, 1))),
+        BidirectionalEdge(Point((1, 1)), Point((0, 2))),
+        BidirectionalEdge(Point((1, 1)), Point((1, 0))),
+        BidirectionalEdge(Point((1, 1)), Point((1, 2))),
+        BidirectionalEdge(Point((1, 1)), Point((2, 0))),
+        BidirectionalEdge(Point((1, 1)), Point((2, 1))),
+        BidirectionalEdge(Point((1, 1)), Point((2, 2))),
 
-      BidirectionalEdge(Point((1, 2)), Point((0, 1))),
-      BidirectionalEdge(Point((1, 2)), Point((0, 2))),
-      BidirectionalEdge(Point((1, 2)), Point((1, 1))),
-      BidirectionalEdge(Point((1, 2)), Point((2, 1))),
-      BidirectionalEdge(Point((1, 2)), Point((2, 2))),
+        BidirectionalEdge(Point((1, 2)), Point((0, 1))),
+        BidirectionalEdge(Point((1, 2)), Point((0, 2))),
+        BidirectionalEdge(Point((1, 2)), Point((1, 1))),
+        BidirectionalEdge(Point((1, 2)), Point((2, 1))),
+        BidirectionalEdge(Point((1, 2)), Point((2, 2))),
 
-      BidirectionalEdge(Point((2, 0)), Point((1, 0))),
-      BidirectionalEdge(Point((2, 0)), Point((1, 1))),
-      BidirectionalEdge(Point((2, 0)), Point((2, 1))),
+        BidirectionalEdge(Point((2, 0)), Point((1, 0))),
+        BidirectionalEdge(Point((2, 0)), Point((1, 1))),
+        BidirectionalEdge(Point((2, 0)), Point((2, 1))),
 
-      BidirectionalEdge(Point((2, 1)), Point((1, 0))),
-      BidirectionalEdge(Point((2, 1)), Point((1, 1))),
-      BidirectionalEdge(Point((2, 1)), Point((1, 2))),
-      BidirectionalEdge(Point((2, 1)), Point((2, 0))),
-      BidirectionalEdge(Point((2, 1)), Point((2, 2))),
+        BidirectionalEdge(Point((2, 1)), Point((1, 0))),
+        BidirectionalEdge(Point((2, 1)), Point((1, 1))),
+        BidirectionalEdge(Point((2, 1)), Point((1, 2))),
+        BidirectionalEdge(Point((2, 1)), Point((2, 0))),
+        BidirectionalEdge(Point((2, 1)), Point((2, 2))),
 
-      BidirectionalEdge(Point((2, 2)), Point((1, 1))),
-      BidirectionalEdge(Point((2, 2)), Point((1, 2))),
-      BidirectionalEdge(Point((2, 2)), Point((2, 1)))
+        BidirectionalEdge(Point((2, 2)), Point((1, 1))),
+        BidirectionalEdge(Point((2, 2)), Point((1, 2))),
+        BidirectionalEdge(Point((2, 2)), Point((2, 1)))
+      )
     )
   )
   val pieces = List(Piece("token", AnyPlayer, 
     LegalMove(
       AnyPlayer, 
-      (gs: GameState) => {
-        gs.space(0)(CoordinateInput()).isEmpty
+      (coord: CoordinateInput, player: Player, gs: GameState): Boolean => {
+        gs.layers(0)(coord.x)(coord.y).isEmpty && gs.players(gs.currentPlayer) == player
       },
-      Push("token", CoordinateInput())
+      // I really don't like this signature, needs to be more general
+      (coord: CoordinateInput, player: Player, gs: GameState) => {
+        gs.layers(0)(coord.x)(coord.y).push("token")
+        gs.nextTurn()
+      }
     )
   ))
   val endConditions = List(
     EndCondition(
       CurrentPlayer,
-      (gS: GameState) => if (gS.ThreeInARow(PreviousPlayer, "token")) {
+      (gs: GameState) => if (gs.ThreeInARow(PreviousPlayer, "token")) {
         Win
       } else {
         Pending
@@ -90,12 +104,3 @@ object Tic_Tac_Toe {
     )
   )
 }
-//object tttImpl {
-//  // Represent the players
-//  // Represent the graph
-//  // Represent the pieces
-//  // Represent the end conditions
-//  def main(args: Array[String]): Unit = {
-//    
-//  }
-//}
