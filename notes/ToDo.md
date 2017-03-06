@@ -1,6 +1,11 @@
 # In Progress
+  - update ast
+    - fix the subclass bug in the legal move definition.
+      - The error is reproduced by temp.scala
 
 # Backlog
+  - refactor directory structure
+  - open, run, test in IntelliJ
   - figure out how to unit test the implementations
   - write some unit tests for implementations
   - start working on "compilation"

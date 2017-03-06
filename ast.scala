@@ -1,65 +1,48 @@
 package beachc
 
+import runTime.GameState
+
 package object ast {
-  implicit def tupleToCoord(t: Tuple2[Int, Int]): Coordinate = Coordinate(t._1, t._2)
-  implicit def CoordToPoint(c: Coordinate): Point = new Point(c)
-
-  type Layer = Int
-  trait Input[T] {
-    def apply(): T
-  }
-  trait NodeInput extends Input[Node] {
-    def apply(): Node
-  }
-  // Change this to a button?
-  case object CoordinateInput extends NodeInput {
-    var x: Int = -1
-    var y: Int = -1
-
-    override def apply(): Point = Point(Coordinate(x, y))
-  }
-  abstract class NodeSelection extends Input[Node] {
-    def apply: Node = new Point((0, 0))
+  object Conversions {
+    implicit def TwoTuple2Discrete2DCoordinate(rawCoord: (Int, Int)): Discrete2DCoordinate = Discrete2DCoordinate(rawCoord._1, rawCoord._2)
+    implicit def CoordToPoint(c: Discrete2DCoordinate): PointNode = PointNode(c)
   }
 
-  // Signal to the meta programmer that an artifact needs access to the implementation's state.
-  class GameState(val name:Name) { 
-    val layers: List[Graph] = List[Graph]() 
-    def place(owner: Player, piece: Piece, node: Node): GameState = this
-    def push(owner: Player, piece: Piece, node: Node): GameState = this
-    def pop(owner: Player, piece: Piece, node: Node): GameState = this
-    def TwoInARow(owner: Player, piece: Piece): Boolean = true
-    def TwoInARow(owner: Player, piece: String): Boolean = true
-    def ThreeInARow(owner: Player, piece: Piece): Boolean = true
-    def ThreeInARow(owner: Player, piece: String): Boolean = true
-    def FourInARow(owner: Player, piece: Piece): Boolean = true
-    def FourInARow(owner: Player, piece: String): Boolean = true
-    def boardFull: Boolean = true
-    def boardFull(l: Layer): Boolean = true
-    def boardEmpty: Boolean = true
-    def boardEmpty(l: Layer): Boolean = true
-  }
-  type ScoringFunction = (GameState) => Double
-  
-  case class GameRuleSet(name: Name, players: Players, board: Graph, pieces: Pieces, endConds: EndConditions) {
-    def letsPlayAGame() = {}
-  }
   type Name = String
+  type Layer = Int
 
+  // Inputs
+  trait Input
+  abstract class PlayerInput[L](label: L) extends Input {}
+  case class ButtonInput[L](label: L) extends PlayerInput(label) {}
+  
+  abstract class GameRuleSet(name: Name) {
+    val playStyle: PlayStyle
+    val turns: TurnStyle
+    val players: List[Player]
+    val graph: Graph
+    val pieces: List[Piece]
+    val legalMoves: List[LegalMove]
+    val endConditions: List[EndCondition]
+    val inputs: List[Input]  
+  }
   /**
    * Player definitions
    **/
-  type Players = List[Player]
-  trait Player
-  case class Person(val name:Name, sF: ScoringFunction) extends Player {}
-  case class Computer(val name:Name, sF: ScoringFunction) extends Player {}
-  case object PreviousPlayer extends Player {}
-  case object CurrentPlayer extends Player {}
-  case object NextPlayer extends Player {}
-  case object AllPlayers extends Player {}
-  case object NoPlayer extends Player {}
-  case object AnyPlayer extends Player {}
-  case class SomePlayers(players: Players) extends Player {}
+  class Player(val name: String) {
+    override def toString: String = s"Player(${name})"
+  }
+  object Player {
+    def apply(name: String): Player = new Player(name)
+  }
+  case class PlayerState(player: Player, var state: GameOutcome = Pending) {}
+  object PreviousPlayer extends Player("Last")
+  object CurrentPlayer extends Player("Current")
+  object NextPlayer extends Player("Next")
+  object AnyPlayer extends Player("Any")
+  object AllPlayers extends Player("All")
+  object NoPlayer extends Player("None") {}
+  object NullPlayer extends Player("Null")
 
   /**
    * Play style
@@ -91,13 +74,13 @@ package object ast {
   case object Indirect extends NeighborType
   case object NoDirect extends NeighborType
   trait Node {
-    var stack: List[Entity] = List[Entity]()
-    def isEmpty: Boolean = stack.isEmpty
+    var pieces: List[Entity] = List[Entity]()
+    def isEmpty: Boolean = pieces.isEmpty
   }
   trait Edge {
     def traverse(n: Node): Option[Node]
   }
-  case class Coordinate(_1: Int, _2: Int) {}
+  case class Discrete2DCoordinate(x: Int, y: Int) {}
 
   case class Graph(nodes: List[Node], edges: List[Edge]) {
     def apply(n: Node): Node = nodes.find(_ == n) match {
@@ -106,7 +89,7 @@ package object ast {
     }
   }
   // Nodes
-  case class Point(position: Coordinate) extends Node { }
+  case class PointNode(position: Discrete2DCoordinate) extends Node { }
 
   // Edges
   abstract class Directed(n1: Node, n2: Node) extends Edge {
@@ -139,37 +122,35 @@ package object ast {
   case class Attribute[T](attr: T)
 
   trait Action 
-  case class Push(pieceName: Name, node:Node) extends Action
-  case class Pop(pieceName: Name, node:Node) extends Action
-  case class Place(pieceName: Name, node:Node) extends Action
+  object Push extends Action
+  object Pop extends Action
+  object Place extends Action
   case class SetAttribute(pieceName: Name, attr:Attribute[_]) extends Action 
 
-  case object PushToken extends Action {
-    def apply(gS: GameState): GameState = new GameState("TicTacToe") //gS.push(CurrentPlayer, 
-  }
   case class LegalMove(
     initiator: Player, 
-    precondition: (GameState) => Boolean=(gs:GameState)=>true, 
+    label: String,
+    precondition: (Input, Player, GameState) => Boolean=(in, player, gs)=>true, 
     action: Action, 
-    postcondition: (GameState) => Boolean=(gs:GameState)=>true) {}
+    postcondition: (Input, Player, GameState) => Boolean=(in, player, gs)=>true) {}
 
   /**
    * Piece definitions
    **/
   trait Entity
   type Pieces = List[Piece]
-  case class Piece(name: Name, owner: Player, moves: LegalMove) extends Entity {}
+  case class Piece(name: Name, owner: Player) extends Entity {}
 
   /**
    * EndCondition definitions
    **/
   type EndConditions = List[EndCondition]
-  type GameCondition = (GameState) => EndState
+  type GameCondition = (GameState) => GameOutcome
   case class EndCondition(val player:Player, cond: GameCondition) {}
 
-  trait EndState 
-  case object Win extends EndState
-  case object Lose extends EndState
-  case object Draw extends EndState
-  case object Pending extends EndState
+  trait GameOutcome 
+  case object Win extends GameOutcome
+  case object Lose extends GameOutcome
+  case object Draw extends GameOutcome
+  case object Pending extends GameOutcome
 }

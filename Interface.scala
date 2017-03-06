@@ -27,7 +27,7 @@ package object Interfaces {
           s"${gs.players(gs.currentPlayer)}${"$"} "
         }, () => {
           gs.inputs.view.zipWithIndex.map({
-            case (input: ButtonInput[DiscreteCoord2D], i: Int) => s"$i. ${input.label}"
+            case (input: ButtonInput[Discrete2DCoordinate], i: Int) => s"$i. ${input.label}"
           }).mkString("\n")
         }
       )
@@ -61,8 +61,8 @@ package object Interfaces {
       board foreach((l) => {
         val lp = l.map(_.pieces match {
           case h :: Nil => h match {
-            case Piece_token_X => X
-            case Piece_token_O => O
+            case Token_X => X
+            case Token_O => O
           }
           case Nil => E
         })
