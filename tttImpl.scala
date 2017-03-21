@@ -1,11 +1,10 @@
-package beachc
+package org.beachc.leisurely
 
-import beachc.metaprogrammers.GameStateGenerator
+import org.beachc.leisurely.metaprogrammers.GameStateGenerator
 import scala.meta._
 
+import org.beachc.leisurely.implicits._
 import ast._
-import ast.{Input => GameInput}
-import ast.Conversions._
 import runTime.GameState
 
 //@GameStateGenerator
@@ -81,7 +80,7 @@ object Tic_Tac_Toe extends GameRuleSet("TicTacToe") {
     LegalMove(
       AnyPlayer, 
       "token",
-      (in: GameInput, player: Player, gs: GameState) => in match {
+      (in: Input, player: Player, gs: GameState) => in match {
 
         case ButtonInput(coord: Discrete2DCoordinate) => (gs.graph((coord.x, coord.y)).isEmpty && gs.players(gs.currentPlayer) == player)
         case _ => false

@@ -1,21 +1,9 @@
-package beachc
+package org.beachc.leisurely
 
 import runTime.GameState
 
 package object ast {
-  object Conversions {
-    implicit def TwoTuple2Discrete2DCoordinate(rawCoord: (Int, Int)): Discrete2DCoordinate = Discrete2DCoordinate(rawCoord._1, rawCoord._2)
-    implicit def CoordToPoint(c: Discrete2DCoordinate): PointNode = PointNode(c)
-  }
 
-  type Name = String
-  type Layer = Int
-
-  // Inputs
-  trait Input
-  abstract class PlayerInput[L](label: L) extends Input {}
-  case class ButtonInput[L](label: L) extends PlayerInput(label) {}
-  
   abstract class GameRuleSet(name: Name) {
     val playStyle: PlayStyle
     val turns: TurnStyle
@@ -26,23 +14,6 @@ package object ast {
     val endConditions: List[EndCondition]
     val inputs: List[Input]  
   }
-  /**
-   * Player definitions
-   **/
-  class Player(val name: String) {
-    override def toString: String = s"Player(${name})"
-  }
-  object Player {
-    def apply(name: String): Player = new Player(name)
-  }
-  case class PlayerState(player: Player, var state: GameOutcome = Pending) {}
-  object PreviousPlayer extends Player("Last")
-  object CurrentPlayer extends Player("Current")
-  object NextPlayer extends Player("Next")
-  object AnyPlayer extends Player("Any")
-  object AllPlayers extends Player("All")
-  object NoPlayer extends Player("None") {}
-  object NullPlayer extends Player("Null")
 
   /**
    * Play style
@@ -73,6 +44,7 @@ package object ast {
   case object Direct extends NeighborType
   case object Indirect extends NeighborType
   case object NoDirect extends NeighborType
+
   trait Node {
     var pieces: List[Entity] = List[Entity]()
     def isEmpty: Boolean = pieces.isEmpty
@@ -80,7 +52,6 @@ package object ast {
   trait Edge {
     def traverse(n: Node): Option[Node]
   }
-  case class Discrete2DCoordinate(x: Int, y: Int) {}
 
   case class Graph(nodes: List[Node], edges: List[Edge]) {
     def apply(n: Node): Node = nodes.find(_ == n) match {
@@ -89,7 +60,9 @@ package object ast {
     }
   }
   // Nodes
-  case class PointNode(position: Discrete2DCoordinate) extends Node { }
+  case class PointNode(position: Discrete2DCoordinate) extends Node {
+    def apply(rawCoord: (Int, Int)): PointNode = PointNode(Discrete2DCoordinate(rawCoord._1, rawCoord._2))  
+  }
 
   // Edges
   abstract class Directed(n1: Node, n2: Node) extends Edge {
@@ -104,6 +77,7 @@ package object ast {
       else if (n == n2) { None } 
       else { None }
   }
+
   case class BidirectionalEdge(n1: Node, n2: Node) extends Bidirectional(n1, n2) {}
   case class CardinalEdge(n1: Node, n2: Node, d: CardinalDirection) extends Directed(n1, n2) {}
   trait CardinalDirection

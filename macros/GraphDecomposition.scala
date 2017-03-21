@@ -1,4 +1,4 @@
-package beachc.metaprogrammers
+package org.beachc.leisurely.metaprogrammers
 
 import scala.meta._
 
@@ -29,7 +29,6 @@ object DecomposeGraph {
 
 object DecomposeNodes {
   def apply(nodeList: Tree): Any = {
-    var i: Int = 0
     nodeList.children.foreach((node) => {
       node match {
         case q"${name: Term.Name}" => {

@@ -1,6 +1,6 @@
-package beachc.ast
+package org.beachc.leisurely.ast
 
-import Conversions._
+import org.beachc.leisurely.implicits._
 
 package object graphs {
   val TTTBoard = 

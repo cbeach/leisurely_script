@@ -1,27 +1,11 @@
-package beachc
-import ast.{
-  Player,
-  PreviousPlayer,
-  CurrentPlayer,
-  NextPlayer,
-  AnyPlayer,
-  AllPlayers,
-  NullPlayer
-}
-
+package org.beachc.leisurely
 
 package object runTime {
-  type Name = String
-  type Layer = Int
-
-  object Conversions {
-    implicit def TwoTuple2Discrete2DCoordinate(rawCoord: (Int, Int)): Discrete2DCoordinate = Discrete2DCoordinate(rawCoord._1, rawCoord._2)
-  }
 
   abstract class GameState(val name:Name) { 
     val players: List[Player]
     val playersState: Map[Player, PlayerState]
-    val inputs: List[Input[_]]
+    val inputs: List[InputImplementation[_]]
     val graph: Map[(Int, Int), PointNode]
     val nodes: List[Node]
     val endConditions: List[EndCondition]
@@ -93,7 +77,6 @@ package object runTime {
   }
   
   // Graph code
-  case class Discrete2DCoordinate(x: Int, y: Int) {}
   abstract class Node(label: Any) {
     var pieces: List[Piece] = List()
     def push(piece: Piece): Unit = {
@@ -114,12 +97,12 @@ package object runTime {
   case object NullPiece extends Piece(NullPlayer) {}
 
   // Inputs
-  abstract class Input[L](gs: GameState, label: L, callbacks: List[Function3[L, Player, GameState, Boolean]]) {
+  abstract class InputImplementation[L](gs: GameState, label: L, callbacks: List[Function3[L, Player, GameState, Boolean]]) {
     def trigger(player: Player): Unit = {
       callbacks.foreach(_(label, player, gs))
     }
   }
-  case class ButtonInput[L](gs: GameState, label: L, callbacks: List[Function3[L, Player, GameState, Boolean]]) extends Input(gs, label, callbacks) {}
+  case class ButtonInputImplementation[L](gs: GameState, label: L, callbacks: List[Function3[L, Player, GameState, Boolean]]) extends InputImplementation(gs, label, callbacks) {}
 
   trait GameOutcome
   case object Win extends GameOutcome {}

@@ -1,7 +1,5 @@
 # In Progress
   - update ast
-    - fix the subclass bug in the legal move definition.
-      - The error is reproduced by temp.scala
 
 # Backlog
   - refactor directory structure
@@ -19,6 +17,8 @@
       - legal moves
 
 # Completed
+  - fix the subclass bug in the legal move definition.
+    - The error is reproduced by temp.scala
   - create a very simple cli interface for the ttt example implementation
     - automate it
   - implement the end conditions

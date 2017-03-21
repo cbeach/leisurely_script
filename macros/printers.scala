@@ -1,4 +1,4 @@
-package beachc.printers
+package org.beachc.leisurely.metaprogrammers
 
 import scala.annotation.StaticAnnotation
 import scala.meta._

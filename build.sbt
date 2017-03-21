@@ -1,8 +1,7 @@
 name := "leisurely_script"
 
-mainClass in (Compile, run) := Some("beachc.Main")
+mainClass in (Compile, run) := Some("org.beachc.leisurely.game.implementations.Main")
 logLevel in Compile := Level.Error;
-
 
 lazy val commonSettings = Seq(
   scalaVersion := "2.11.8",

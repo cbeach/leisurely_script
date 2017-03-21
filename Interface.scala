@@ -1,8 +1,9 @@
-package beachc
+package org.beachc.leisurely.runTime
 
-import beachc.runTime._
 import scala.util.{Try, Success, Failure}
 import scala.annotation.tailrec
+import org.beachc.leisurely._
+import org.beachc.leisurely.game.implementations.TicTacToe._
 
 package object Interfaces {
   case class TicTacToe_CLIInterface(gs: TicTacToe) {
@@ -27,7 +28,7 @@ package object Interfaces {
           s"${gs.players(gs.currentPlayer)}${"$"} "
         }, () => {
           gs.inputs.view.zipWithIndex.map({
-            case (input: ButtonInput[Discrete2DCoordinate], i: Int) => s"$i. ${input.label}"
+            case (input: ButtonInputImplementation[Discrete2DCoordinate], i: Int) => s"$i. ${input.label}"
           }).mkString("\n")
         }
       )
