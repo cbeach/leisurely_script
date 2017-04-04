@@ -7,14 +7,14 @@ import org.beachc.leisurely.implicits._
 import ast._
 import runTime.GameState
 
-//@GameStateGenerator
+@GameStateGenerator
 object Tic_Tac_Toe extends GameRuleSet("TicTacToe") {
   val players = List(
     Player("X"),
     Player("Y")
   )
   val playStyle = Antagonistic
-  val turns = Sequential
+  val turnStyle = Sequential
   // Add the "Layer" abstraction on top of the Graph
   val graph = Graph(
     List(

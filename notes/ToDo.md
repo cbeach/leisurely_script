@@ -1,5 +1,6 @@
 # In Progress
-  - update ast
+  - start working on "compilation"
+    2. decompose the test program into an ast
 
 # Backlog
   - refactor directory structure
@@ -17,6 +18,7 @@
       - legal moves
 
 # Completed
+  - update ast
   - fix the subclass bug in the legal move definition.
     - The error is reproduced by temp.scala
   - create a very simple cli interface for the ttt example implementation
