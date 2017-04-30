@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+rm -rf macros/target/scala-2.11/classes/org/beachc/leisurely/
+rm -rf target/scala-2.11/classes/org/beachc/leisurely/
+sbt compile

@@ -4,10 +4,10 @@ import org.beachc.leisurely.metaprogrammers.GameStateGenerator
 import scala.meta._
 
 import org.beachc.leisurely.implicits._
-import ast._
+import org.beachc.leisurely.ast._
 import runTime.GameState
 
-@GameStateGenerator
+//@GameStateGenerator
 object Tic_Tac_Toe extends GameRuleSet("TicTacToe") {
   val players = List(
     Player("X"),

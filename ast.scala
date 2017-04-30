@@ -6,7 +6,7 @@ package object ast {
 
   abstract class GameRuleSet(name: Name) {
     val playStyle: PlayStyle
-    val turns: TurnStyle
+    val turnStyle: TurnStyle
     val players: List[Player]
     val graph: Graph
     val pieces: List[Piece]
